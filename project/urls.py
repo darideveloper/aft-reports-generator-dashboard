@@ -2,12 +2,18 @@ from django.contrib import admin
 from django.views.generic import RedirectView
 from django.urls import include, path
 
-
 from rest_framework import routers
+
+from survey import views as survey_views
 
 
 # Setup drf router
 router = routers.DefaultRouter()
+router.register(
+    r'companies',
+    survey_views.CompanyViewSet,
+    basename='companies'
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
