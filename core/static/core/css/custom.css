@@ -1,0 +1,38 @@
+.debug {
+  border: 1px solid red;
+}
+
+.debug {
+  border: 1px solid red;
+}
+
+h1 img {
+  width: 300px;
+}
+
+#jazzy-logo img {
+  box-shadow: none !important;
+}
+
+.select2-selection__choice__display {
+  padding-left: 10px !important;
+  color: black;
+}
+
+.rendered-media {
+  display: block;
+  height: auto;
+}
+.rendered-media.rendered-image {
+  height: 120px;
+}
+.rendered-media.rendered-icon {
+  width: 35px;
+}
+.rendered-media.rendered-video {
+  width: 300px;
+}
+.rendered-media.rendered-audio {
+  width: 300px;
+  height: 50px;
+}/*# sourceMappingURL=custom.css.map */

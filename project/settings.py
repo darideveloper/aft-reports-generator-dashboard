@@ -165,17 +165,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Jazzmin (layout template) settings
 JAZZMIN_SETTINGS = {
     # Text
-    "site_title": "Cake Store Mommy Dashboard",
+    "site_title": "AFT Reports Generator",
     "site_header": "Admin",
-    "site_brand": "CSM Dashboard",
-    "welcome_sign": "Bienvenido a Cake Store Mommy Dashboard",
+    "site_brand": "AFT Dashboard",
+    "welcome_sign": "Bienvenido a AFT Reports Generator",
     "copyright": "Powered by Dari Developer",
 
     # Media
     "site_logo": "core/imgs/favicon.ico",
     "login_logo": "core/imgs/logo.webp",
     "login_logo_dark": "core/imgs/logo.webp",
-    "site_logo_classes": "img-circle",
+    "site_logo_classes": "",
     "site_icon": "core/imgs/favicon.ico",
     
     # Search model in header
@@ -263,7 +263,7 @@ JAZZMIN_SETTINGS = {
     # (use custom_css to supply font otherwise)
     "use_google_fonts_cdn": True,
     # Whether to show the UI customizer on the sidebar
-    "show_ui_builder": False,
+    "show_ui_builder": True,
 
     ###############
     # Change view #
