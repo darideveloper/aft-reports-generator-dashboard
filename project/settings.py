@@ -244,7 +244,13 @@ JAZZMIN_SETTINGS = {
         "auth.Group": "fas fa-users",
         
         # Survey
-        
+        "survey.Company": "fas fa-building",
+        "survey.Survey": "fas fa-poll",
+        "survey.QuestionGroup": "fas fa-file-circle-question",
+        "survey.Question": "fas fa-question",
+        "survey.QuestionOption": "fas fa-ellipsis-vertical",
+        "survey.Participant": "fas fa-user",
+        "survey.Answer": "fas fa-check",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
