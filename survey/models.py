@@ -6,16 +6,27 @@ from utils.text_generation import get_uuid
 class Company(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, verbose_name="Nombre", unique=True)
-    details = models.TextField(blank=True, null=True, verbose_name="Detalles")
+    details = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Detalles",
+        help_text="Detalles adicionales de la empresa. "
+        "Información interna, no visible en los reportes",
+    )
     logo = models.ImageField(
-        upload_to="companies/logos/", blank=True, null=True, verbose_name="Logo"
+        upload_to="companies/logos/",
+        blank=True,
+        null=True,
+        verbose_name="Logo",
+        help_text="Logo de la empresa. Se mostrará en los reportes",
     )
     invitation_code = models.CharField(
         max_length=255,
         verbose_name="Código de Invitación",
         unique=True,
         default=get_uuid,
-        editable=False,
+        help_text="Código de invitación para acceder a la encuesta."
+        "Ejemplo: LeadForwardNissan2025",
     )
     is_active = models.BooleanField(default=True, verbose_name="Activo")
     created_at = models.DateTimeField(auto_now_add=True)
