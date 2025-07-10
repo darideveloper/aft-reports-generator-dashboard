@@ -12,8 +12,8 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(models.Survey)
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ("name", "description", "created_at")
-    search_fields = ("name", "description")
+    list_display = ("name", "instructions", "created_at")
+    search_fields = ("name", "instructions")
     readonly_fields = ("created_at", "updated_at")
 
 

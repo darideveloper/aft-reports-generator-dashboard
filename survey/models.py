@@ -43,7 +43,13 @@ class Company(models.Model):
 class Survey(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, verbose_name="Nombre")
-    description = models.TextField(blank=True, null=True, verbose_name="Descripción")
+    instructions = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Instrucciones",
+        help_text="Instrucciones para el participante. "
+        "Se mostrarán al inicio de la encuesta.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
