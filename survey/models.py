@@ -95,8 +95,8 @@ class QuestionOption(models.Model):
         verbose_name="Puntos",
         help_text=(
             "Recomendado: 1 en caso de que sea una respuesta correcta, ",
-            "de lo contrario 0"
-        )
+            "de lo contrario 0",
+        ),
     )
     text = models.TextField(verbose_name="Opción")
     created_at = models.DateTimeField(auto_now_add=True)
