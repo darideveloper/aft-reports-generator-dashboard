@@ -63,11 +63,14 @@ class Survey(models.Model):
 
 class QuestionGroup(models.Model):
     id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, verbose_name="Nombre")
+    details = models.TextField(blank=True, null=True, verbose_name="Detalles")
     survey = models.ForeignKey(
         Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
     )
-    name = models.CharField(max_length=255, verbose_name="Nombre")
-    details = models.TextField(blank=True, null=True, verbose_name="Detalles")
+    survey_index = models.IntegerField(
+        default=0, verbose_name="Posición del grupo en la encuesta"
+    )
     survey_percentage = models.FloatField(
         default=0, verbose_name="Porcentaje de la Encuesta"
     )
@@ -86,6 +89,9 @@ class Question(models.Model):
     id = models.AutoField(primary_key=True)
     question_group = models.ForeignKey(
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
+    )
+    question_group_index = models.IntegerField(
+        default=0, verbose_name="Posición de la pregunta en el grupo"
     )
     text = models.TextField(verbose_name="Pregunta")
     details = models.TextField(
@@ -106,6 +112,9 @@ class QuestionOption(models.Model):
     id = models.AutoField(primary_key=True)
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, verbose_name="Pregunta"
+    )
+    question_index = models.IntegerField(
+        default=0, verbose_name="Posición de la opción en la pregunta"
     )
     points = models.IntegerField(
         default=0,
