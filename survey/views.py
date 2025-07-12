@@ -29,7 +29,7 @@ class InvitationCodeView(APIView):
                     {
                         "status": "error",
                         "message": "Invalid or inactive invitation code.",
-                        "data": [],
+                        "data": {},
                     },
                     status=status.HTTP_404_NOT_FOUND,
                 )
