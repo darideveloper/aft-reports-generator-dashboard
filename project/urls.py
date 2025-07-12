@@ -24,6 +24,11 @@ urlpatterns = [
     ),
     # API URLs
     path("api/", include(router.urls)),
+    path(
+        "api/invitation/",
+        survey_views.InvitationCodeView.as_view(),
+        name="invitation-code",
+    ),
 ]
 
 if not settings.STORAGE_AWS:
