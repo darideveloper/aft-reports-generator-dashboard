@@ -31,7 +31,17 @@ class InvitationCodeView(APIView):
                         "message": "Invalid or inactive invitation code.",
                         "data": {},
                     },
-                    status=status.HTTP_404_NOT_FOUND,
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if not company.is_active:
+                return Response(
+                    {
+                        "status": "error",
+                        "message": "Invalid or inactive invitation code.",
+                        "data": {},
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             data = {
