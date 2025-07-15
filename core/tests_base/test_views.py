@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
+
 from rest_framework.test import APITestCase
 from rest_framework import status
+
 
 from core.tests_base.test_models import (
     TestSurveyModelBase,
@@ -8,13 +10,13 @@ from core.tests_base.test_models import (
 from core.tests_base.test_admin import TestAdminBase
 
 
-class TestApiViewsMethods(APITestCase, TestAdminBase):
+class BaseTestApiViewsMethods(APITestCase, TestAdminBase):
     """Base class for testing api views that only allows get views"""
 
     def setUp(
         self,
         endpoint="/api/",
-        restricted_get: bool = True,
+        restricted_get: bool = False,
         restricted_post: bool = True,
         restricted_put: bool = True,
         restricted_patch: bool = True,
@@ -50,7 +52,11 @@ class TestApiViewsMethods(APITestCase, TestAdminBase):
         """Validate that the given method is not allowed on the endpoint"""
 
         response = getattr(self.client, method)(self.endpoint)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            f"Method {method} should be restricted at {self.endpoint}, {self.restricted_get}"
+        )
 
     def test_authenticated_user_post(self):
         """Test that authenticated users can not post to the endpoint"""
@@ -69,7 +75,7 @@ class TestApiViewsMethods(APITestCase, TestAdminBase):
 
         if self.restricted_patch:
             self.validate_invalid_method("patch")
-            
+
     def test_authenticated_user_delete(self):
         """Test that authenticated users can not delete to the endpoint"""
 
@@ -83,14 +89,22 @@ class TestApiViewsMethods(APITestCase, TestAdminBase):
             self.validate_invalid_method("get")
 
 
-class TestSurveyViewsBase(TestApiViewsMethods, TestSurveyModelBase):
+class TestSurveyViewsBase(BaseTestApiViewsMethods, TestSurveyModelBase):
 
-    def setUp(self, endpoint="/api/"):
+    def setUp(
+        self,
+        endpoint="/api/",
+        restricted_post: bool = True,
+        restricted_get: bool = False,
+    ):
         """Initialize test data"""
 
         # Create initial data
         self.company_1 = self.create_company()
 
         # Send enpoint to parent
-        super().setUp(restricted_post=False)
+        super().setUp(
+            restricted_post=restricted_post,
+            restricted_get=restricted_get,
+        )
         self.endpoint = endpoint
