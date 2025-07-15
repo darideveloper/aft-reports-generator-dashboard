@@ -7,7 +7,7 @@ class InvitationCodeViewTestCase(TestSurveyViewsBase):
 
     def setUp(self):
         # Set endpoint
-        super().setUp(endpoint="/api/invitation/")
+        super().setUp(endpoint="/api/invitation-code/")
 
     def test_post_valid_invitation_code(self):
         """Test post request with valid invitation code"""

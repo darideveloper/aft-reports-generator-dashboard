@@ -18,8 +18,11 @@ class InvitationCodeView(APIView):
     def post(self, request):
         serializer = serializers.InvitationCodeSerializer(data=request.data)
         if serializer.is_valid():
+            
+            # Validate data structure
             invitation_code = serializer.validated_data["invitation_code"]
 
+            # Check if the invitation code is valid
             try:
                 company = models.Company.objects.get(
                     invitation_code=invitation_code, is_active=True
@@ -34,6 +37,7 @@ class InvitationCodeView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+            # Check if the company is active
             if not company.is_active:
                 return Response(
                     {
@@ -44,6 +48,7 @@ class InvitationCodeView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+            # Valid
             data = {
                 "status": "ok",
                 "message": "Valid invitation code.",
