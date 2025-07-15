@@ -24,8 +24,10 @@ urlpatterns = [
     ),
     # API URLs
     path("api/", include(router.urls)),
+    
+    # No crud endpoints
     path(
-        "api/invitation/",
+        "api/invitation-code/",
         survey_views.InvitationCodeView.as_view(),
         name="invitation-code",
     ),
