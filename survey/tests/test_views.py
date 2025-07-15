@@ -36,15 +36,15 @@ class InvitationCodeViewTestCase(TestSurveyViewsBase):
         # Delete all companies
         survey_models.Company.objects.all().delete()
 
-        payload = {"invitation_code": "13b1d8ea"}
+        payload = {"invitation_code": "test"}
 
         response = self.client.post(self.endpoint, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data["status"])
 
-    def test_post_valid_invitation_code_invalid_company(self):
-        """Test post request with valid invitation code but invalid company"""
+    def test_post_valid_invitation_code_inactive_company(self):
+        """Test post request with valid invitation code but inactive company"""
         payload = {"invitation_code": "test"}
 
         self.company_1.is_active = False
