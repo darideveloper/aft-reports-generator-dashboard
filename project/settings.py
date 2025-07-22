@@ -223,7 +223,15 @@ JAZZMIN_SETTINGS = {
 
     # List of apps (and/or models) to base side menu ordering off of
     # (does not need to contain all apps/models)
-    "order_with_respect_to": [],
+    "order_with_respect_to": [
+        "survey.Company",
+        "survey.Survey",
+        "survey.QuestionGroup",
+        "survey.Question",
+        "survey.QuestionOption",
+        "survey.Participant",
+        "survey.Answer",
+    ],
 
     # Custom links to append to app groups, keyed on app name
     "custom_links": {
