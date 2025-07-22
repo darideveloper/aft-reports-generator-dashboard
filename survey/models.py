@@ -115,8 +115,8 @@ class Question(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        text = f"{self.question_group.survey_index}."
-        text += f"{self.question_group_index}."
+        text = f"{self.question_group.survey_index}. "
+        text += f"{self.question_group_index}. "
         text += f"{self.text}"
         return text
 
