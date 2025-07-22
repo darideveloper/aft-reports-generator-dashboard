@@ -19,10 +19,17 @@ class SurveyAdmin(admin.ModelAdmin):
 
 @admin.register(models.QuestionGroup)
 class QuestionGroupAdmin(admin.ModelAdmin):
-    list_display = ("name", "survey", "survey_percentage", "created_at")
+    list_display = (
+        "name",
+        "survey",
+        "survey_index",
+        "survey_percentage",
+        "created_at",
+    )
     list_filter = ("survey", "created_at", "updated_at")
     search_fields = ("name", "survey__name")
     readonly_fields = ("created_at", "updated_at")
+    ordering = ("survey_index", "name")
 
 
 @admin.register(models.Question)
