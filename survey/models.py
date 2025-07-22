@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib import admin
 
 from utils.text_generation import get_uuid
 
@@ -115,6 +116,14 @@ class Question(models.Model):
     class Meta:
         verbose_name = "Pregunta"
         verbose_name_plural = "Preguntas"
+        
+    @property
+    def survey(self):
+        return self.question_group.survey
+    
+    @admin.display(description="Encuesta", ordering="survey__name")
+    def get_survey_for_admin(self):
+        return self.survey.name
 
 
 class QuestionOption(models.Model):
@@ -143,7 +152,23 @@ class QuestionOption(models.Model):
     class Meta:
         verbose_name = "Opción de Pregunta"
         verbose_name_plural = "Opciones de Preguntas"
-
+        
+    @property
+    def survey(self):
+        return self.question.survey
+    
+    @admin.display(description="Encuesta", ordering="survey__name")
+    def get_survey_for_admin(self):
+        return self.survey.name
+    
+    @property
+    def question_group(self):
+        return self.question.question_group
+    
+    @admin.display(description="Grupo de Preguntas", ordering="question_group__name")
+    def get_question_group_for_admin(self):
+        return self.question_group.name
+    
 
 class Participant(models.Model):
 

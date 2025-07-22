@@ -27,7 +27,7 @@ class QuestionGroupAdmin(admin.ModelAdmin):
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ("text", "question_group", "created_at")
+    list_display = ("text", "question_group", "get_survey_for_admin", "created_at")
     list_filter = (
         "question_group__survey",
         "question_group",
@@ -40,7 +40,14 @@ class QuestionAdmin(admin.ModelAdmin):
 
 @admin.register(models.QuestionOption)
 class QuestionOptionAdmin(admin.ModelAdmin):
-    list_display = ("text", "question", "points", "created_at")
+    list_display = (
+        "text",
+        "question",
+        "get_question_group_for_admin",
+        "get_survey_for_admin",
+        "points",
+        "created_at",
+    )
     list_filter = (
         "points",
         "question__question_group__survey",
