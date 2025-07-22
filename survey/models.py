@@ -86,12 +86,21 @@ class QuestionGroup(models.Model):
 
 
 class Question(models.Model):
+    
+    QUESTION_TYPE_CHOICES = [
+        ("text", "Texto"),
+        ("select", "Selección"),
+    ]
+    
     id = models.AutoField(primary_key=True)
     question_group = models.ForeignKey(
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
     )
     question_group_index = models.IntegerField(
         default=0, verbose_name="Posición de la pregunta en el grupo"
+    )
+    question_type = models.CharField(
+        max_length=255, choices=QUESTION_TYPE_CHOICES, verbose_name="Tipo de Pregunta"
     )
     text = models.TextField(verbose_name="Pregunta")
     details = models.TextField(
