@@ -27,7 +27,13 @@ class QuestionGroupAdmin(admin.ModelAdmin):
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ("text", "question_group", "get_survey_for_admin", "created_at")
+    list_display = (
+        "text",
+        "get_survey_for_admin",
+        "question_group",
+        "question_group_index",
+        "created_at",
+    )
     list_filter = (
         "question_group__survey",
         "question_group",
@@ -36,6 +42,7 @@ class QuestionAdmin(admin.ModelAdmin):
     )
     search_fields = ("text", "question_group__name")
     readonly_fields = ("created_at", "updated_at")
+    ordering = ("question_group", "question_group_index")
 
 
 @admin.register(models.QuestionOption)
@@ -43,8 +50,9 @@ class QuestionOptionAdmin(admin.ModelAdmin):
     list_display = (
         "text",
         "question",
-        "get_question_group_for_admin",
         "get_survey_for_admin",
+        "get_question_group_for_admin",
+        "question_index",
         "points",
         "created_at",
     )
@@ -58,6 +66,7 @@ class QuestionOptionAdmin(admin.ModelAdmin):
     )
     search_fields = ("text", "question__text")
     readonly_fields = ("created_at", "updated_at")
+    ordering = ("question", "question_index")
 
 
 @admin.register(models.Participant)

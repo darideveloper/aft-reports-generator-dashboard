@@ -70,10 +70,12 @@ class QuestionGroup(models.Model):
         Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
     )
     survey_index = models.IntegerField(
-        default=0, verbose_name="Posición del grupo en la encuesta"
+        default=0,
+        verbose_name="Posición",
+        help_text="Posición del grupo en la encuesta",
     )
     survey_percentage = models.FloatField(
-        default=0, verbose_name="Porcentaje de la Encuesta"
+        default=0, verbose_name="Porcentaje", help_text="Porcentaje de la encuesta"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -98,7 +100,9 @@ class Question(models.Model):
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
     )
     question_group_index = models.IntegerField(
-        default=0, verbose_name="Posición de la pregunta en el grupo"
+        default=0,
+        verbose_name="Posición",
+        help_text="Posición de la pregunta en el grupo",
     )
     question_type = models.CharField(
         max_length=255, choices=QUESTION_TYPE_CHOICES, verbose_name="Tipo de Pregunta"
@@ -124,7 +128,7 @@ class Question(models.Model):
     def survey(self):
         return self.question_group.survey
 
-    @admin.display(description="Encuesta", ordering="survey__name")
+    @admin.display(description="Encuesta", ordering="question_group__survey__name")
     def get_survey_for_admin(self):
         return self.survey.name
 
@@ -135,7 +139,9 @@ class QuestionOption(models.Model):
         Question, on_delete=models.CASCADE, verbose_name="Pregunta"
     )
     question_index = models.IntegerField(
-        default=0, verbose_name="Posición de la opción en la pregunta"
+        default=0,
+        verbose_name="Posición",
+        help_text="Posición de la opción en la pregunta",
     )
     points = models.IntegerField(
         default=0,
@@ -210,7 +216,10 @@ class Participant(models.Model):
         max_length=255, choices=BIRTH_RANGE_CHOICES, verbose_name="Rango de Edad"
     )
     position = models.CharField(
-        max_length=255, choices=POSITION_CHOICES, verbose_name="Posición"
+        max_length=255,
+        choices=POSITION_CHOICES,
+        verbose_name="Posición",
+        help_text="Posición del participante en la empresa",
     )
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, verbose_name="Empresa"
