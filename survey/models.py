@@ -70,7 +70,7 @@ class QuestionGroup(models.Model):
         Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
     )
     survey_index = models.IntegerField(
-        default=0,
+        default=1,
         verbose_name="Posición",
         help_text="Posición del grupo en la encuesta",
     )
@@ -100,7 +100,7 @@ class Question(models.Model):
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
     )
     question_group_index = models.IntegerField(
-        default=0,
+        default=1,
         verbose_name="Posición",
         help_text="Posición de la pregunta en el grupo",
     )
@@ -139,7 +139,7 @@ class QuestionOption(models.Model):
         Question, on_delete=models.CASCADE, verbose_name="Pregunta"
     )
     question_index = models.IntegerField(
-        default=0,
+        default=1,
         verbose_name="Posición",
         help_text="Posición de la opción en la pregunta",
     )
