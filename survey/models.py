@@ -79,7 +79,7 @@ class QuestionGroup(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.survey_index}. {self.name}"
 
     class Meta:
         verbose_name = "Grupo de Preguntas"
@@ -87,12 +87,12 @@ class QuestionGroup(models.Model):
 
 
 class Question(models.Model):
-    
+
     QUESTION_TYPE_CHOICES = [
         ("text", "Texto"),
         ("select", "Selección"),
     ]
-    
+
     id = models.AutoField(primary_key=True)
     question_group = models.ForeignKey(
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
@@ -111,16 +111,19 @@ class Question(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.text
+        text = f"{self.question_group.survey_index}."
+        text += f"{self.question_group_index}."
+        text += f"{self.text}"
+        return text
 
     class Meta:
         verbose_name = "Pregunta"
         verbose_name_plural = "Preguntas"
-        
+
     @property
     def survey(self):
         return self.question_group.survey
-    
+
     @admin.display(description="Encuesta", ordering="survey__name")
     def get_survey_for_admin(self):
         return self.survey.name
@@ -147,28 +150,32 @@ class QuestionOption(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.text
+        text = f"{self.question.question_group.survey_index}."
+        text += f"{self.question.question_group_index}."
+        text += f"{self.question.text}"
+        text += f" - {self.text}"
+        return text
 
     class Meta:
         verbose_name = "Opción de Pregunta"
         verbose_name_plural = "Opciones de Preguntas"
-        
+
     @property
     def survey(self):
         return self.question.survey
-    
+
     @admin.display(description="Encuesta", ordering="survey__name")
     def get_survey_for_admin(self):
         return self.survey.name
-    
+
     @property
     def question_group(self):
         return self.question.question_group
-    
+
     @admin.display(description="Grupo de Preguntas", ordering="question_group__name")
     def get_question_group_for_admin(self):
         return self.question_group.name
-    
+
 
 class Participant(models.Model):
 
