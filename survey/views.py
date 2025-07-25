@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -69,3 +69,8 @@ class InvitationCodeView(APIView):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class SurveyDetailView(generics.RetrieveAPIView):
+    queryset = models.Survey.objects.all()
+    serializer_class = serializers.SurveyDetailSerializer
