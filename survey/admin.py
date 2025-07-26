@@ -105,6 +105,10 @@ class AnswerAdmin(admin.ModelAdmin):
     list_filter = (
         "participant__company",
         "question_option__question__question_group__survey",
+        "question_option__question__question_group",
+        "question_option__question",
+        "question_option",
+        "participant",
         "created_at",
         "updated_at",
     )
