@@ -146,9 +146,11 @@ class QuestionOption(models.Model):
     points = models.IntegerField(
         default=0,
         verbose_name="Puntos",
-        help_text=(
-            "Recomendado: 1 en caso de que sea una respuesta correcta, ",
-            "de lo contrario 0",
+        help_text="".join(
+            [
+                "Recomendado: 1 en caso de que sea una respuesta correcta, ",
+                "de lo contrario 0",
+            ]
         ),
     )
     text = models.TextField(verbose_name="Opción")
