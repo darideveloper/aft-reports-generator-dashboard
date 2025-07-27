@@ -86,7 +86,7 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         question_group = self.create_question_group(survey=survey)[0]
 
         # Retrieve question group data
-        response = self.client.get(f"{self.endpoint}{question_group.id}/")
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
@@ -103,21 +103,16 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         survey = self.create_survey()
 
         # Create question groups
-        question_groups = [
-            survey_models.QuestionGroup.objects.create(
-                name=f"Question group test {i}",
-                survey=survey,
-            )
-            for i in range(1, 6)
-        ]
+        question_groups = self.create_question_group(survey=survey, quantity=5)
 
         # Retrieve question groups data
-        for question_group in question_groups:
-            response = self.client.get(f"{self.endpoint}{question_group.id}/")
+        for i, question_group in enumerate(question_groups):
+            response = self.client.get(f"{self.endpoint}{survey.id}/")
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["name"], question_group.name)
-            self.assertEqual(response.data["survey"], question_group.survey.id)
+            self.assertEqual(
+                response.data["question_groups"][i]["name"], question_group.name
+            )
 
     def test_question_group_sorting(self):
         """
