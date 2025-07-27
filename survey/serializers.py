@@ -16,7 +16,7 @@ class InvitationCodeSerializer(serializers.Serializer):
 class QuestionOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionOption
-        fields = ["id", "text"]
+        fields = ["id", "text", "question_index"]
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ["id", "text", "details", "options"]
+        fields = ["id", "text", "details", "options", "question_group_index"]
 
     def get_options(self, obj):
         return QuestionOptionSerializer(
@@ -37,7 +37,14 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuestionGroup
-        fields = ["id", "name", "details", "survey_percentage", "questions"]
+        fields = [
+            "id",
+            "name",
+            "details",
+            "survey_percentage",
+            "questions",
+            "survey_index",
+        ]
 
     def get_questions(self, obj):
         return QuestionSerializer(

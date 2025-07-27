@@ -120,27 +120,16 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         """
 
         # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
+        survey = self.create_survey()
 
         # Create question groups
-        question_groups = [
-            survey_models.QuestionGroup.objects.create(
-                name=f"Question group test {i}",
-                survey=survey,
-            )
-            for i in range(1, 4)
-        ]
+        question_groups = self.create_question_group(survey=survey, quantity=3)
 
         # Retrieve question groups data
         for i, question_group in enumerate(question_groups):
-            response = self.client.get(f"{self.endpoint}{question_group.id}/")
-
+            response = self.client.get(f"{self.endpoint}{survey.id}/")
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["survey_index"], i)
+            self.assertEqual(response.data["question_groups"][i]["survey_index"], i + 1)
 
     def test_question_data_single(self):
         """
