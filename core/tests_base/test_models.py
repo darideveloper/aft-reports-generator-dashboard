@@ -40,34 +40,47 @@ class TestSurveyModelBase(TestCase):
         self,
         name: str = "Question group test",
         survey: survey_models.Survey = None,
+        quantity: int = 1,
     ) -> survey_models.QuestionGroup:
         """Create a question group object"""
-
-        return survey_models.QuestionGroup.objects.create(
-            name=name,
-            survey=survey,
-        )
+        question_groups = [
+            survey_models.QuestionGroup.objects.create(
+                name=f"Question group test {i}",
+                survey=survey,
+            )
+            for i in range(1, quantity + 1)
+        ]
+        return question_groups
     
     def create_question(
         self,
         text: str = "Question test",
         question_group: survey_models.QuestionGroup = None,
+        quantity: int = 1,
     ) -> survey_models.Question:
         """Create a question object"""
-
-        return survey_models.Question.objects.create(
-            text=text,
-            question_group=question_group,
-        )
+        questions = [
+            survey_models.Question.objects.create(
+                text=f"Question test {i}",
+                question_group=question_group,
+            )
+            for i in range(1, quantity + 1)
+        ]
+        return questions
     
     def create_question_option(
         self,
         text: str = "Question option test",
         question: survey_models.Question = None,
+        quantity: int = 1,
     ) -> survey_models.QuestionOption:
         """Create a question option object"""
 
-        return survey_models.QuestionOption.objects.create(
-            text=text,
-            question=question,
-        )
+        question_options = [
+            survey_models.QuestionOption.objects.create(
+                text=f"Question option test {i}",
+                question=question,
+            )
+            for i in range(1, quantity + 1)
+        ]
+        return question_options
