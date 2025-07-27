@@ -47,6 +47,7 @@ class TestSurveyModelBase(TestCase):
             survey_models.QuestionGroup.objects.create(
                 name=f"Question group test {i}",
                 survey=survey,
+                survey_index=i,
             )
             for i in range(1, quantity + 1)
         ]
@@ -63,6 +64,7 @@ class TestSurveyModelBase(TestCase):
             survey_models.Question.objects.create(
                 text=f"Question test {i}",
                 question_group=question_group,
+                question_group_index=i,
             )
             for i in range(1, quantity + 1)
         ]
@@ -80,6 +82,7 @@ class TestSurveyModelBase(TestCase):
             survey_models.QuestionOption.objects.create(
                 text=f"Question option test {i}",
                 question=question,
+                question_index=i,
             )
             for i in range(1, quantity + 1)
         ]
