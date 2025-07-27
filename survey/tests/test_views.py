@@ -103,12 +103,13 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         survey = self.create_survey()
 
         # Create question groups
-        question_groups = self.create_question_group(survey=survey, quantity=5)
+        question_groups = self.create_question_group(survey=survey, quantity=5).order_by(
+            "survey_index"
+        )
 
         # Retrieve question groups data
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
         for i, question_group in enumerate(question_groups):
-            response = self.client.get(f"{self.endpoint}{survey.id}/")
-
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(
                 response.data["question_groups"][i]["name"], question_group.name
@@ -126,8 +127,8 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         question_groups = self.create_question_group(survey=survey, quantity=3)
 
         # Retrieve question groups data
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
         for i, question_group in enumerate(question_groups):
-            response = self.client.get(f"{self.endpoint}{survey.id}/")
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["question_groups"][i]["survey_index"], i + 1)
 
@@ -164,35 +165,26 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         """
 
         # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
+        survey = self.create_survey()
 
         # Create question group
-        question_group = survey_models.QuestionGroup.objects.create(
-            name="Question group test",
-            survey=survey,
-        )
+        question_group = self.create_question_group(survey=survey)[0]
 
         # Create questions
-        questions = [
-            survey_models.Question.objects.create(
-                text=f"Question test {i}",
-                question_group=question_group,
-            )
-            for i in range(1, 6)
-        ]
+        questions = self.create_question(question_group=question_group, quantity=5)
 
         # Retrieve questions data
-        for question in questions:
-            response = self.client.get(f"{self.endpoint}{question.id}/")
-
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
+        print(response.data["question_groups"][0]["questions"])
+        for i, question in enumerate(questions):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["text"], question.text)
             self.assertEqual(
-                response.data["question_group"], question.question_group.id
+                response.data["question_groups"][0]["questions"][i]["text"],
+                question.text,
+            )
+            self.assertEqual(
+                response.data["question_groups"][0]["questions"][i]["question_group"],
+                question.question_group.id,
             )
 
     def test_question_sorting(self):

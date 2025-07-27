@@ -2,8 +2,6 @@ from django.test import TestCase
 
 from survey import models as survey_models
 
-import random
-
 
 class TestSurveyModelBase(TestCase):
     """Test survey models"""
@@ -33,61 +31,63 @@ class TestSurveyModelBase(TestCase):
     ) -> survey_models.Survey:
         """Create a survey object"""
 
-        return survey_models.Survey.objects.create(
-            name=name,
-            instructions=instructions
-        )
+        return survey_models.Survey.objects.create(name=name, instructions=instructions)
 
     def create_question_group(
         self,
+        survey: survey_models.Survey,
         name: str = "Question group test",
-        survey: survey_models.Survey = None,
-        quantity: int = 1,
+        details: str = "",
+        survey_index: int = 0,
+        survey_percentage: float = 0,
     ) -> survey_models.QuestionGroup:
-        """Create a question group object with random survey_index values"""
-        indices = random.sample(range(1, quantity + 1), quantity)
-        question_groups = [
-            survey_models.QuestionGroup.objects.create(
-                name=f"Question group test {i}",
-                survey=survey,
-                survey_index=index,
-            )
-            for i, index in enumerate(indices, start=1)
-        ]
-        return question_groups
+        """Create a question group object"""
+
+        if not survey:
+            survey = self.create_survey()
+
+        return survey_models.QuestionGroup.objects.create(
+            name=name,
+            survey=survey,
+            survey_index=survey_index,
+            survey_percentage=survey_percentage,
+            details=details,
+        )
 
     def create_question(
         self,
+        question_group: survey_models.QuestionGroup,
         text: str = "Question test",
-        question_group: survey_models.QuestionGroup = None,
-        quantity: int = 1,
+        details: str = "",
+        question_group_index: int = 0
     ) -> survey_models.Question:
-        """Create a question object with random question_group_index values"""
-        indices = random.sample(range(1, quantity + 1), quantity)
-        questions = [
-            survey_models.Question.objects.create(
-                text=f"Question test {i}",
-                question_group=question_group,
-                question_group_index=index,
-            )
-            for i, index in enumerate(indices, start=1)
-        ]
-        return questions
+        """Create a question object"""
+
+        if not question_group:
+            question_group = self.create_question_group()
+
+        return survey_models.Question.objects.create(
+            text=text,
+            question_group=question_group,
+            question_group_index=question_group_index,
+            details=details,
+        )
 
     def create_question_option(
         self,
+        question: survey_models.Question,
         text: str = "Question option test",
-        question: survey_models.Question = None,
-        quantity: int = 1,
+        question_index: int = 0,
+        points: int = 0,
     ) -> survey_models.QuestionOption:
-        """Create a question option object with random question_index values"""
-        indices = random.sample(range(1, quantity + 1), quantity)
-        question_options = [
-            survey_models.QuestionOption.objects.create(
-                text=f"Question option test {i}",
-                question=question,
-                question_index=index,
-            )
-            for i, index in enumerate(indices, start=1)
-        ]
-        return question_options
+        """Create a question option object"""
+
+        if not question:
+            question = self.create_question()
+
+        return survey_models.QuestionOption.objects.create(
+            text=text,
+            question=question,
+            question_index=question_index,
+            points=points,
+        )
