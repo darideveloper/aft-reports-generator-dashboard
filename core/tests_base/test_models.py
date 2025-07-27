@@ -2,6 +2,8 @@ from django.test import TestCase
 
 from survey import models as survey_models
 
+import random
+
 
 class TestSurveyModelBase(TestCase):
     """Test survey models"""
@@ -35,55 +37,57 @@ class TestSurveyModelBase(TestCase):
             name=name,
             instructions=instructions
         )
-    
+
     def create_question_group(
         self,
         name: str = "Question group test",
         survey: survey_models.Survey = None,
         quantity: int = 1,
     ) -> survey_models.QuestionGroup:
-        """Create a question group object"""
+        """Create a question group object with random survey_index values"""
+        indices = random.sample(range(1, quantity + 1), quantity)
         question_groups = [
             survey_models.QuestionGroup.objects.create(
                 name=f"Question group test {i}",
                 survey=survey,
-                survey_index=i,
+                survey_index=index,
             )
-            for i in range(1, quantity + 1)
+            for i, index in enumerate(indices, start=1)
         ]
         return question_groups
-    
+
     def create_question(
         self,
         text: str = "Question test",
         question_group: survey_models.QuestionGroup = None,
         quantity: int = 1,
     ) -> survey_models.Question:
-        """Create a question object"""
+        """Create a question object with random question_group_index values"""
+        indices = random.sample(range(1, quantity + 1), quantity)
         questions = [
             survey_models.Question.objects.create(
                 text=f"Question test {i}",
                 question_group=question_group,
-                question_group_index=i,
+                question_group_index=index,
             )
-            for i in range(1, quantity + 1)
+            for i, index in enumerate(indices, start=1)
         ]
         return questions
-    
+
     def create_question_option(
         self,
         text: str = "Question option test",
         question: survey_models.Question = None,
         quantity: int = 1,
     ) -> survey_models.QuestionOption:
-        """Create a question option object"""
-
+        """Create a question option object with random question_index values"""
+        indices = random.sample(range(1, quantity + 1), quantity)
         question_options = [
             survey_models.QuestionOption.objects.create(
                 text=f"Question option test {i}",
                 question=question,
-                question_index=i,
+                question_index=index,
             )
-            for i in range(1, quantity + 1)
+            for i, index in enumerate(indices, start=1)
         ]
         return question_options

@@ -137,30 +137,25 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         """
 
         # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
+        survey = self.create_survey()
 
         # Create question group
-        question_group = survey_models.QuestionGroup.objects.create(
-            name="Question group test",
-            survey=survey,
-        )
+        question_group = self.create_question_group(survey=survey)[0]
 
         # Create question
-        question = survey_models.Question.objects.create(
-            text="Question test",
-            question_group=question_group,
-        )
+        question = self.create_question(question_group=question_group)[0]
 
         # Retrieve question data
-        response = self.client.get(f"{self.endpoint}{question.id}/")
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["text"], question.text)
-        self.assertEqual(response.data["question_group"], question.question_group.id)
+        self.assertEqual(
+            response.data["question_groups"][0]["questions"][0]["text"], question.text
+        )
+        self.assertEqual(
+            response.data["question_groups"][0]["questions"][0]["question_group"],
+            question.question_group.id,
+        )
 
     def test_question_data_many(self):
         """
@@ -233,12 +228,6 @@ class SurveyViewTestCase(TestSurveyViewsBase):
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["question_group_index"], i)
-
-    def test_question_own_question_group(self):
-        """
-        Create three questions by question_group and compare its queston group
-        """
-        pass
 
     def test_question_option_data_single(self):
         """
@@ -359,9 +348,3 @@ class SurveyViewTestCase(TestSurveyViewsBase):
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(response.data["question_index"], i)
-
-    def test_option_own_question(self):
-        """
-        Create three option by question and compare its queston
-        """
-        pass
