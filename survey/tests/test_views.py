@@ -83,7 +83,7 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         survey = self.create_survey()
 
         # Create question group
-        question_group = self.create_question_group(survey=survey)
+        question_group = self.create_question_group(survey=survey)[0]
 
         # Retrieve question group data
         response = self.client.get(f"{self.endpoint}{question_group.id}/")
@@ -100,11 +100,7 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         """
 
         # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
+        survey = self.create_survey()
 
         # Create question groups
         question_groups = [
