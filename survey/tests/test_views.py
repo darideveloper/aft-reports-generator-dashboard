@@ -247,37 +247,27 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         as created
         """
 
-        # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
-
-        # Create question group
-        question_group = survey_models.QuestionGroup.objects.create(
-            name="Question group test",
-            survey=survey,
-        )
-
-        # Create question
-        question = survey_models.Question.objects.create(
-            text="Question test",
-            question_group=question_group,
-        )
-
         # Create question option
-        question_option = survey_models.QuestionOption.objects.create(
-            text="Question option test",
-            question=question,
+        question_option = self.create_question_option(
+            text="Question option test", question_index=1, points=1
         )
 
         # Retrieve question option data
-        response = self.client.get(f"{self.endpoint}{question_option.id}/")
+        response = self.client.get(
+            f"{self.endpoint}{question_option.question.question_group.survey.id}/"
+        )
 
+        question_option_response = response.data["question_groups"][0]["questions"][0][
+            "options"
+        ][0]
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["text"], question_option.text)
-        self.assertEqual(response.data["question"], question_option.question.id)
+        self.assertEqual(question_option_response["text"], question_option.text)
+        self.assertEqual(
+            question_option_response["question_index"], question_option.question_index
+        )
+        self.assertEqual(
+            question_option_response["question"], question_option.question.id
+        )
 
     def test_question_option_data_many(self):
         """
@@ -286,40 +276,41 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         """
 
         # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
+        survey = self.create_survey()
 
         # Create question group
-        question_group = survey_models.QuestionGroup.objects.create(
-            name="Question group test",
-            survey=survey,
-        )
+        question_group = self.create_question_group(survey=survey)
 
         # Create question
-        question = survey_models.Question.objects.create(
-            text="Question test",
-            question_group=question_group,
-        )
+        question = self.create_question(question_group=question_group)
 
         # Create question options
-        question_options = [
-            survey_models.QuestionOption.objects.create(
-                text=f"Question option test {i}",
-                question=question,
+        question_options = []
+        for i in range(1, 6):
+            question_options.append(
+                self.create_question_option(
+                    question=question,
+                    text=f"Question option test {i}",
+                    question_index=i,
+                    points=1,
+                )
             )
-            for i in range(1, 6)
-        ]
 
         # Retrieve question options data
-        for question_option in question_options:
-            response = self.client.get(f"{self.endpoint}{question_option.id}/")
-
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
+        question_option_response = response.data["question_groups"][0]["questions"][0][
+            "options"
+        ]
+        for question_option_index, question_option in enumerate(question_options):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["text"], question_option.text)
-            self.assertEqual(response.data["question"], question_option.question.id)
+            self.assertEqual(
+                question_option_response[question_option_index]["text"],
+                question_option.text,
+            )
+            self.assertEqual(
+                question_option_response[question_option_index]["question"],
+                question_option.question.id,
+            )
 
     def test_question_option_sorting(self):
         """
@@ -327,36 +318,35 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         """
 
         # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
+        survey = self.create_survey()
 
         # Create question group
-        question_group = survey_models.QuestionGroup.objects.create(
-            name="Question group test",
-            survey=survey,
-        )
+        question_group = self.create_question_group(survey=survey)
 
         # Create question
-        question = survey_models.Question.objects.create(
-            text="Question test",
-            question_group=question_group,
-        )
+        question = self.create_question(question_group=question_group)
 
         # Create question options
-        question_options = [
-            survey_models.QuestionOption.objects.create(
-                text=f"Question option test {i}",
-                question=question,
+        question_options = []
+        indices = random.sample(range(1, 7), 6)
+        for question_option_index in indices:
+            question_options.append(
+                self.create_question_option(
+                    question=question,
+                    text=f"Question option test {question_option_index}",
+                    question_index=question_option_index,
+                    points=1,
+                )
             )
-            for i in range(1, 4)
-        ]
 
         # Retrieve question options data
-        for i, question_option in enumerate(question_options):
-            response = self.client.get(f"{self.endpoint}{question_option.id}/")
-
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
+        question_option_response = response.data["question_groups"][0]["questions"][0][
+            "options"
+        ]
+        for question_option_index, question_option in enumerate(question_options):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["question_index"], i)
+            self.assertEqual(
+                question_option_response[question_option_index]["question_index"],
+                question_option_index + 1,
+            )
