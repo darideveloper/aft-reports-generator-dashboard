@@ -35,7 +35,7 @@ class TestSurveyModelBase(TestCase):
 
     def create_question_group(
         self,
-        survey: survey_models.Survey,
+        survey: survey_models.Survey = None,
         name: str = "Question group test",
         details: str = "",
         survey_index: int = 0,

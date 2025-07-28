@@ -3,6 +3,7 @@ from rest_framework import status
 from core.tests_base.test_views import TestSurveyViewsBase
 
 from survey import models as survey_models
+import random
 
 
 class InvitationCodeViewTestCase(TestSurveyViewsBase):
@@ -79,18 +80,28 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         Create question group and retrieve its data to validate is the same as created
         """
 
-        # Create survey
-        survey = self.create_survey()
-
         # Create question group
-        question_group = self.create_question_group(survey=survey)[0]
+        question_group = self.create_question_group(
+            name="Question group test",
+            details="Details question group",
+            survey_index=1,
+            survey_percentage=0.7,
+        )
 
         # Retrieve question group data
-        response = self.client.get(f"{self.endpoint}{survey.id}/")
+        response = self.client.get(f"{self.endpoint}{question_group.survey.id}/")
+
+        question_group_response = response.data["question_groups"][0]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(question_group_response["name"], question_group.name)
+        self.assertEqual(question_group_response["details"], question_group.details)
         self.assertEqual(
-            response.data["question_groups"][0]["name"], question_group.name
+            question_group_response["survey_index"], question_group.survey_index
+        )
+        self.assertEqual(
+            question_group_response["survey_percentage"],
+            question_group.survey_percentage,
         )
 
     def test_question_group_data_many(self):
@@ -103,16 +114,17 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         survey = self.create_survey()
 
         # Create question groups
-        question_groups = self.create_question_group(survey=survey, quantity=5).order_by(
-            "survey_index"
-        )
+        question_groups = []
+        for _ in range(1, 6):
+            question_groups.append(self.create_question_group(survey=survey))
 
         # Retrieve question groups data
         response = self.client.get(f"{self.endpoint}{survey.id}/")
-        for i, question_group in enumerate(question_groups):
+        for question_group_index, question_group in enumerate(question_groups):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(
-                response.data["question_groups"][i]["name"], question_group.name
+                response.data["question_groups"][question_group_index]["name"],
+                question_group.name,
             )
 
     def test_question_group_sorting(self):
@@ -124,7 +136,14 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         survey = self.create_survey()
 
         # Create question groups
-        question_groups = self.create_question_group(survey=survey, quantity=3)
+        question_groups = []
+        indices = random.sample(range(1, 7), 6)
+        for question_group_index in indices:
+            question_groups.append(
+                self.create_question_group(
+                    survey=survey, survey_index=question_group_index
+                )
+            )
 
         # Retrieve question groups data
         response = self.client.get(f"{self.endpoint}{survey.id}/")
