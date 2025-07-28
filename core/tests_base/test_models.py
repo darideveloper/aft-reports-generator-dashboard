@@ -56,7 +56,7 @@ class TestSurveyModelBase(TestCase):
 
     def create_question(
         self,
-        question_group: survey_models.QuestionGroup,
+        question_group: survey_models.QuestionGroup = None,
         text: str = "Question test",
         details: str = "",
         question_group_index: int = 0
@@ -75,7 +75,7 @@ class TestSurveyModelBase(TestCase):
 
     def create_question_option(
         self,
-        question: survey_models.Question,
+        question: survey_models.Question = None,
         text: str = "Question option test",
         question_index: int = 0,
         points: int = 0,

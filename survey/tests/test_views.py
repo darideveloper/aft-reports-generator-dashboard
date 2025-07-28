@@ -138,43 +138,44 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         # Create question groups
         question_groups = []
         indices = random.sample(range(1, 7), 6)
-        for question_group_index in indices:
+        for survey_index in indices:
             question_groups.append(
-                self.create_question_group(
-                    survey=survey, survey_index=question_group_index
-                )
+                self.create_question_group(survey=survey, survey_index=survey_index)
             )
 
         # Retrieve question groups data
         response = self.client.get(f"{self.endpoint}{survey.id}/")
-        for i, question_group in enumerate(question_groups):
+        for question_group_index, question_group in enumerate(question_groups):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["question_groups"][i]["survey_index"], i + 1)
+            self.assertEqual(
+                response.data["question_groups"][question_group_index]["survey_index"],
+                question_group_index + 1,
+            )
 
     def test_question_data_single(self):
         """
         Create JUST a question and retrieve its data to validate is the same as created
         """
 
-        # Create survey
-        survey = self.create_survey()
-
-        # Create question group
-        question_group = self.create_question_group(survey=survey)[0]
-
         # Create question
-        question = self.create_question(question_group=question_group)[0]
+        question = self.create_question(
+            text="Question test", details="Test description", question_group_index=1
+        )
 
         # Retrieve question data
-        response = self.client.get(f"{self.endpoint}{survey.id}/")
+        response = self.client.get(
+            f"{self.endpoint}{question.question_group.survey.id}/"
+        )
 
+        question_response = response.data["question_groups"][0]["questions"][0]
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(question_response["text"], question.text)
+        self.assertEqual(question_response["details"], question.details)
         self.assertEqual(
-            response.data["question_groups"][0]["questions"][0]["text"], question.text
+            question_response["question_group_index"], question.question_group_index
         )
         self.assertEqual(
-            response.data["question_groups"][0]["questions"][0]["question_group"],
-            question.question_group.id,
+            question_response["question_group"], question.question_group.id
         )
 
     def test_question_data_many(self):
@@ -187,22 +188,24 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         survey = self.create_survey()
 
         # Create question group
-        question_group = self.create_question_group(survey=survey)[0]
+        question_group = self.create_question_group(survey=survey)
 
         # Create questions
-        questions = self.create_question(question_group=question_group, quantity=5)
+        questions = []
+        for _ in range(1, 6):
+            questions.append(self.create_question(question_group=question_group))
 
         # Retrieve questions data
         response = self.client.get(f"{self.endpoint}{survey.id}/")
-        print(response.data["question_groups"][0]["questions"])
-        for i, question in enumerate(questions):
+        question_response = response.data["question_groups"][0]["questions"]
+        for question_index, question in enumerate(questions):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(
-                response.data["question_groups"][0]["questions"][i]["text"],
+                question_response[question_index]["text"],
                 question.text,
             )
             self.assertEqual(
-                response.data["question_groups"][0]["questions"][i]["question_group"],
+                question_response[question_index]["question_group"],
                 question.question_group.id,
             )
 
@@ -212,33 +215,31 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         """
 
         # Create survey
-        survey = survey_models.Survey.objects.create(
-            name="Survey test",
-            details="Test description",
-            company=self.company_1,
-        )
+        survey = self.create_survey()
 
         # Create question group
-        question_group = survey_models.QuestionGroup.objects.create(
-            name="Question group test",
-            survey=survey,
-        )
+        question_group = self.create_question_group(survey=survey)
 
         # Create questions
-        questions = [
-            survey_models.Question.objects.create(
-                text=f"Question test {i}",
-                question_group=question_group,
+        questions = []
+        indices = random.sample(range(1, 7), 6)
+        for question_group_index in indices:
+            questions.append(
+                self.create_question(
+                    question_group=question_group,
+                    question_group_index=question_group_index,
+                )
             )
-            for i in range(1, 4)
-        ]
 
         # Retrieve questions data
-        for i, question in enumerate(questions):
-            response = self.client.get(f"{self.endpoint}{question.id}/")
-
+        response = self.client.get(f"{self.endpoint}{survey.id}/")
+        question_response = response.data["question_groups"][0]["questions"]
+        for question_index, question in enumerate(questions):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
-            self.assertEqual(response.data["question_group_index"], i)
+            self.assertEqual(
+                question_response[question_index]["question_group_index"],
+                question_index + 1,
+            )
 
     def test_question_option_data_single(self):
         """
