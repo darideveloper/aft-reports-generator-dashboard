@@ -60,7 +60,7 @@ class InvitationCodeViewTestCase(TestSurveyViewsBase):
 class SurveyViewTestCase(TestSurveyViewsBase):
     def setUp(self):
         # Set endpoint
-        super().setUp(endpoint="/api/survey-detail/")
+        super().setUp(endpoint="/api/surveys/")
 
     def test_survey_data(self):
         """Create survey and retrieve its data to validate is the same as created"""

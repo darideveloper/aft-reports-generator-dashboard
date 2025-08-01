@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -71,6 +71,10 @@ class InvitationCodeView(APIView):
         )
 
 
-class SurveyDetailView(generics.RetrieveAPIView):
+# Get api endpoint
+class SurveyDetailView(viewsets.ReadOnlyModelViewSet):
     queryset = models.Survey.objects.all()
     serializer_class = serializers.SurveyDetailSerializer
+
+    def get_queryset(self):
+        return self.queryset
