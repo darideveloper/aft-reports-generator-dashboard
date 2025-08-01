@@ -55,7 +55,7 @@ class BaseTestApiViewsMethods(APITestCase, TestAdminBase):
         self.assertEqual(
             response.status_code,
             status.HTTP_405_METHOD_NOT_ALLOWED,
-            f"Method {method} should be restricted at {self.endpoint}, {self.restricted_get}"
+            f"Method {method} should be restricted at {self.endpoint}, {self.restricted_get}",
         )
 
     def test_authenticated_user_post(self):
