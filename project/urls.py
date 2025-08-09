@@ -11,7 +11,6 @@ from survey import views as survey_views
 
 # Setup drf router
 router = routers.DefaultRouter()
-router.register(r"companies", survey_views.CompanyViewSet, basename="companies")
 router.register(r"surveys", survey_views.SurveyDetailView, basename="surveys")
 
 urlpatterns = [

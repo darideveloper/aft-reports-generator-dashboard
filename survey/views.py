@@ -6,14 +6,6 @@ from rest_framework import status
 from survey import serializers, models
 
 
-class CompanyViewSet(viewsets.ModelViewSet):
-    queryset = models.Company.objects.all()
-    serializer_class = serializers.CompanySerializer
-
-    def get_queryset(self):
-        return self.queryset.filter(is_active=True)
-
-
 class InvitationCodeView(APIView):
     def post(self, request):
         serializer = serializers.InvitationCodeSerializer(data=request.data)

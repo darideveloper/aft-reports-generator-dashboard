@@ -1,12 +1,6 @@
 from rest_framework import serializers
 
-from .models import Company, Survey, QuestionGroup, Question, QuestionOption
-
-
-class CompanySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = "__all__"
+from survey import models
 
 
 class InvitationCodeSerializer(serializers.Serializer):
@@ -15,7 +9,7 @@ class InvitationCodeSerializer(serializers.Serializer):
 
 class QuestionOptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = QuestionOption
+        model = models.QuestionOption
         fields = ["id", "text", "question_index", "question"]
 
 
@@ -23,7 +17,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()
 
     class Meta:
-        model = Question
+        model = models.Question
         fields = [
             "id",
             "text",
@@ -43,7 +37,7 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField()
 
     class Meta:
-        model = QuestionGroup
+        model = models.QuestionGroup
         fields = [
             "id",
             "name",
@@ -63,7 +57,7 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
     question_groups = serializers.SerializerMethodField()
 
     class Meta:
-        model = Survey
+        model = models.Survey
         fields = [
             "id",
             "name",
