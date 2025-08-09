@@ -201,7 +201,7 @@ class Participant(models.Model):
     ]
 
     POSITION_CHOICES = [
-        ("directir", "Director"),
+        ("director", "Director"),
         ("manager", "Gerente"),
         ("supervisor", "Supervisor"),
         ("operator", "Operador"),
