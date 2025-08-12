@@ -1,0 +1,26 @@
+{
+    "cultura": {
+        "subtitle": "Líder en adaptación digital",
+        "paragraph": "Ha comenzado a incorporar herramientas y conceptos digitales en su práctica diaria, aunque aún depende de apoyo para aplicarlos de forma estratégica. Muestra disposición al aprendizaje, pero necesita mayor consistencia para liderar con seguridad en entornos digitales. Podría hacer un mayor esfuerzo para convertirse en un aliado del área de tecnología en esta era digital."
+    },
+    "tecnologia": {
+        "subtitle": "Líder digital estratégico",
+        "paragraph": "Se mantiene informado sobre tendencias de conectividad y tecnologías emergentes, comprende su impacto en el negocio y las incorpora en discusiones estratégicas. Sabe identificar cuándo una solución digital puede mejorar procesos, hace preguntas relevantes al área técnica y promueve decisiones basadas en datos y oportunidades tecnológicas."
+    },
+    "ciberseguridad": {
+        "subtitle": "Líder en desarrollo digital responsable",
+        "paragraph": "Reconoce la importancia de la ciberseguridad y busca informarse, aunque aún no aplica de forma consistente las buenas prácticas digitales. Muestra disposición a mejorar, participa en iniciativas de concientización y empieza a promover comportamientos responsables en su equipo, aunque requiere acompañamiento para reforzar su rol como referente en este ámbito."
+    },
+    "impacto": {
+        "subtitle": "Líder en desarrollo de su imagen digital",
+        "paragraph": "Es consciente del impacto de su comportamiento en línea y ha comenzado a ajustar sus prácticas, aunque de forma todavía inconsistente. Participa en redes sociales, pero puede tener dificultades para proyectar un mensaje alineado con su rol y valores organizacionales. Requiere fortalecer el criterio y la intención estratégica en su presencia digital."
+    },
+    "ambiente": {
+        "subtitle": "Líder en transición hacia la sostenibilidad digital",
+        "paragraph": "Implementa algunas prácticas sostenibles y comienza a considerar herramientas de asistencia en su entorno laboral. Sin embargo, lo hace de forma aislada o sin una intención clara de integrarlas en su rutina o en la toma de decisiones. Requiere mayor consistencia para alinear sus acciones con una visión digital más integral y una determinación proactiva."
+    },
+    "ecosistema": {
+        "subtitle": "Líder colaborativo digital",
+        "paragraph": "Utiliza con fluidez dispositivos digitales y herramientas colaborativas para coordinar equipos, compartir información y gestionar proyectos en tiempo real. Integra plataformas en la nube, automatiza tareas y promueve una cultura de trabajo ágil, conectada y eficiente. Su ejemplo ayuda a otros a actualizarse y a mantener un ritmo activo."
+    }
+}
