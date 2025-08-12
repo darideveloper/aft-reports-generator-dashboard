@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.utils.html import format_html
+
 from survey import models
 
 
@@ -97,6 +99,22 @@ class ParticipantAdmin(admin.ModelAdmin):
     )
     search_fields = ("name", "email", "company__name")
     readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(models.Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ("participant", "survey", "created_at", "custom_links")
+    list_filter = ("participant__company", "survey", "created_at", "updated_at")
+    search_fields = ("participant__name", "survey__name")
+    readonly_fields = ("created_at", "updated_at")
+
+    # CUSTOM FIELDS
+    def custom_links(self, obj):
+        """Create custom Imprimir and Ver buttons"""
+        return format_html(
+            '<a class="btn btn-primary my-1" href="{}">Ver Reporte</a>',
+            f"/reports/{obj.survey.id}/{obj.participant.id}",
+        )
 
 
 @admin.register(models.Answer)
