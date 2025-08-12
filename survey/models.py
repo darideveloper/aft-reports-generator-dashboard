@@ -237,6 +237,18 @@ class Participant(models.Model):
         verbose_name_plural = "Participantes"
 
 
+class Report(models.Model):
+    id = models.AutoField(primary_key=True)
+    survey = models.ForeignKey(
+        Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
+    )
+    participant = models.ForeignKey(
+        Participant, on_delete=models.CASCADE, verbose_name="Participante"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Answer(models.Model):
     id = models.AutoField(primary_key=True)
     participant = models.ForeignKey(
