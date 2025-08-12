@@ -71,8 +71,3 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
         return QuestionGroupSerializer(
             obj.questiongroup_set.order_by("survey_index"), many=True
         ).data
-
-
-class ReportSerializer(serializers.Serializer):
-    participant_id = serializers.IntegerField()
-    survey_id = serializers.IntegerField()

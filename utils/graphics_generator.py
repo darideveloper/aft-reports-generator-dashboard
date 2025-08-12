@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 import os
+import matplotlib
+matplotlib.use("Agg")
 
 
 def generate_bell_curve_plot(

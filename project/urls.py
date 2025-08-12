@@ -31,6 +31,11 @@ urlpatterns = [
         survey_views.InvitationCodeView.as_view(),
         name="invitation-code",
     ),
+    path(
+        "report/<int:survey_id>/<int:participant_id>/",
+        survey_views.ReportView.as_view(),
+        name="report",
+    ),
 ]
 
 if not settings.STORAGE_AWS:

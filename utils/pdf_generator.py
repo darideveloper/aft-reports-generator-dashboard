@@ -8,7 +8,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.colors import Color
 import numpy as np
-from graphics_generator import generate_bell_curve_plot
+from .graphics_generator import generate_bell_curve_plot
 
 
 current_folder = os.path.dirname(__file__)
@@ -27,10 +27,12 @@ arial = os.path.join(fonts_folder, "ARIAL.TTF")
 arial_bold = os.path.join(fonts_folder, "ARIALBD.TTF")
 
 # Open JSON with mockup data
-with open("mock_up_scores.json", 'r', encoding='utf-8') as f:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(BASE_DIR, "mock_up_scores.json"), 'r', encoding='utf-8') as f:
     mock_up_data = json.load(f)
 
-with open("mock_up_results.json", 'r', encoding='utf-8') as f:
+with open(os.path.join(BASE_DIR, "mock_up_results.json"), 'r', encoding='utf-8') as f:
     mock_up_results = json.load(f)
 
 
@@ -135,8 +137,6 @@ def generate_report(
     date: str,
     grade_code: str,
     final_score: float,
-    logo_path: str,
-    graph_path: str,
     data: list,
     resulting_paragraphs: list,
     resulting_titles: dict,
@@ -361,8 +361,6 @@ if __name__ == "__main__":
         date="30/12/2025",
         grade_code="MDP",
         final_score=38.9,
-        logo_path=logo_path,
-        graph_path=graph_path,
         data=np.array(
             [
                 53.1,
@@ -396,8 +394,6 @@ if __name__ == "__main__":
         date="30/12/2025",
         grade_code="P",
         final_score=50,
-        logo_path=logo_path,
-        graph_path=graph_path,
         data=np.array(
             [
                 53.1,
@@ -427,12 +423,10 @@ if __name__ == "__main__":
     )
 
     generate_report(
-        name="Abel Soto Martinez de la Cruz Parez de Dios",
+        name="Abel Soto Martinez de la Cruz Parez de Dios",
         date="30/12/2025",
         grade_code="MEP",
         final_score=70,
-        logo_path=logo_path,
-        graph_path=graph_path,
         data=np.array(
             [
                 53.1,
@@ -466,8 +460,6 @@ if __name__ == "__main__":
         date="30/12/2025",
         grade_code="MEP",
         final_score=70,
-        logo_path=logo_path,
-        graph_path=graph_path,
         data=np.array(
             [
                 53.1,
