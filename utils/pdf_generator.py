@@ -1,4 +1,3 @@
-from csv import Dialect
 import os
 import io
 import json
@@ -140,7 +139,7 @@ def generate_report(
     graph_path: str,
     data: list,
     resulting_paragraphs: list,
-    resulting_titles: Dialect,
+    resulting_titles: dict,
 ) -> str:
     """Generate PDF report from data
 
