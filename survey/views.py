@@ -7,7 +7,7 @@ from rest_framework import status
 from django.http import FileResponse, Http404
 from django.conf import settings
 
-from utils import pdf_generator
+from utils import pdf_generator, media
 
 from survey import serializers, models
 
@@ -108,15 +108,19 @@ class ReportView(APIView):
 
         name = participant.name
 
-        # TODO: Obtener datos de survey si es necesario
         # survey = models.Survey.objects.get(id=survey_id)
 
+        company = participant.company
+        logo_path = media.get_media_url(company.logo)
+        logo_path = logo_path.replace("https:", "http:")
+        
         # Generar el PDF
         pdf_generator.generate_report(
             name,
             "date",
             "grade_code",
             0.9,
+            logo_path,
             np.array(
                 [
                     53.1,

@@ -137,6 +137,7 @@ def generate_report(
     date: str,
     grade_code: str,
     final_score: float,
+    logo_path: str,
     data: list,
     resulting_paragraphs: list,
     resulting_titles: dict,
@@ -361,6 +362,7 @@ if __name__ == "__main__":
         date="30/12/2025",
         grade_code="MDP",
         final_score=38.9,
+        logo_path=logo_path,
         data=np.array(
             [
                 53.1,
@@ -394,6 +396,7 @@ if __name__ == "__main__":
         date="30/12/2025",
         grade_code="P",
         final_score=50,
+        logo_path=logo_path,
         data=np.array(
             [
                 53.1,
@@ -427,6 +430,7 @@ if __name__ == "__main__":
         date="30/12/2025",
         grade_code="MEP",
         final_score=70,
+        logo_path=logo_path,
         data=np.array(
             [
                 53.1,
@@ -460,6 +464,7 @@ if __name__ == "__main__":
         date="30/12/2025",
         grade_code="MEP",
         final_score=70,
+        logo_path=logo_path,
         data=np.array(
             [
                 53.1,
