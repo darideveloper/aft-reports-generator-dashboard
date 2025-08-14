@@ -73,10 +73,8 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
         ).data
 
 
-class ParticipantSerializer(serializers.ModelSerializer):
-    email = serializers.SlugRelatedField(
-        queryset=models.Participant.objects.all(), slug_field="email"
-    )
+class ParticipantSerializer(serializers.Serializer):
+    email = serializers.EmailField()
     survey_id = serializers.PrimaryKeyRelatedField(
         queryset=models.Survey.objects.all()
     )

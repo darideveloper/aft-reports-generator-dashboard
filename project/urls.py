@@ -36,6 +36,11 @@ urlpatterns = [
         survey_views.ReportView.as_view(),
         name="report",
     ),
+    path(
+        "api/participant/has-answer/",
+        survey_views.ParticipantView.as_view(),
+        name="participant-has-answer",
+    )
 ]
 
 if not settings.STORAGE_AWS:
