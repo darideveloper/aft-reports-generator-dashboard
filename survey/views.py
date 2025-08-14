@@ -240,3 +240,26 @@ class ReportView(APIView):
             as_attachment=False,
             filename=f"{name}.pdf",
         )
+
+
+class ParticipantListView(viewsets.ReadOnlyModelViewSet):
+
+    def get(self, request):
+        serializer = serializers.ParticipantSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data["email"]
+            survey_id = serializer.validated_data["survey_id"]
+
+            # Buscamos si existe algún Answer asociado a ese email y survey
+            has_answer = models.Answer.objects.filter(
+                participant__email=email,
+                question_option__question__question_group__survey_id=survey_id
+            ).exists()
+
+            return Response(
+                {"has_answer": has_answer},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            

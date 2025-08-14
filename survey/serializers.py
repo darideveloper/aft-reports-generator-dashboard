@@ -71,3 +71,12 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
         return QuestionGroupSerializer(
             obj.questiongroup_set.order_by("survey_index"), many=True
         ).data
+
+
+class ParticipantSerializer(serializers.ModelSerializer):
+    email = serializers.SlugRelatedField(
+        queryset=models.Participant.objects.all(), slug_field="email"
+    )
+    survey_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Survey.objects.all()
+    )
