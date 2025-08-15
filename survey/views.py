@@ -237,7 +237,7 @@ class ReportView(APIView):
 class HasAnswerView(APIView):
 
     def get(self, request):
-        serializer = serializers.HasAnswerViewSerializer(data=request.data)
+        serializer = serializers.HasAnswerSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(
                 {
@@ -247,22 +247,13 @@ class HasAnswerView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        email = serializer.validated_data["email"]
-        survey_id = serializer.validated_data["survey_id"]
-
-        # Buscamos si existe algún Answer asociado a ese email y survey
-        has_answer = models.Answer.objects.filter(
-            participant__email=email,
-            question_option__question__question_group__survey_id=survey_id,
-        ).exists()
-        if has_answer:
+        if serializer.validated_data["has_answer"]:
             return Response(
                 {
                     "status": "ok",
                     "message": "Valid participant with answer.",
                     "data": {
-                        "has_answer": has_answer,
+                        "has_answer": serializer.validated_data["has_answer"],
                     },
                 },
                 status=status.HTTP_200_OK,
@@ -273,7 +264,7 @@ class HasAnswerView(APIView):
                     "status": "error",
                     "message": "Valid participant without answer.",
                     "data": {
-                        "has_answer": has_answer,
+                        "has_answer": serializer.validated_data["has_answer"],
                     },
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -294,7 +285,6 @@ class ResponseView(APIView):
             )
 
         company = serializer.validated_data["company"]
-        survey = serializer.validated_data["survey"]
         participant_data = serializer.validated_data["participant_data"]
         answers_data = serializer.validated_data["answers_data"]
 
