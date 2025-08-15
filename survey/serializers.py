@@ -139,7 +139,22 @@ class ResponseSerializer(serializers.Serializer):
         return value
 
     def validate(self, data):
-        # Ya tenemos self.company, podemos añadirla a validated_data
+        # Inyectar company validada para usar en la vista
         data["company"] = getattr(self, "company", None)
-        return data
 
+        survey = data["survey"]                        # Survey (instancia)
+        p = data.get("participant_data", {})
+        email = p.get("email")
+
+        # Validar si YA respondió este survey
+        already_answered = models.Answer.objects.filter(
+            participant__email=email,
+            question_option__question__question_group__survey=survey
+        ).exists()
+
+        if already_answered:
+            raise serializers.ValidationError(
+                {"participant": "No puede volver a hacer este cuestionario."}
+            )
+
+        return data
