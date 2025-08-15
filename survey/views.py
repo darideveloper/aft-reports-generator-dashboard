@@ -301,13 +301,11 @@ class ResponseView(APIView):
         with transaction.atomic():
             participant = models.Participant.objects.create(
                 company=company,
-                survey=survey,
                 **participant_data
             )
             models.Answer.objects.bulk_create([
                 models.Answer(
                     participant=participant,
-                    question=answer["question"],
                     question_option=answer["question_option"]
                 )
                 for answer in answers_data
