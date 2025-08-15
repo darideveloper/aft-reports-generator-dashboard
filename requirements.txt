@@ -24,3 +24,9 @@ django-jazzmin==3.0.1
 
 # testing
 selenium==4.20.0
+
+# reports
+PyPDF2==3.0.1
+reportlab==4.4.2
+scipy==1.16.0
+matplotlib==3.10.3
