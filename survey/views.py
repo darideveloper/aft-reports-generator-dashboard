@@ -235,7 +235,7 @@ class ReportView(APIView):
 class HasAnswerView(APIView):
 
     def get(self, request):
-        serializer = serializers.ParticipantSerializer(data=request.data)
+        serializer = serializers.HasAnswerViewSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(
                 {

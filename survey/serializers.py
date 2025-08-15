@@ -82,7 +82,7 @@ class ReportSerializer(serializers.Serializer):
     )
 
 
-class ParticipantSerializer(serializers.Serializer):
+class HasAnswerViewSerializer(serializers.Serializer):
     email = serializers.EmailField()
     survey_id = serializers.PrimaryKeyRelatedField(
         queryset=models.Survey.objects.all()
