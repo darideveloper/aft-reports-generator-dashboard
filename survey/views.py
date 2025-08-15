@@ -234,43 +234,43 @@ class HasAnswerView(APIView):
 
     def get(self, request):
         serializer = serializers.ParticipantSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data["email"]
-            survey_id = serializer.validated_data["survey_id"]
-
-            # Buscamos si existe algún Answer asociado a ese email y survey
-            has_answer = models.Answer.objects.filter(
-                participant__email=email,
-                question_option__question__question_group__survey_id=survey_id,
-            ).exists()
-            if has_answer:
-                return Response(
-                    {
-                        "status": "ok",
-                        "message": "Valid participant with answer.",
-                        "data": {
-                            "has_answer": has_answer,
-                        },
-                    },
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(
-                    {
-                        "status": "error",
-                        "message": "Valid participant without answer.",
-                        "data": {
-                            "has_answer": has_answer,
-                        },
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        else:
+        if not serializer.is_valid():
             return Response(
                 {
                     "status": "error",
                     "message": "Invalid data",
                     "data": serializer.errors,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        email = serializer.validated_data["email"]
+        survey_id = serializer.validated_data["survey_id"]
+
+        # Buscamos si existe algún Answer asociado a ese email y survey
+        has_answer = models.Answer.objects.filter(
+            participant__email=email,
+            question_option__question__question_group__survey_id=survey_id,
+        ).exists()
+        if has_answer:
+            return Response(
+                {
+                    "status": "ok",
+                    "message": "Valid participant with answer.",
+                    "data": {
+                        "has_answer": has_answer,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(
+                {
+                    "status": "error",
+                    "message": "Valid participant without answer.",
+                    "data": {
+                        "has_answer": has_answer,
+                    },
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
