@@ -87,3 +87,51 @@ class HasAnswerViewSerializer(serializers.Serializer):
     survey_id = serializers.PrimaryKeyRelatedField(
         queryset=models.Survey.objects.all()
     )
+
+
+class ParticipantDataSerializer(serializers.Serializer):
+    gender = serializers.ChoiceField(choices=["m", "f", "o"])
+    birth_range = serializers.ChoiceField(choices=[
+        "1946-1964", "1965-1980", "1981-1996", "1997-2012"
+    ])
+    position = serializers.ChoiceField(choices=[
+        "director", "manager", "supervisor", "operator", "other"
+    ])
+    name = serializers.CharField(max_length=255)
+    email = serializers.EmailField()
+
+
+class AnswerDataSerializer(serializers.Serializer):
+    question_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Question.objects.all(),
+        source="question"
+    )
+    question_option_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.QuestionOption.objects.all(),
+        source="question_option"
+    )
+
+    def validate(self, data):
+        # Validar que la opción pertenezca a la pregunta
+        if data["question_option"].question_id != data["question"].id:
+            raise serializers.ValidationError(
+                "La opción no pertenece a la pregunta especificada."
+            )
+        return data
+
+
+class ResponseSerializer(serializers.Serializer):
+    invitation_code = serializers.CharField(max_length=255)
+    survey_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Survey.objects.all(),
+        source="survey"
+    )
+    participant = ParticipantDataSerializer(source="participant_data")
+    answers = AnswerDataSerializer(many=True, source="answers_data")
+
+    def validate_invitation_code(self, value):
+        if not models.Company.objects.filter(invitation_code=value).exists():
+            raise serializers.ValidationError(
+                "El código de invitación no es válido."
+            )
+        return value
