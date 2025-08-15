@@ -276,3 +276,25 @@ class HasAnswerView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class ResponseView(APIView):
+
+    def post(self, request):
+        serializer = serializers.ResponseSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "status": "error",
+                    "message": "Invalid data",
+                    "data": serializer.errors,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        invitation_code = serializer.validated_data["invitation_code"]
+        survey_id = serializer.validated_data["survey_id"]
+        participant_data = serializer.validated_data["participant_data"]
+        answers_data = serializer.validated_data["answers_data"]
+
+        
