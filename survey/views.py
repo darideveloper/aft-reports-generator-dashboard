@@ -84,21 +84,9 @@ class ReportView(APIView):
     """
 
     def get(self, request, survey_id, participant_id):
-        # Leer query params
-        try:
-            participant = models.Participant.objects.get(pk=participant_id)
-        except models.Participant.DoesNotExist:
-            return Response(
-                {"error": f"Participant {participant_id} not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
         # Validar que vengan los parámetros obligatorios
         if not participant_id:
-            return Response(
-                {"error": "El parámetro 'participant_id' es requerido"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise Http404("El parámetro 'participant_id' es requerido")
 
         # Obtener datos del participante
         try:
@@ -242,7 +230,7 @@ class ReportView(APIView):
         )
 
 
-class ParticipantView(APIView):
+class HasAnswerView(APIView):
 
     def get(self, request):
         serializer = serializers.ParticipantSerializer(data=request.data)

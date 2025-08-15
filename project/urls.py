@@ -38,7 +38,7 @@ urlpatterns = [
     ),
     path(
         "api/participant/has-answer/",
-        survey_views.ParticipantView.as_view(),
+        survey_views.HasAnswerView.as_view(),
         name="participant-has-answer",
     )
 ]
