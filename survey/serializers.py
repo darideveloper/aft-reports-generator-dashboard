@@ -73,6 +73,15 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
         ).data
 
 
+class ReportSerializer(serializers.Serializer):
+    survey_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Survey.objects.all(), required=True
+    )
+    participant_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Participant.objects.all(), required=True
+    )
+
+
 class ParticipantSerializer(serializers.Serializer):
     email = serializers.EmailField()
     survey_id = serializers.PrimaryKeyRelatedField(

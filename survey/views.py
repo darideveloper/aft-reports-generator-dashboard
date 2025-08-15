@@ -83,20 +83,22 @@ class ReportView(APIView):
     API endpoint to generate and render PDF reports from query params.
     """
 
-    def get(self, request, survey_id, participant_id):
-        # Validar que vengan los parámetros obligatorios
-        if not participant_id:
-            raise Http404("El parámetro 'participant_id' es requerido")
+    def get(self, request):
+        serializer = serializers.ReportSerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "status": "error",
+                    "message": "Parámetros inválidos",
+                    "errors": serializer.errors,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        # Obtener datos del participante
-        try:
-            participant = models.Participant.objects.get(id=participant_id)
-        except models.Participant.DoesNotExist:
-            raise Http404(f"No se encontró participante con id={participant_id}")
-
+        # survey = serializer.validated_data["survey_id"]        # objeto Survey
+        participant = serializer.validated_data["participant_id"]  # objeto Participant
+        
         name = participant.name
-
-        # survey = models.Survey.objects.get(id=survey_id)
 
         company = participant.company
         logo_path = media.get_media_url(company.logo)
