@@ -130,8 +130,16 @@ class ResponseSerializer(serializers.Serializer):
     answers = AnswerDataSerializer(many=True, source="answers_data")
 
     def validate_invitation_code(self, value):
-        if not models.Company.objects.filter(invitation_code=value).exists():
-            raise serializers.ValidationError(
-                "El código de invitación no es válido."
-            )
+        try:
+            company = models.Company.objects.get(invitation_code=value)
+        except models.Company.DoesNotExist:
+            raise serializers.ValidationError("El código de invitación no es válido.")
+        # Guardamos la instancia para usarla luego en validated_data
+        self.company = company
         return value
+
+    def validate(self, data):
+        # Ya tenemos self.company, podemos añadirla a validated_data
+        data["company"] = getattr(self, "company", None)
+        return data
+

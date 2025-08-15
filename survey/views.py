@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import FileResponse, Http404
 from django.conf import settings
+from django.db import transaction
+
 
 from utils import pdf_generator, media
 
@@ -279,7 +281,6 @@ class HasAnswerView(APIView):
 
 
 class ResponseView(APIView):
-
     def post(self, request):
         serializer = serializers.ResponseSerializer(data=request.data)
         if not serializer.is_valid():
@@ -292,9 +293,34 @@ class ResponseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        invitation_code = serializer.validated_data["invitation_code"]
-        survey_id = serializer.validated_data["survey_id"]
+        company = serializer.validated_data["company"]
+        survey = serializer.validated_data["survey"]
         participant_data = serializer.validated_data["participant_data"]
         answers_data = serializer.validated_data["answers_data"]
 
-        
+        with transaction.atomic():
+            participant = models.Participant.objects.create(
+                company=company,
+                survey=survey,
+                **participant_data
+            )
+            models.Answer.objects.bulk_create([
+                models.Answer(
+                    participant=participant,
+                    question=answer["question"],
+                    question_option=answer["question_option"]
+                )
+                for answer in answers_data
+            ])
+
+        return Response(
+            {
+                "status": "ok",
+                "message": "Participant and answers registered successfully",
+                "data": {
+                    "participant_id": participant.id,
+                    "answers_count": len(answers_data)
+                },
+            },
+            status=status.HTTP_201_CREATED,
+        )
