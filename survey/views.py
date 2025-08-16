@@ -104,7 +104,6 @@ class ReportView(APIView):
 
         company = participant.company
         logo_path = media.get_media_url(company.logo)
-        logo_path = logo_path.replace("https:", "http:")
 
         # Generar el PDF
         pdf_generator.generate_report(
