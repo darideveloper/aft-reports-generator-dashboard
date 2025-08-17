@@ -257,28 +257,24 @@ class HasAnswerView(APIView):
         ).exists()
             
         # Return true if not has answer
-        if not has_answer:
-            return Response(
-                {
-                    "status": "ok",
-                    "message": "Participant without answer.",
-                    "data": {
-                        "has_answer": False,
-                    },
-                },
-                status=status.HTTP_200_OK,
-            )
         
-        return Response(
-            {
-                "status": "error",
-                "message": "Participant with answer.",
-                "data": {
-                    "has_answer": True,
-                },
+        data = {
+            "status": "ok",
+            "message": "Participant without answer.",
+            "data": {
+                "has_answer": False,
             },
-            status=status.HTTP_200_OK,
-        )
+        }
+        if not has_answer:
+            data = {
+                "status": "ok",
+                "message": "Participant without answer.",
+                "data": {
+                    "has_answer": False,
+                },
+            }
+        
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class ResponseView(APIView):
