@@ -16,9 +16,12 @@ class InvitationCodeViewTestCase(TestSurveyViewsBase):
 
     def test_post_valid_invitation_code(self):
         """Test post request with valid invitation code"""
-        payload = {"invitation_code": "test"}
+        invitation_code = "test"
+        self.create_company(invitation_code=invitation_code)
+        payload = {"invitation_code": invitation_code}
 
         response = self.client.post(self.endpoint, payload, format="json")
+        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("ok", response.data["status"])

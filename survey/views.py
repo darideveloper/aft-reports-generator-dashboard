@@ -259,10 +259,10 @@ class HasAnswerView(APIView):
         # Return true if not has answer
         
         data = {
-            "status": "ok",
-            "message": "Participant without answer.",
+            "status": "error",
+            "message": "Participant with answer.",
             "data": {
-                "has_answer": False,
+                "has_answer": True,
             },
         }
         if not has_answer:
