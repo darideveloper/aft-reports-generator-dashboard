@@ -350,3 +350,95 @@ class SurveyViewTestCase(TestSurveyViewsBase):
                 question_option_response[question_option_index]["question_index"],
                 question_option_index + 1,
             )
+
+
+class HasAnswerViewTestCase(TestSurveyViewsBase):
+
+    def setUp(self):
+        # Set endpoint
+        super().setUp(
+            endpoint="/api/participant/has-answer/",
+            restricted_get=True,
+            restricted_post=False,
+        )
+
+        self.data = {"email": "test@test.com", "survey_id": 1}
+
+    def test_get_invalid_data(self):
+        """Test get request with invalid data"""
+
+        response = self.client.post(self.endpoint, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("email", response.data["data"])
+        self.assertIn("survey_id", response.data["data"])
+
+    def test_get_invalid_survey_id(self):
+        """Test get request with invalid survey id
+        Expects status error and "Invalid data"
+        """
+
+        # Create pariticipant but not survey or answers
+        self.create_participant(email=self.data["email"])
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("survey_id", response.data["data"])
+        self.assertNotIn("email", response.data["data"])
+
+    def test_get_invalid_email(self):
+        """Test get request with invalid email
+        Expects status error and "Invalid data"
+        """
+
+        self.data["email"] = "invalid_email"
+
+        # Create survey
+        self.create_survey()
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("email", response.data["data"])
+        self.assertNotIn("survey_id", response.data["data"])
+
+    def test_get_valid_participant_without_answer(self):
+        """Test get request with valid participant without answer
+        Expects status ok and "has_answer" false
+        """
+
+        # Create participant and survey
+        self.create_participant(email=self.data["email"])
+        self.create_survey()
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("ok", response.data["status"])
+        self.assertIn("Participant without answer.", response.data["message"])
+        self.assertIn("has_answer", response.data["data"])
+        self.assertFalse(response.data["data"]["has_answer"])
+
+    def test_get_valid_participant_with_answer(self):
+        """Test get request with valid participant with answer
+        Expects status error and "has_answer" true
+        """
+
+        # Create participant and survey
+        participant = self.create_participant(email=self.data["email"])
+        self.create_answer(participant=participant)
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Participant with answer.", response.data["message"])
+        self.assertIn("has_answer", response.data["data"])
+        self.assertTrue(response.data["data"]["has_answer"])

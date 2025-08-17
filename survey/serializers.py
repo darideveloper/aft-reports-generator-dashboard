@@ -87,25 +87,7 @@ class HasAnswerSerializer(serializers.Serializer):
     survey_id = serializers.PrimaryKeyRelatedField(
         queryset=models.Survey.objects.all()
     )
-
-    def validate(self, data):
-        email = data["email"]
-        survey = data["survey_id"]
-
-        has_answer = models.Answer.objects.filter(
-            participant__email=email,
-            question_option__question__question_group__survey=survey
-        ).exists()
-
-        if not has_answer:
-            raise serializers.ValidationError(
-                {"has_answer": "El participante no tiene respuestas para esta encuesta."}
-            )
-
-        # Podemos incluirlo para que el view lo tenga listo
-        data["has_answer"] = True
-        return data
-
+    
 
 class ParticipantDataSerializer(serializers.Serializer):
     gender = serializers.ChoiceField(choices=["m", "f", "o"])

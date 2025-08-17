@@ -234,8 +234,9 @@ class ReportView(APIView):
 
 
 class HasAnswerView(APIView):
+    """ Validate if the user already answered the survey, to avoid duplicate answers """
 
-    def get(self, request):
+    def post(self, request):
         serializer = serializers.HasAnswerSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(
@@ -246,28 +247,38 @@ class HasAnswerView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if serializer.validated_data["has_answer"]:
+            
+        email = serializer.validated_data["email"]
+        survey = serializer.validated_data["survey_id"]
+
+        has_answer = models.Answer.objects.filter(
+            participant__email=email,
+            question_option__question__question_group__survey=survey
+        ).exists()
+            
+        # Return true if not has answer
+        if not has_answer:
             return Response(
                 {
                     "status": "ok",
-                    "message": "Valid participant with answer.",
+                    "message": "Participant without answer.",
                     "data": {
-                        "has_answer": serializer.validated_data["has_answer"],
+                        "has_answer": False,
                     },
                 },
                 status=status.HTTP_200_OK,
             )
-        else:
-            return Response(
-                {
-                    "status": "error",
-                    "message": "Valid participant without answer.",
-                    "data": {
-                        "has_answer": serializer.validated_data["has_answer"],
-                    },
+        
+        return Response(
+            {
+                "status": "error",
+                "message": "Participant with answer.",
+                "data": {
+                    "has_answer": True,
                 },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ResponseView(APIView):
