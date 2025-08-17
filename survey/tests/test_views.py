@@ -442,3 +442,164 @@ class HasAnswerViewTestCase(TestSurveyViewsBase):
         self.assertIn("Participant with answer.", response.data["message"])
         self.assertIn("has_answer", response.data["data"])
         self.assertTrue(response.data["data"]["has_answer"])
+
+
+class ResponseViewTestCase(TestSurveyViewsBase):
+
+    def setUp(self):
+        # Set endpoint
+        super().setUp(
+            endpoint="/api/response/",
+            restricted_get=True,
+            restricted_post=False,
+        )
+
+        self.invitation_code = "test"
+        self.data = {
+            "invitation_code": self.invitation_code,
+            "survey_id": 1,
+            "participant": {
+                "email": "test@test.com",
+                "name": "Test User",
+                "gender": "m",
+                "birth_range": "1946-1964",
+                "position": "director",
+            },
+            "answers": [1, 2, 3],
+        }
+
+        # Create 3 options
+        for _ in range(3):
+            self.create_question_option()
+
+        # Create company with invitation code
+        self.company = self.create_company(invitation_code=self.invitation_code)
+
+    def test_post_invalid_data(self):
+        """Test post request with valid data"""
+
+        response = self.client.post(self.endpoint, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("invitation_code", response.data["data"])
+        self.assertIn("survey_id", response.data["data"])
+        self.assertIn("participant", response.data["data"])
+        self.assertIn("answers", response.data["data"])
+
+    def test_post_invalid_invitation_code(self):
+        """Test post request with invalid invitation code"""
+
+        self.data["invitation_code"] = "invalid_code"
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("invitation_code", response.data["data"])
+        self.assertNotIn("survey_id", response.data["data"])
+        self.assertNotIn("participant", response.data["data"])
+        self.assertNotIn("answers", response.data["data"])
+
+    def test_post_invalid_survey_id(self):
+        """Test post request with invalid survey id"""
+
+        self.data["survey_id"] = 999
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("survey_id", response.data["data"])
+        self.assertNotIn("invitation_code", response.data["data"])
+        self.assertNotIn("participant", response.data["data"])
+        self.assertNotIn("answers", response.data["data"])
+
+    def test_post_missing_participant_data(self):
+        """Test post request with missing participant data"""
+
+        self.data["participant"] = {}
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("participant", response.data["data"])
+        self.assertIn("email", response.data["data"]["participant"])
+        self.assertIn("name", response.data["data"]["participant"])
+        self.assertIn("gender", response.data["data"]["participant"])
+        self.assertIn("birth_range", response.data["data"]["participant"])
+        self.assertIn("position", response.data["data"]["participant"])
+        self.assertNotIn("survey_id", response.data["data"])
+        self.assertNotIn("invitation_code", response.data["data"])
+        self.assertNotIn("answers", response.data["data"])
+
+    def test_post_invalid_answers(self):
+        """Test post request with invalid answers"""
+
+        self.data["answers"] = [900, 901, 902]
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn("answers", response.data["data"])
+        self.assertNotIn("invitation_code", response.data["data"])
+        self.assertNotIn("survey_id", response.data["data"])
+        self.assertNotIn("participant", response.data["data"])
+
+    def test_post_participant_already_submitted(self):
+        """Test post request with participant already submitted"""
+
+        # Delete old survey
+        survey_models.Survey.objects.all().delete()
+
+        # Create answer in specific survey
+        survey = self.create_survey()
+        question_group = self.create_question_group(survey=survey)
+        question = self.create_question(question_group=question_group)
+        question_option = self.create_question_option(question=question)
+        participant = self.create_participant(email=self.data["participant"]["email"])
+        self.create_answer(participant=participant, question_option=question_option)
+
+        # Update json data
+        self.data["survey_id"] = survey.id
+        self.data["answers"] = [question_option.id]
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data["status"])
+        self.assertIn("Invalid data", response.data["message"])
+        self.assertIn(
+            "This participant has already submitted answers for this survey.",
+            str(response.data["data"]),
+        )
+        self.assertNotIn("invitation_code", response.data["data"])
+        self.assertNotIn("survey_id", response.data["data"])
+        self.assertNotIn("participant", response.data["data"])
+        self.assertNotIn("answers", response.data["data"])
+
+    def test_post_valid_data(self):
+        """Test post request with valid data"""
+
+        response = self.client.post(self.endpoint, self.data, format="json")
+        participant = survey_models.Participant.objects.get(
+            email=self.data["participant"]["email"]
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("ok", response.data["status"])
+        self.assertIn(
+            "Participant and answers registered successfully", response.data["message"]
+        )
+        self.assertIn("answers_count", response.data["data"])
+        self.assertEqual(response.data["data"]["participant_id"], participant.id)
+        self.assertEqual(
+            response.data["data"]["answers_count"], len(self.data["answers"])
+        )

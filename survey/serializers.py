@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from rest_framework import serializers
 
 from survey import models
@@ -84,31 +86,27 @@ class ReportSerializer(serializers.Serializer):
 
 class HasAnswerSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    survey_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Survey.objects.all()
-    )
-    
+    survey_id = serializers.PrimaryKeyRelatedField(queryset=models.Survey.objects.all())
+
 
 class ParticipantDataSerializer(serializers.Serializer):
     gender = serializers.ChoiceField(choices=["m", "f", "o"])
-    birth_range = serializers.ChoiceField(choices=[
-        "1946-1964", "1965-1980", "1981-1996", "1997-2012"
-    ])
-    position = serializers.ChoiceField(choices=[
-        "director", "manager", "supervisor", "operator", "other"
-    ])
+    birth_range = serializers.ChoiceField(
+        choices=["1946-1964", "1965-1980", "1981-1996", "1997-2012"]
+    )
+    position = serializers.ChoiceField(
+        choices=["director", "manager", "supervisor", "operator", "other"]
+    )
     name = serializers.CharField(max_length=255)
     email = serializers.EmailField()
 
 
 class AnswerDataSerializer(serializers.Serializer):
     question_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Question.objects.all(),
-        source="question"
+        queryset=models.Question.objects.all(), source="question"
     )
     question_option_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.QuestionOption.objects.all(),
-        source="question_option"
+        queryset=models.QuestionOption.objects.all(), source="question_option"
     )
 
     def validate(self, data):
@@ -121,40 +119,47 @@ class AnswerDataSerializer(serializers.Serializer):
 
 
 class ResponseSerializer(serializers.Serializer):
-    invitation_code = serializers.CharField(max_length=255)
+    invitation_code = serializers.SlugRelatedField(
+        queryset=models.Company.objects.filter(is_active=True),
+        slug_field="invitation_code",
+    )
     survey_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Survey.objects.all(),
-        source="survey"
+        queryset=models.Survey.objects.all(), source="survey"
     )
     participant = ParticipantDataSerializer(source="participant_data")
-    answers = AnswerDataSerializer(many=True, source="answers_data")
-
-    def validate_invitation_code(self, value):
-        try:
-            company = models.Company.objects.get(invitation_code=value)
-        except models.Company.DoesNotExist:
-            raise serializers.ValidationError("El código de invitación no es válido.")
-        # Guardamos la instancia para usarla luego en validated_data
-        self.company = company
-        return value
-
+    answers = serializers.PrimaryKeyRelatedField(
+        queryset=models.QuestionOption.objects.all(), many=True, source="answers_data"
+    )
+    
     def validate(self, data):
-        # Inyectar company validada para usar en la vista
-        data["company"] = getattr(self, "company", None)
-
-        survey = data["survey"]                        # Survey (instancia)
-        p = data.get("participant_data", {})
-        email = p.get("email")
-
-        # Validar si YA respondió este survey
-        already_answered = models.Answer.objects.filter(
-            participant__email=email,
-            question_option__question__question_group__survey=survey
-        ).exists()
-
-        if already_answered:
-            raise serializers.ValidationError(
-                {"participant": "No puede volver a hacer este cuestionario."}
-            )
+        participant_email = data.get("participant_data", {}).get("email")
+        survey = data.get("survey")
+        
+        if participant_email and survey:
+            if models.Answer.objects.filter(
+                participant__email=participant_email,
+                question_option__question__question_group__survey=survey
+            ).exists():
+                raise serializers.ValidationError(
+                    "This participant has already submitted answers for this survey."
+                )
 
         return data
+    
+    def create(self, validated_data):
+
+        company = validated_data.pop("invitation_code")
+        participant_data = validated_data.pop("participant_data")
+        selected_options = validated_data.pop("answers_data")
+
+        with transaction.atomic():
+            participant = models.Participant.objects.create(
+                company=company, **participant_data
+            )
+            for option in selected_options:
+                models.Answer.objects.create(
+                    participant=participant,
+                    question_option=option,
+                )
+
+        return participant, selected_options

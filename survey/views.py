@@ -294,22 +294,7 @@ class ResponseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        company = serializer.validated_data["company"]
-        participant_data = serializer.validated_data["participant_data"]
-        answers_data = serializer.validated_data["answers_data"]
-
-        with transaction.atomic():
-            participant = models.Participant.objects.create(
-                company=company,
-                **participant_data
-            )
-            models.Answer.objects.bulk_create([
-                models.Answer(
-                    participant=participant,
-                    question_option=answer["question_option"]
-                )
-                for answer in answers_data
-            ])
+        participant, options = serializer.save()
 
         return Response(
             {
@@ -317,7 +302,7 @@ class ResponseView(APIView):
                 "message": "Participant and answers registered successfully",
                 "data": {
                     "participant_id": participant.id,
-                    "answers_count": len(answers_data)
+                    "answers_count": len(options)
                 },
             },
             status=status.HTTP_201_CREATED,
