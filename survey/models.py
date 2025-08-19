@@ -245,6 +245,13 @@ class Report(models.Model):
     participant = models.ForeignKey(
         Participant, on_delete=models.CASCADE, verbose_name="Participante"
     )
+    pdf_file = models.FileField(
+        upload_to="reports/",
+        blank=True,
+        null=True,
+        verbose_name="Archivo PDF",
+        help_text="Archivo PDF del reporte generado",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

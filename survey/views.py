@@ -1,13 +1,13 @@
 import os
 import numpy as np
+
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.http import FileResponse, Http404
-from django.conf import settings
-from django.db import transaction
 
+from django.http import FileResponse, Http404
+from django.core.files import File
 
 from utils import pdf_generator, media
 
@@ -220,6 +220,16 @@ class ReportView(APIView):
 
         if not os.path.exists(pdf_path):
             raise Http404("El reporte no fue generado correctamente.")
+        
+        # Save file in database
+        report, _ = models.Report.objects.get_or_create(
+            survey=serializer.validated_data["survey_id"],
+            participant=serializer.validated_data["participant_id"],
+        )
+        
+        # Open the file and save it to FileField
+        with open(pdf_path, "rb") as f:
+            report.pdf_file.save(os.path.basename(pdf_path), File(f), save=True)
 
         # Devolver el PDF para renderizado en el navegador
         return FileResponse(
