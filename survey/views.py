@@ -8,6 +8,7 @@ from rest_framework import status
 
 from django.http import FileResponse, Http404
 from django.core.files import File
+from django.utils import timezone
 
 from utils import pdf_generator, media
 
@@ -105,14 +106,14 @@ class ReportView(APIView):
         company = participant.company
         logo_path = media.get_media_url(company.logo)
 
-        # Generar el PDF
+        # Generar el PDF (dummy data)
         pdf_path = pdf_generator.generate_report(
-            name,
-            "date",
-            "grade_code",
-            0.9,
-            logo_path,
-            np.array(
+            name=name,
+            date=timezone.now().strftime("%d/%m/%Y"),
+            grade_code="MDP",
+            final_score=9.9,
+            logo_path=logo_path,
+            data=np.array(
                 [
                     53.1,
                     48.7,
@@ -136,7 +137,7 @@ class ReportView(APIView):
                     40.5,
                 ]
             ),
-            [
+            resulting_paragraphs=[
                 {
                     "score": 90,
                     "text": "Tu evaluación refleja un conocimiento sólido y avanzado sobre los aspectos clave de la alfabetización tecnológica, lo cual es una fortaleza significativa en tu perfil profesional. Comprendes bien las implicaciones y aplicaciones de tecnologías, lo que te permite tomar decisiones informadas y estratégicas en tu organización. No obstante, es recomendable que sigas profundizando en áreas emergentes, como la automatización de procesos y la cadena de bloques, para mantenerte a la vanguardia de las innovaciones tecnológicas. También podrías centrarte en expandir tu capacidad para fomentar una cultura digital dentro de tu equipo, asegurando que todos estén alineados con las nuevas herramientas y tecnologías. Si continúas desarrollando tus habilidades en la gestión de riesgos tecnológicos y el cumplimiento de normativas globales de seguridad, podrás fortalecer aún más tu liderazgo digital y asegurar que tu organización se mantenga competitiva a largo plazo.",
@@ -190,7 +191,7 @@ class ReportView(APIView):
                     "text": "Tu evaluación refleja un nivel sobresaliente en cuanto a etiqueta digital, lo que indica que tienes una gran capacidad para comunicarte de manera respetuosa y profesional en plataformas digitales. Sabes manejar diferentes tipos de comunicación y eres consciente de la importancia de la rapidez y la claridad en las respuestas. Además, muestras una excelente habilidad para adaptarte a las expectativas de las diversas generaciones, lo que te permite gestionar equipos de manera efectiva en un entorno digital. Sin embargo, es importante que continúes perfeccionando tu capacidad para respetar los límites digitales, tanto para ti como para tu equipo, especialmente en un entorno remoto donde el trabajo puede fácilmente invadir el tiempo personal. Te sugiero que sigas promoviendo un uso responsable de las tecnologías y sigas modelando un comportamiento digital positivo para tu equipo. No olvides que liderar con el ejemplo es una ventaja única. ",
                 },
             ],
-            {
+            resulting_titles={
                 "cultura": {
                     "subtitle": "Líder en adaptación digital",
                     "paragraph": "Ha comenzado a incorporar herramientas y conceptos digitales en su práctica diaria, aunque aún depende de apoyo para aplicarlos de forma estratégica. Muestra disposición al aprendizaje, pero necesita mayor consistencia para liderar con seguridad en entornos digitales. Podría hacer un mayor esfuerzo para convertirse en un aliado del área de tecnología en esta era digital.",
