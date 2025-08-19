@@ -74,7 +74,8 @@ def generate_bell_curve_plot(
     plt.tight_layout()
 
     # Create folder in case it doesn't exists
-    carpeta_salida = "graphics"
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    carpeta_salida = os.path.join(current_dir, "graphics")
     os.makedirs(carpeta_salida, exist_ok=True)
 
     # Save plot
