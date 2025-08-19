@@ -106,7 +106,7 @@ class ReportView(APIView):
         logo_path = media.get_media_url(company.logo)
 
         # Generar el PDF
-        pdf_generator.generate_report(
+        pdf_path = pdf_generator.generate_report(
             name,
             "date",
             "grade_code",
@@ -217,9 +217,6 @@ class ReportView(APIView):
                 },
             },
         )
-
-        # Ruta absoluta al PDF
-        pdf_path = os.path.join(settings.BASE_DIR, "files", f"{name}.pdf")
 
         if not os.path.exists(pdf_path):
             raise Http404("El reporte no fue generado correctamente.")

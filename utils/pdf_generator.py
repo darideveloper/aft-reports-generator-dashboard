@@ -13,7 +13,7 @@ from .graphics_generator import generate_bell_curve_plot
 
 current_folder = os.path.dirname(__file__)
 parent_folder = os.path.dirname(current_folder)
-files_folder = os.path.join(parent_folder, "files")
+files_folder = os.path.join(parent_folder, "temp_files")
 
 # Create files folder in case it doesn't exist
 os.makedirs(files_folder, exist_ok=True)
