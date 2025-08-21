@@ -16,9 +16,7 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    options = QuestionOptionSerializer(
-        many=True, read_only=True, source="questionoption_set"
-    )
+    options = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Question
@@ -31,9 +29,14 @@ class QuestionSerializer(serializers.ModelSerializer):
             "question_group",
         ]
 
+    def get_options(self, obj):
+        return QuestionOptionSerializer(
+            obj.questionoption_set.order_by("question_index"), many=True
+        ).data
+
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True, source="question_set")
+    questions = serializers.SerializerMethodField()
     modifiers = serializers.SerializerMethodField()
 
     class Meta:
@@ -51,11 +54,14 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
     def get_modifiers(self, obj):
         return obj.modifiers.values_list("name", flat=True)
 
+    def get_questions(self, obj):
+        return QuestionSerializer(
+            obj.question_set.order_by("question_group_index"), many=True
+        ).data
+
 
 class SurveyDetailSerializer(serializers.ModelSerializer):
-    question_groups = QuestionGroupSerializer(
-        many=True, read_only=True, source="questiongroup_set"
-    )
+    question_groups = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Survey
@@ -67,6 +73,11 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
             "updated_at",
             "question_groups",
         ]
+
+    def get_question_groups(self, obj):
+        return QuestionGroupSerializer(
+            obj.questiongroup_set.order_by("survey_index"), many=True
+        ).data
 
 
 class ReportSerializer(serializers.Serializer):
