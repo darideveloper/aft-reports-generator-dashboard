@@ -15,8 +15,7 @@ h1 img {
 }
 
 .select2-selection__choice__display {
-  padding-left: 10px !important;
-  color: black;
+  color: white !important;
 }
 
 @media screen and (max-width: 768px) {
@@ -83,12 +82,9 @@ h1 img {
   max-width: 100% !important;
 }
 
-.select2-selection__choice {
-  background-color: #0c2110 !important;
-  color: #fefefe !important;
-}
 .select2-selection__choice > span {
   margin-left: 10px !important;
+  color: black !important;
 }
 
 .select2.select2-container {
