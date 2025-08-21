@@ -16,7 +16,9 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    options = serializers.SerializerMethodField()
+    options = QuestionOptionSerializer(
+        many=True, read_only=True, source="questionoption_set"
+    )
 
     class Meta:
         model = models.Question
@@ -29,14 +31,10 @@ class QuestionSerializer(serializers.ModelSerializer):
             "question_group",
         ]
 
-    def get_options(self, obj):
-        return QuestionOptionSerializer(
-            obj.questionoption_set.order_by("question_index"), many=True
-        ).data
-
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
-    questions = serializers.SerializerMethodField()
+    questions = QuestionSerializer(many=True, read_only=True, source="question_set")
+    modifiers = serializers.SerializerMethodField()
 
     class Meta:
         model = models.QuestionGroup
@@ -47,16 +45,17 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
             "survey_percentage",
             "questions",
             "survey_index",
+            "modifiers",
         ]
 
-    def get_questions(self, obj):
-        return QuestionSerializer(
-            obj.question_set.order_by("question_group_index"), many=True
-        ).data
+    def get_modifiers(self, obj):
+        return obj.modifiers.values_list("name", flat=True)
 
 
 class SurveyDetailSerializer(serializers.ModelSerializer):
-    question_groups = serializers.SerializerMethodField()
+    question_groups = QuestionGroupSerializer(
+        many=True, read_only=True, source="questiongroup_set"
+    )
 
     class Meta:
         model = models.Survey
@@ -68,11 +67,6 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
             "updated_at",
             "question_groups",
         ]
-
-    def get_question_groups(self, obj):
-        return QuestionGroupSerializer(
-            obj.questiongroup_set.order_by("survey_index"), many=True
-        ).data
 
 
 class ReportSerializer(serializers.Serializer):
@@ -130,22 +124,22 @@ class ResponseSerializer(serializers.Serializer):
     answers = serializers.PrimaryKeyRelatedField(
         queryset=models.QuestionOption.objects.all(), many=True, source="answers_data"
     )
-    
+
     def validate(self, data):
         participant_email = data.get("participant_data", {}).get("email")
         survey = data.get("survey")
-        
+
         if participant_email and survey:
             if models.Answer.objects.filter(
                 participant__email=participant_email,
-                question_option__question__question_group__survey=survey
+                question_option__question__question_group__survey=survey,
             ).exists():
                 raise serializers.ValidationError(
                     "This participant has already submitted answers for this survey."
                 )
 
         return data
-    
+
     def create(self, validated_data):
 
         company = validated_data.pop("invitation_code")

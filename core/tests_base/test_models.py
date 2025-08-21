@@ -1,4 +1,5 @@
 import uuid
+import json
 
 from django.test import TestCase
 
@@ -45,6 +46,22 @@ class TestSurveyModelBase(TestCase):
 
         return survey_models.Survey.objects.create(name=name, instructions=instructions)
 
+    def create_question_group_modifier(
+        self,
+        name: str = "Question group modifier test {x}",
+        details: str = "",
+        data: dict = {},
+    ) -> survey_models.QuestionGroupModifier:
+        """Create a question group modifier object"""
+
+        name = self.__replace_random_string__(name)
+
+        return survey_models.QuestionGroupModifier.objects.create(
+            name=name,
+            details=details,
+            data=json.dumps(data),
+        )
+
     def create_question_group(
         self,
         survey: survey_models.Survey = None,
@@ -52,6 +69,7 @@ class TestSurveyModelBase(TestCase):
         details: str = "",
         survey_index: int = 0,
         survey_percentage: float = 0,
+        modifiers: list[survey_models.QuestionGroupModifier] = [],
     ) -> survey_models.QuestionGroup:
         """Create a question group object"""
 
@@ -60,13 +78,18 @@ class TestSurveyModelBase(TestCase):
         if not survey:
             survey = self.create_survey()
 
-        return survey_models.QuestionGroup.objects.create(
+        question_group = survey_models.QuestionGroup.objects.create(
             name=name,
             survey=survey,
             survey_index=survey_index,
             survey_percentage=survey_percentage,
             details=details,
         )
+
+        for modifier in modifiers:
+            question_group.modifiers.add(modifier)
+
+        return question_group
 
     def create_question(
         self,

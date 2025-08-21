@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import status
 
 from core.tests_base.test_views import TestSurveyViewsBase
@@ -154,6 +156,34 @@ class SurveyViewTestCase(TestSurveyViewsBase):
                 response.data["question_groups"][question_group_index]["survey_index"],
                 question_group_index + 1,
             )
+
+    def test_question_group_modifiers(self):
+        """
+        Create question group with modifiers and retrieve its data to validate is the
+        same as created
+        """
+        
+        # Create question group with modifiers
+        modifiers = [
+            self.create_question_group_modifier(),
+            self.create_question_group_modifier(),
+        ]
+        modifiers_names = [modifier.name for modifier in modifiers]
+        
+        question_group = self.create_question_group(
+            name="Question group test",
+            details="Details question group",
+            survey_index=1,
+            survey_percentage=0.7,
+            modifiers=modifiers,
+        )
+        
+        # Retrieve question group data
+        response = self.client.get(f"{self.endpoint}{question_group.survey.id}/")
+        
+        json_data = json.loads(response.content)
+        question_group_response = json_data["question_groups"][0]
+        self.assertEqual(question_group_response["modifiers"], modifiers_names)
 
     def test_question_data_single(self):
         """
