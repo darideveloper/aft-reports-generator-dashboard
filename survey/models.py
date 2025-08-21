@@ -254,6 +254,13 @@ class Report(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.participant.name} - {self.survey.name}"
+    
+    class Meta:
+        verbose_name = "Reporte"
+        verbose_name_plural = "Reportes"
 
 
 class Answer(models.Model):
