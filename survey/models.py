@@ -252,6 +252,11 @@ class Report(models.Model):
         verbose_name="Archivo PDF",
         help_text="Archivo PDF del reporte generado",
     )
+    total = models.FloatField(
+        default=0,
+        verbose_name="Calificación final",
+        help_text="Calificación final del participante en la encuesta",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
