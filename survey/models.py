@@ -108,6 +108,8 @@ class QuestionGroup(models.Model):
         QuestionGroupModifier,
         verbose_name="Modificadores",
         help_text="Modificadores del grupo de preguntas",
+        null=True,
+        blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
