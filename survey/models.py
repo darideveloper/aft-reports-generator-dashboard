@@ -62,6 +62,33 @@ class Survey(models.Model):
         verbose_name_plural = "Encuestas"
 
 
+class QuestionGroupModifier(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, verbose_name="Nombre")
+    details = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Detalles",
+        help_text="Detalles adicionales del modificador del formulario. ",
+    )
+    data = models.JSONField(
+        blank=True,
+        null=True,
+        verbose_name="Datos",
+        help_text="Datos adicionales del modificador del formulario. "
+        "Se usarán para generar el formulario.",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "Modificador de Grupo de Preguntas"
+        verbose_name_plural = "Modificadores de Grupos de Preguntas"
+        
+
 class QuestionGroup(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, verbose_name="Nombre")
@@ -76,6 +103,11 @@ class QuestionGroup(models.Model):
     )
     survey_percentage = models.FloatField(
         default=0, verbose_name="Porcentaje", help_text="Porcentaje de la encuesta"
+    )
+    modifiers = models.ManyToManyField(
+        QuestionGroupModifier,
+        verbose_name="Modificadores",
+        help_text="Modificadores del grupo de preguntas",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

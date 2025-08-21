@@ -1,0 +1,23 @@
+[
+    {
+        "model": "survey.QuestionGroupModifier",
+        "pk": 1,
+        "fields": {
+            "name": "Grid",
+            "details": "Modifica el grupo de preguntas para que se muestre en una cuadrícula (todas las opciones del grupo de preguntas, deben ser las mismas)",
+            "created_at": "2025-08-21T00:00:00Z",
+            "updated_at": "2025-08-21T00:00:00Z"
+        }
+    },
+    {
+        "model": "survey.QuestionGroupModifier",
+        "pk": 2,
+        "fields": {
+            "name": "Unique",
+            "details": "Permite que el participante no pueda repetir opciones en el grupo de preguntas (todas las opciones del grupo de preguntas, deben ser las mismas)",
+            "data": {},
+            "created_at": "2025-08-21T00:00:00Z",
+            "updated_at": "2025-08-21T00:00:00Z"
+        }
+    }
+]

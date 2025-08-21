@@ -19,6 +19,14 @@ class SurveyAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
 
 
+@admin.register(models.QuestionGroupModifier)
+class QuestionGroupModifierAdmin(admin.ModelAdmin):
+    list_display = ("name", "created_at")
+    search_fields = ("name",)
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("name",)
+
+
 @admin.register(models.QuestionGroup)
 class QuestionGroupAdmin(admin.ModelAdmin):
     list_display = (
