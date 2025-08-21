@@ -112,7 +112,7 @@ class ReportAdmin(admin.ModelAdmin):
     def custom_links(self, obj):
         """Create custom Imprimir and Ver buttons"""
         return format_html(
-            '<a class="btn btn-primary my-1" href="{}">Ver Reporte</a>',
+            '<a class="btn btn-primary my-1" href="{}" target="_blank">Ver Reporte</a>',
             f"/report/?survey_id={obj.survey.id}&participant_id={obj.participant.id}",
         )
 
