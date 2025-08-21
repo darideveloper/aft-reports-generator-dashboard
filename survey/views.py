@@ -105,11 +105,16 @@ class ReportView(APIView):
 
         company = participant.company
         logo_path = media.get_media_url(company.logo)
+        
+        report = models.Report.objects.get(
+            survey=serializer.validated_data["survey_id"],
+            participant=serializer.validated_data["participant_id"],
+        )
 
         # Generar el PDF (dummy data)
         pdf_path = pdf_generator.generate_report(
             name=name,
-            date=timezone.now().strftime("%d/%m/%Y"),
+            date=report.created_at.strftime("%d/%m/%Y"),
             grade_code="MDP",
             final_score=9.9,
             logo_path=logo_path,
