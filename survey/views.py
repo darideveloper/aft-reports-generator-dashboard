@@ -207,7 +207,7 @@ class ResponseView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        participant, options = serializer.save()
+        participant, options, report = serializer.save()
 
         return Response(
             {
@@ -215,7 +215,8 @@ class ResponseView(APIView):
                 "message": "Participant and answers registered successfully",
                 "data": {
                     "participant_id": participant.id,
-                    "answers_count": len(options)
+                    "answers_count": len(options),
+                    "report_id": report.id,
                 },
             },
             status=status.HTTP_201_CREATED,

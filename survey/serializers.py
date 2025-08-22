@@ -156,8 +156,11 @@ class ResponseSerializer(serializers.Serializer):
         company = validated_data.pop("invitation_code")
         participant_data = validated_data.pop("participant_data")
         selected_options = validated_data.pop("answers_data")
+        survey = validated_data.pop("survey")
 
         with transaction.atomic():
+            
+            # Save participant and answers
             participant = models.Participant.objects.create(
                 company=company, **participant_data
             )
@@ -166,5 +169,11 @@ class ResponseSerializer(serializers.Serializer):
                     participant=participant,
                     question_option=option,
                 )
+                
+            # Create report
+            report = models.Report.objects.create(
+                participant=participant,
+                survey=survey,
+            )
 
-        return participant, selected_options
+        return participant, selected_options, report

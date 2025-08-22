@@ -162,14 +162,14 @@ class SurveyViewTestCase(TestSurveyViewsBase):
         Create question group with modifiers and retrieve its data to validate is the
         same as created
         """
-        
+
         # Create question group with modifiers
         modifiers = [
             self.create_question_group_modifier(),
             self.create_question_group_modifier(),
         ]
         modifiers_names = [modifier.name for modifier in modifiers]
-        
+
         question_group = self.create_question_group(
             name="Question group test",
             details="Details question group",
@@ -177,10 +177,10 @@ class SurveyViewTestCase(TestSurveyViewsBase):
             survey_percentage=0.7,
             modifiers=modifiers,
         )
-        
+
         # Retrieve question group data
         response = self.client.get(f"{self.endpoint}{question_group.survey.id}/")
-        
+
         json_data = json.loads(response.content)
         question_group_response = json_data["question_groups"][0]
         self.assertEqual(question_group_response["modifiers"], modifiers_names)
@@ -626,6 +626,7 @@ class ResponseViewTestCase(TestSurveyViewsBase):
             email=self.data["participant"]["email"]
         )
 
+        # Validate response
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("ok", response.data["status"])
         self.assertIn(
@@ -636,3 +637,15 @@ class ResponseViewTestCase(TestSurveyViewsBase):
         self.assertEqual(
             response.data["data"]["answers_count"], len(self.data["answers"])
         )
+        self.assertIn("report_id", response.data["data"])
+
+        # Validate data created in database
+        participant = survey_models.Participant.objects.get(
+            email=self.data["participant"]["email"]
+        )
+        answers = survey_models.Answer.objects.filter(participant=participant)
+        report = survey_models.Report.objects.get(id=response.data["data"]["report_id"])
+
+        self.assertEqual(answers.count(), len(self.data["answers"]))
+        self.assertEqual(report.participant, participant)
+        self.assertEqual(answers.count(), len(self.data["answers"]))
