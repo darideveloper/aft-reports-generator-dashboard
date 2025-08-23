@@ -24,6 +24,7 @@ django-jazzmin==3.0.1
 
 # testing
 selenium==4.20.0
+beautifulsoup4==4.13.4
 
 # reports
 PyPDF2==3.0.1

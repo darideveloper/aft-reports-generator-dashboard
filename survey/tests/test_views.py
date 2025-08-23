@@ -23,7 +23,6 @@ class InvitationCodeViewTestCase(TestSurveyViewsBase):
         payload = {"invitation_code": invitation_code}
 
         response = self.client.post(self.endpoint, payload, format="json")
-        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("ok", response.data["status"])
