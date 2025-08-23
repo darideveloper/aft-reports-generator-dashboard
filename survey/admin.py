@@ -4,6 +4,72 @@ from django.utils.html import format_html
 from survey import models
 
 
+# Custom filters for deep filtering relationships (3+ levels)
+class SurveyFilter(admin.SimpleListFilter):
+    title = "Encuesta"
+    parameter_name = "survey"
+
+    def lookups(self, request, model_admin):
+        return [(s.id, str(s)) for s in models.Survey.objects.all().order_by("id")]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            # Check if this is for Answer model (4 levels) or
+            # QuestionOption model (3 levels)
+            if hasattr(queryset.model, "question_option"):
+                # Answer model: question_option__question__question_group__survey
+                return queryset.filter(
+                    question_option__question__question_group__survey__id=self.value()
+                )
+            else:
+                # QuestionOption model: question__question_group__survey
+                return queryset.filter(
+                    question__question_group__survey__id=self.value()
+                )
+        return queryset
+
+
+class QuestionGroupFilter(admin.SimpleListFilter):
+    title = "Grupo de Preguntas"
+    parameter_name = "question_group"
+
+    def lookups(self, request, model_admin):
+        return [
+            (qg.id, str(qg))
+            for qg in models.QuestionGroup.objects.all().order_by("survey_index")
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            # Check if this is for Answer model (3 levels) or
+            # QuestionOption model (2 levels)
+            if hasattr(queryset.model, "question_option"):
+                # Answer model: question_option__question__question_group
+                return queryset.filter(
+                    question_option__question__question_group__id=self.value()
+                )
+            else:
+                # QuestionOption model: question__question_group
+                return queryset.filter(question__question_group__id=self.value())
+        return queryset
+
+
+class QuestionFilter(admin.SimpleListFilter):
+    title = "Pregunta"
+    parameter_name = "question"
+
+    def lookups(self, request, model_admin):
+        return [
+            (q.id, str(q))
+            for q in models.Question.objects.all().order_by("question_group_index")
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(question_option__question__id=self.value())
+        return queryset
+
+
 @admin.register(models.Company)
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ("name", "invitation_code", "is_active", "created_at")
@@ -75,8 +141,8 @@ class QuestionOptionAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "points",
-        "question__question_group__survey",
-        "question__question_group",
+        SurveyFilter,
+        QuestionGroupFilter,
         "question",
         "created_at",
         "updated_at",
@@ -130,9 +196,9 @@ class AnswerAdmin(admin.ModelAdmin):
     list_display = ("participant", "question_option", "created_at")
     list_filter = (
         "participant__company",
-        "question_option__question__question_group__survey",
-        "question_option__question__question_group",
-        "question_option__question",
+        SurveyFilter,
+        QuestionGroupFilter,
+        QuestionFilter,
         "question_option",
         "participant",
         "created_at",
