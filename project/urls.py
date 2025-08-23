@@ -24,7 +24,6 @@ urlpatterns = [
     ),
     # API URLs
     path("api/", include(router.urls)),
-    
     # No crud endpoints
     path(
         "api/invitation-code/",
@@ -37,7 +36,8 @@ urlpatterns = [
         "api/participant/has-answer/",
         survey_views.HasAnswerView.as_view(),
         name="participant-has-answer",
-    )
+    ),
+    path("api/bar-chart/", survey_views.BarChartView.as_view(), name="bar-chart"),
 ]
 
 if not settings.STORAGE_AWS:

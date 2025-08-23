@@ -177,3 +177,12 @@ class ResponseSerializer(serializers.Serializer):
             )
 
         return participant, selected_options, report
+
+
+class BarChartSerializer(serializers.Serializer):
+    survey_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Survey.objects.all(), source="survey"
+    )
+    participant_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Participant.objects.all(), source="participant"
+    )

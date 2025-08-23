@@ -9,11 +9,10 @@ class SurveyCalcs:
         self,
         participant: models.Participant,
         survey: models.Survey,
-        company: models.Company,
     ):
         self.participant = participant
         self.survey = survey
-        self.company = company
+        self.company = participant.company
 
     def get_company_totals(self) -> np.ndarray:
         """
@@ -178,3 +177,128 @@ class SurveyCalcs:
                 "paragraph": "Utiliza con fluidez dispositivos digitales y herramientas colaborativas para coordinar equipos, compartir información y gestionar proyectos en tiempo real. Integra plataformas en la nube, automatiza tareas y promueve una cultura de trabajo ágil, conectada y eficiente. Su ejemplo ayuda a otros a actualizarse y a mantener un ritmo activo.",
             },
         }
+
+    def get_bar_chart_data(self) -> list[dict]:
+        """
+        DUMMY FUNCTION
+        Get the bar chart data for a participant in a survey.
+        """
+        return [
+            {
+                "titulo": "Antecedentes tecnológicos",
+                "valor": 1,
+                "promedio": 6,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Comprender cómo funcionan las tecnologías y sus efectos sociales fortalece el liderazgo estratégico.",
+                "color": "text-tech-red bg-tech-red border-tech-red",
+            },
+            {
+                "titulo": "Evolución tecnológica",
+                "valor": 2,
+                "promedio": 6,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Conocer la evolución tecnológica permite anticipar cambios y liderar la innovación.",
+                "color": "text-tech-red bg-tech-red border-tech-red",
+            },
+            {
+                "titulo": "Internet y conectividad",
+                "valor": 3,
+                "promedio": 7,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Diferenciar Web e Internet ayuda a planear mejor la infraestructura y seguridad digital.",
+                "color": "text-tech-red bg-tech-red border-tech-red",
+            },
+            {
+                "titulo": "Dispositivos digitales",
+                "valor": 4,
+                "promedio": 7.88,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Usar correctamente dispositivos digitales mejora productividad y colaboración en tiempo real.",
+                "color": "text-tech-red bg-tech-red border-tech-red",
+            },
+            {
+                "titulo": "Ciberseguridad",
+                "valor": 5,
+                "promedio": 6,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Proteger los datos y gestionar riesgos es clave para mantener la resiliencia organizacional.",
+                "color": "text-tech-red bg-tech-red border-tech-red",
+            },
+            {
+                "titulo": "Huella digital",
+                "valor": 6,
+                "promedio": 7.5,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Controlar la huella digital protege la privacidad personal y corporativa frente a amenazas.",
+                "color": "text-tech-green bg-tech-green border-tech-green",
+            },
+            {
+                "titulo": "Uso de la tecnología",
+                "valor": 7,
+                "promedio": 8,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Un liderazgo ético y responsable en lo digital genera confianza y respeto.",
+                "color": "text-tech-green bg-tech-green border-tech-green",
+            },
+            {
+                "titulo": "Herramientas de colaboración",
+                "valor": 8,
+                "promedio": 8,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Usar bien las herramientas colaborativas mejora flujos de trabajo y eficiencia.",
+                "color": "text-tech-green bg-tech-green border-tech-green",
+            },
+            {
+                "titulo": "Tecnologías emergentes",
+                "valor": 9,
+                "promedio": 9,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Conocer y aplicar tecnologías emergentes permite innovar y mantenerse competitivo.",
+                "color": "text-tech-green bg-tech-green border-tech-green",
+            },
+            {
+                "titulo": "Tecnologías de asistencia",
+                "valor": 10,
+                "promedio": 5,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Fomentar su uso promueve la inclusión y la equidad para todos.",
+                "color": "text-tech-green bg-tech-green border-tech-green",
+            },
+            {
+                "titulo": "Rol del líder y la tecnología",
+                "valor": 10,
+                "promedio": 7,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Gestionar redes sociales de forma consciente protege la imagen y el equipo.",
+                "color": "text-tech-blue bg-tech-blue border-tech-blue",
+            },
+            {
+                "titulo": "Tecnología y medio ambiente",
+                "valor": 7,
+                "promedio": 6,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Adoptar prácticas sostenibles reduce el impacto ambiental de la tecnología.",
+                "color": "text-tech-blue bg-tech-blue border-tech-blue",
+            },
+            {
+                "titulo": "Etiqueta digital",
+                "valor": 7,
+                "promedio": 8,
+                "minimo": 1,
+                "maximo": 10,
+                "descripcion": "Mantener una comunicación respetuosa en línea mejora relaciones y confianza.",
+                "color": "text-tech-blue bg-tech-blue border-tech-blue",
+            },
+        ]

@@ -19,7 +19,7 @@ class InvitationCodeView(APIView):
     def post(self, request):
         serializer = serializers.InvitationCodeSerializer(data=request.data)
         if serializer.is_valid():
-
+            
             # Validate data structure
             invitation_code = serializer.validated_data["invitation_code"]
 
@@ -100,12 +100,12 @@ class ReportView(APIView):
 
         # survey = serializer.validated_data["survey_id"]        # objeto Survey
         participant = serializer.validated_data["participant_id"]  # objeto Participant
-        
+
         name = participant.name
 
         company = participant.company
         logo_path = get_media_url(company.logo)
-        
+
         report = models.Report.objects.get(
             survey=serializer.validated_data["survey_id"],
             participant=serializer.validated_data["participant_id"],
@@ -115,7 +115,6 @@ class ReportView(APIView):
         survey_calcs = SurveyCalcs(
             participant=participant,
             survey=serializer.validated_data["survey_id"],
-            company=company,
         )
         pdf_path = pdf_generator.generate_report(
             name=name,
@@ -130,13 +129,13 @@ class ReportView(APIView):
 
         if not os.path.exists(pdf_path):
             raise Http404("El reporte no fue generado correctamente.")
-        
+
         # Save file in database
         report, _ = models.Report.objects.get_or_create(
             survey=serializer.validated_data["survey_id"],
             participant=serializer.validated_data["participant_id"],
         )
-        
+
         # Open the file and save it to FileField
         with open(pdf_path, "rb") as f:
             report.pdf_file.save(os.path.basename(pdf_path), File(f), save=True)
@@ -151,7 +150,7 @@ class ReportView(APIView):
 
 
 class HasAnswerView(APIView):
-    """ Validate if the user already answered the survey, to avoid duplicate answers """
+    """Validate if the user already answered the survey, to avoid duplicate answers"""
 
     def post(self, request):
         serializer = serializers.HasAnswerSerializer(data=request.data)
@@ -164,17 +163,17 @@ class HasAnswerView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-            
+
         email = serializer.validated_data["email"]
         survey = serializer.validated_data["survey_id"]
 
         has_answer = models.Answer.objects.filter(
             participant__email=email,
-            question_option__question__question_group__survey=survey
+            question_option__question__question_group__survey=survey,
         ).exists()
-            
+
         # Return true if not has answer
-        
+
         data = {
             "status": "error",
             "message": "Participant with answer.",
@@ -190,7 +189,7 @@ class HasAnswerView(APIView):
                     "has_answer": False,
                 },
             }
-        
+
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -220,4 +219,37 @@ class ResponseView(APIView):
                 },
             },
             status=status.HTTP_201_CREATED,
+        )
+
+
+class BarChartView(APIView):
+    def get(self, request):
+        serializer = serializers.BarChartSerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "status": "error",
+                    "message": "Invalid data",
+                    "data": serializer.errors,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        survey = serializer.validated_data["survey"]
+        participant = serializer.validated_data["participant"]
+
+        # Dummy data
+        survey_calcs = SurveyCalcs(
+            participant=participant,
+            survey=survey,
+        )
+        data = survey_calcs.get_bar_chart_data()
+
+        return Response(
+            {
+                "status": "ok",
+                "message": "Bar chart data generated successfully",
+                "data": data,
+            },
+            status=status.HTTP_200_OK,
         )
