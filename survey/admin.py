@@ -206,5 +206,5 @@ class AnswerAdmin(admin.ModelAdmin):
     )
     search_fields = ("participant__name", "question_option__text")
     readonly_fields = ("created_at", "updated_at")
-    ordering = ("participant", "question_option")
+    ordering = ("participant", "question_option__question__question_group_index")
     list_per_page = 30
