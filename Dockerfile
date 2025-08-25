@@ -5,7 +5,7 @@
 #
 
 # Use Python 3.12 slim image
-FROM python:3.12-slim
+FROM mcr.microsoft.com/playwright/python:v1.54.0-noble
 
 # ENV variables
 
@@ -82,7 +82,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # Install Playwright browsers
-RUN python -m playwright install --with-deps
+RUN python -m playwright install
 
 
 # Collect static files and migrate database
