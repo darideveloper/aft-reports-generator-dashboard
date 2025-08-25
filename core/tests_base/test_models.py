@@ -1,7 +1,10 @@
+import os
 import uuid
 import json
 
 from django.test import TestCase
+from django.conf import settings
+from django.core.files import File
 
 from survey import models as survey_models
 
@@ -9,8 +12,15 @@ from survey import models as survey_models
 class TestSurveyModelBase(TestCase):
     """Test survey models"""
 
-    def __replace_random_string__(self, string: str):
-        """Replace random string with a random string"""
+    def __replace_random_string__(self, string: str) -> str:
+        """Replace random string with a random string
+
+        Args:
+            string (str): The string to replace
+
+        Returns:
+            str: The replaced string
+        """
         random_string = str(uuid.uuid4())
         return string.replace("{x}", random_string)
 
@@ -18,29 +28,56 @@ class TestSurveyModelBase(TestCase):
         self,
         name: str = "Company test {x}",
         details: str = "Test description",
-        logo: str = "test.webp",
+        logo: str = "logo.png",
         invitation_code: str = "test {x}",
         is_active: bool = True,
     ) -> survey_models.Company:
-        """Create a company object"""
+        """Create a company object
+
+        Args:
+            name (str): The name of the company
+            details (str): The details of the company
+            logo (str): The logo of the company (inside media folder)
+            invitation_code (str): The invitation code of the company
+            is_active (bool): Whether the company is active
+
+        Returns:
+            survey_models.Company: The created company object
+        """
 
         name = self.__replace_random_string__(name)
         invitation_code = self.__replace_random_string__(invitation_code)
 
-        return survey_models.Company.objects.create(
+        # Logo path from local media folder
+        logo_path = os.path.join(settings.BASE_DIR, "media", logo)
+
+        company = survey_models.Company.objects.create(
             name=name,
             details=details,
-            logo=logo,
             invitation_code=invitation_code,
             is_active=is_active,
         )
+
+        # Upload logo
+        with open(logo_path, "rb") as f:
+            company.logo.save(logo, File(f))
+
+        return company
 
     def create_survey(
         self,
         name: str = "Survey test {x}",
         instructions: str = "Test instructions",
     ) -> survey_models.Survey:
-        """Create a survey object"""
+        """Create a survey object
+
+        Args:
+            name (str): The name of the survey
+            instructions (str): The instructions of the survey
+
+        Returns:
+            survey_models.Survey: The created survey object
+        """
 
         name = self.__replace_random_string__(name)
 
@@ -52,7 +89,16 @@ class TestSurveyModelBase(TestCase):
         details: str = "",
         data: dict = {},
     ) -> survey_models.QuestionGroupModifier:
-        """Create a question group modifier object"""
+        """Create a question group modifier object
+
+        Args:
+            name (str): The name of the question group modifier
+            details (str): The details of the question group modifier
+            data (dict): The data of the question group modifier
+
+        Returns:
+            survey_models.QuestionGroupModifier: The created question group modifier object
+        """
 
         name = self.__replace_random_string__(name)
 
@@ -71,7 +117,20 @@ class TestSurveyModelBase(TestCase):
         survey_percentage: float = 0,
         modifiers: list[survey_models.QuestionGroupModifier] = [],
     ) -> survey_models.QuestionGroup:
-        """Create a question group object"""
+        """Create a question group object
+
+        Args:
+            survey (survey_models.Survey): The survey of the question group
+            name (str): The name of the question group
+            details (str): The details of the question group
+            survey_index (int): The index of the question group in the survey
+            survey_percentage (float): The percentage of the question group in the survey
+            modifiers (list[survey_models.QuestionGroupModifier]): Modifiers of the
+                question group.
+
+        Returns:
+            survey_models.QuestionGroup: The created question group object
+        """
 
         name = self.__replace_random_string__(name)
 
@@ -98,7 +157,18 @@ class TestSurveyModelBase(TestCase):
         details: str = "",
         question_group_index: int = 0,
     ) -> survey_models.Question:
-        """Create a question object"""
+        """Create a question object
+        
+        Args:
+            question_group (survey_models.QuestionGroup): The question group of the
+                question.
+            text (str): The text of the question
+            details (str): The details of the question
+            question_group_index (int): The index of the question in the question group
+
+        Returns:
+            survey_models.Question: The created question object
+        """
 
         text = self.__replace_random_string__(text)
 
@@ -119,7 +189,17 @@ class TestSurveyModelBase(TestCase):
         question_index: int = 0,
         points: int = 0,
     ) -> survey_models.QuestionOption:
-        """Create a question option object"""
+        """Create a question option object
+        
+        Args:
+            question (survey_models.Question): The question of the question option
+            text (str): The text of the question option
+            question_index (int): The index of the question option in the question
+            points (int): The points of the question option
+
+        Returns:
+            survey_models.QuestionOption: The created question option object
+        """
 
         text = self.__replace_random_string__(text)
 
@@ -142,7 +222,19 @@ class TestSurveyModelBase(TestCase):
         position: str = "director",
         company: survey_models.Company = None,
     ) -> survey_models.Participant:
-        """Create a participant object"""
+        """Create a participant object
+        
+        Args:
+            name (str): The name of the participant
+            email (str): The email of the participant
+            gender (str): The gender of the participant
+            birth_range (str): The birth range of the participant
+            position (str): The position of the participant
+            company (survey_models.Company): The company of the participant
+
+        Returns:
+            survey_models.Participant: The created participant object
+        """
 
         name = self.__replace_random_string__(name)
         email = self.__replace_random_string__(email)
@@ -164,7 +256,16 @@ class TestSurveyModelBase(TestCase):
         participant: survey_models.Participant = None,
         question_option: survey_models.QuestionOption = None,
     ) -> survey_models.Answer:
-        """Create an answer object"""
+        """Create an answer object
+        
+        Args:
+            participant (survey_models.Participant): The participant of the answer
+            question_option (survey_models.QuestionOption): The question option of 
+                the answer
+
+        Returns:
+            survey_models.Answer: The created answer object
+        """
 
         if not participant:
             participant = self.create_participant()
@@ -175,4 +276,30 @@ class TestSurveyModelBase(TestCase):
         return survey_models.Answer.objects.create(
             participant=participant,
             question_option=question_option,
+        )
+
+    def create_report(
+        self,
+        survey: survey_models.Survey = None,
+        participant: survey_models.Participant = None,
+    ) -> survey_models.Report:
+        """Create a report object
+        
+        Args:
+            survey (survey_models.Survey): The survey of the report
+            participant (survey_models.Participant): The participant of the report
+
+        Returns:
+            survey_models.Report: The created report object
+        """
+
+        if not survey:
+            survey = self.create_survey()
+
+        if not participant:
+            participant = self.create_participant()
+
+        return survey_models.Report.objects.create(
+            survey=survey,
+            participant=participant,
         )

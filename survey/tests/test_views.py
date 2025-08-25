@@ -648,3 +648,49 @@ class ResponseViewTestCase(TestSurveyViewsBase):
         self.assertEqual(answers.count(), len(self.data["answers"]))
         self.assertEqual(report.participant, participant)
         self.assertEqual(answers.count(), len(self.data["answers"]))
+
+
+class ReportViewTestCase(TestSurveyViewsBase):
+    def setUp(self):
+        # Set endpoint
+        super().setUp(endpoint="/report")
+
+        # Create data
+        self.survey = self.create_survey()
+        self.participant = self.create_participant(email="test@test.com")
+        self.report = self.create_report(
+            survey=self.survey, participant=self.participant
+        )
+
+    def test_pdf_missing_report_id(self):
+        """Test get request with missing report id"""
+
+        response = self.client.get(f"{self.endpoint}/")
+
+        # Validate error in html response
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Error: reporte no encontrado", response.content.decode())
+        self.assertIn("report_id", response.content.decode())
+
+    def test_pdf_wrong_report_id(self):
+        """Test get request with wrong report id"""
+
+        response = self.client.get(f"{self.endpoint}/999/")
+
+        # Validate error in html response
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Error: reporte no encontrado", response.content.decode())
+        self.assertIn("report_id", response.content.decode())
+
+    def test_pdf_found(self):
+        """Test get request with valid params and validate pdf content"""
+
+        response = self.client.get(f"{self.endpoint}/{self.report.id}/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Validate pdf response
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        self.assertIn(
+            ".pdf", response["Content-Disposition"],
+        )

@@ -81,11 +81,8 @@ class SurveyDetailSerializer(serializers.ModelSerializer):
 
 
 class ReportSerializer(serializers.Serializer):
-    survey_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Survey.objects.all(), required=True
-    )
-    participant_id = serializers.PrimaryKeyRelatedField(
-        queryset=models.Participant.objects.all(), required=True
+    report_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Report.objects.all(), required=True
     )
 
 

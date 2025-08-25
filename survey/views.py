@@ -4,6 +4,7 @@ import uuid
 from django.http import FileResponse, Http404
 from django.core.files import File
 from django.conf import settings
+from django.http import HttpResponse
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -90,20 +91,19 @@ class ReportView(APIView):
     API endpoint to generate and render PDF reports from query params.
     """
 
-    def get(self, request):
-        serializer = serializers.ReportSerializer(data=request.query_params)
+    def get(self, request, report_id=None):
+        serializer = serializers.ReportSerializer(data={"report_id": report_id})
         if not serializer.is_valid():
-            return Response(
-                {
-                    "status": "error",
-                    "message": "Parámetros inválidos",
-                    "errors": serializer.errors,
-                },
+            # Return html response with error message
+            return HttpResponse(
+                f"<h1>Error: reporte no encontrado</h1>"
+                f"<code>Detalles: {str(serializer.errors)}</code>",
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         # Get participant
-        participant = serializer.validated_data["participant_id"]
+        participant = serializer.validated_data["report_id"].participant
+        survey = serializer.validated_data["report_id"].survey
         name = participant.name
 
         # Get company logo
@@ -127,14 +127,14 @@ class ReportView(APIView):
         )
 
         report = models.Report.objects.get(
-            survey=serializer.validated_data["survey_id"],
-            participant=serializer.validated_data["participant_id"],
+            survey=survey,
+            participant=participant,
         )
 
         # Generar el PDF (dummy data)
         survey_calcs = SurveyCalcs(
             participant=participant,
-            survey=serializer.validated_data["survey_id"],
+            survey=survey,
         )
         pdf_path = pdf_generator.generate_report(
             name=name,
@@ -153,8 +153,8 @@ class ReportView(APIView):
 
         # Save file in database
         report, _ = models.Report.objects.get_or_create(
-            survey=serializer.validated_data["survey_id"],
-            participant=serializer.validated_data["participant_id"],
+            survey=survey,
+            participant=participant,
         )
 
         # Open the file and save it to FileField
