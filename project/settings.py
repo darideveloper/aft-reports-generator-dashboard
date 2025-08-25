@@ -21,6 +21,7 @@ STORAGE_AWS = os.environ.get("STORAGE_AWS") == "True"
 HOST = os.getenv("HOST")
 TEST_HEADLESS = os.getenv("TEST_HEADLESS", "False") == "True"
 PAGE_SIZE = int(os.getenv("PAGE_SIZE", 10))
+BAR_CHART_ENDPOINT = os.getenv("BAR_CHART_ENDPOINT")
 
 print(f"DEBUG: {DEBUG}")
 print(f"STORAGE_AWS: {STORAGE_AWS}")

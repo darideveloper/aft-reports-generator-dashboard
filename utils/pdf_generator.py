@@ -21,7 +21,6 @@ os.makedirs(files_folder, exist_ok=True)
 templates_folder = os.path.join(current_folder, "pdf_utils")
 original_pdf = os.path.join(templates_folder, "template.pdf")
 logo_path = os.path.join(templates_folder, "logo.png")
-graph_path = os.path.join(templates_folder, "logo.png")
 fonts_folder = os.path.join(templates_folder, "fonts")
 arial = os.path.join(fonts_folder, "ARIAL.TTF")
 arial_bold = os.path.join(fonts_folder, "ARIALBD.TTF")
@@ -138,6 +137,7 @@ def generate_report(
     grade_code: str,
     final_score: float,
     logo_path: str,
+    graph_path: str,
     data: list,
     resulting_paragraphs: list,
     resulting_titles: dict,
@@ -261,7 +261,7 @@ def generate_report(
 
     image_width = width - 140
     x = (width - image_width) / 2
-    c.drawImage(graph_path, x, 320, width=image_width, height=image_width - 100)
+    c.drawImage(graph_path, x, 230, width=image_width, height=image_width)
 
     # Draw footer content
     footer_setting(c, name, width, color_darkgrey)

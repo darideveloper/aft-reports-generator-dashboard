@@ -32,3 +32,4 @@ reportlab==4.4.2
 scipy==1.16.0
 matplotlib==3.10.3
 numpy==1.26.4
+playwright==1.54.0

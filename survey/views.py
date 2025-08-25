@@ -1,16 +1,20 @@
 import os
+import uuid
+
+from django.http import FileResponse, Http404
+from django.core.files import File
+from django.conf import settings
 
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.http import FileResponse, Http404
-from django.core.files import File
-
 from utils import pdf_generator
 from utils.media import get_media_url
 from utils.survey_calcs import SurveyCalcs
+from utils.screenshots import render_image_from_url
+
 
 from survey import serializers, models
 
@@ -19,7 +23,7 @@ class InvitationCodeView(APIView):
     def post(self, request):
         serializer = serializers.InvitationCodeSerializer(data=request.data)
         if serializer.is_valid():
-            
+
             # Validate data structure
             invitation_code = serializer.validated_data["invitation_code"]
 
@@ -98,13 +102,29 @@ class ReportView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # survey = serializer.validated_data["survey_id"]        # objeto Survey
-        participant = serializer.validated_data["participant_id"]  # objeto Participant
-
+        # Get participant
+        participant = serializer.validated_data["participant_id"]
         name = participant.name
 
+        # Get company logo
         company = participant.company
         logo_path = get_media_url(company.logo)
+
+        # Get bar char
+        image_random_uuid = str(uuid.uuid4())
+        image_temp_folder = os.path.join(settings.BASE_DIR, "utils", "graphics")
+        os.makedirs(image_temp_folder, exist_ok=True)
+        image_temp_path = os.path.join(
+            image_temp_folder, f"bar-chart-{image_random_uuid}.jpg"
+        )
+
+        # Generate bar chart, also rendering css
+        render_image_from_url(
+            f"{settings.BAR_CHART_ENDPOINT}",
+            image_temp_path,
+            width=1000,
+            height=1000,
+        )
 
         report = models.Report.objects.get(
             survey=serializer.validated_data["survey_id"],
@@ -122,6 +142,7 @@ class ReportView(APIView):
             grade_code="MDP",
             final_score=9.9,
             logo_path=logo_path,
+            graph_path=image_temp_path,
             data=survey_calcs.get_company_totals(),
             resulting_paragraphs=survey_calcs.get_resulting_paragraphs(),
             resulting_titles=survey_calcs.get_resulting_titles(),
