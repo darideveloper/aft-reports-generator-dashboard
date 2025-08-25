@@ -67,15 +67,23 @@ WORKDIR /app
 # Copy the current directory contents into the container
 COPY . /app/
 
-# Install system dependencies (e.g., for PostgreSQL support)
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     libpq-dev gcc \
+    curl \
+    wget \
+    gnupg \
+    ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+
+# Install Playwright browsers
+RUN python -m playwright install --with-deps
+
 
 # Collect static files and migrate database
 RUN python manage.py collectstatic --noinput
