@@ -1,8 +1,13 @@
+import os
+import uuid
+
+import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
+
+from django.conf import settings
 from scipy.stats import norm
-import os
-import matplotlib
+
 matplotlib.use("Agg")
 
 
@@ -74,8 +79,7 @@ def generate_bell_curve_plot(
     plt.tight_layout()
 
     # Create folder in case it doesn't exists
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    carpeta_salida = os.path.join(current_dir, "graphics")
+    carpeta_salida = os.path.join(settings.BASE_DIR, "media", "temp")
     os.makedirs(carpeta_salida, exist_ok=True)
 
     # Save plot
@@ -92,5 +96,10 @@ if __name__ == "__main__":
     datos = np.random.normal(70, 10, 1000)
 
     # Generate plot
-    ruta = generate_bell_curve_plot(grade=65, mean_grades=70, grades=datos)
+    ruta = generate_bell_curve_plot(
+        grade=65,
+        mean_grades=70,
+        grades=datos,
+        file_name=f"graico-{uuid.uuid4()}.png",
+    )
     print("Image save at:", ruta)
