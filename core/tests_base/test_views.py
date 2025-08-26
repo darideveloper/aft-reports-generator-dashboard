@@ -51,7 +51,11 @@ class BaseTestApiViewsMethods(APITestCase, TestAdminBase):
     def validate_invalid_method(self, method: str):
         """Validate that the given method is not allowed on the endpoint"""
 
-        response = getattr(self.client, method)(self.endpoint)
+        endpoint = self.endpoint
+        if not endpoint.endswith("/"):
+            endpoint += "/"
+
+        response = getattr(self.client, method)(endpoint)
         self.assertEqual(
             response.status_code,
             status.HTTP_405_METHOD_NOT_ALLOWED,

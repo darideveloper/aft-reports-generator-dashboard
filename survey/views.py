@@ -12,10 +12,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from utils import pdf_generator
-from utils.media import get_media_url
 from utils.survey_calcs import SurveyCalcs
 from utils.screenshots import render_image_from_url
-
 
 from survey import serializers, models
 
@@ -105,17 +103,22 @@ class ReportView(APIView):
         participant = serializer.validated_data["report_id"].participant
         survey = serializer.validated_data["report_id"].survey
         name = participant.name
-
-        # Get company logo
+        
+        # Temp folder for images
+        temp_folder = os.path.join(settings.BASE_DIR, "media", "temp")
+        
+        # Save company logo as local file
         company = participant.company
-        logo_path = get_media_url(company.logo)
+        logo = company.logo
+        logo_path = os.path.join(temp_folder, f"logo-{company.id}.png")
+        with open(logo_path, "wb") as f:
+            f.write(logo.read())
 
-        # Get bar char
+        # Save logo in temp folder
         image_random_uuid = str(uuid.uuid4())
-        image_temp_folder = os.path.join(settings.BASE_DIR, "utils", "graphics")
-        os.makedirs(image_temp_folder, exist_ok=True)
+        os.makedirs(temp_folder, exist_ok=True)
         image_temp_path = os.path.join(
-            image_temp_folder, f"bar-chart-{image_random_uuid}.jpg"
+            temp_folder, f"bar-chart-{image_random_uuid}.jpg"
         )
 
         # Generate bar chart, also rendering css
