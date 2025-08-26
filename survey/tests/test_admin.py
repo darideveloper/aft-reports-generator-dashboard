@@ -1,3 +1,5 @@
+from bs4 import BeautifulSoup
+
 from core.tests_base.test_admin import TestAdminBase
 from core.tests_base.test_models import TestSurveyModelBase
 
@@ -159,3 +161,34 @@ class AnswerAdminTestCase(TestAdminBase, TestSurveyModelBase):
 
         # Validate question filter
         self.validate_custom_filter("question", question_1.id, question_2.id)
+
+
+class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
+    """Testing report admin"""
+
+    def setUp(self):
+        super().setUp()
+        self.endpoint = "/admin/survey/report/"
+
+    def test_search_bar(self):
+        """Validate search bar working"""
+
+        self.submit_search_bar(self.endpoint)
+
+    def test_custom_links(self):
+        """Validate custom links working"""
+
+        # Create required data
+        survey = self.create_survey()
+        participant = self.create_participant()
+        report = self.create_report(survey=survey, participant=participant)
+
+        # Validate response
+        response = self.client.get(f"{self.endpoint}")
+        self.assertEqual(response.status_code, 200)
+
+        # Validate link "Ver Reporte" to /report/1/
+        soup = BeautifulSoup(response.content, "html.parser")
+        link = soup.select_one("#result_list a.btn-primary")
+        self.assertIsNotNone(link)
+        self.assertEqual(link["href"], f"/report/{report.id}/")
