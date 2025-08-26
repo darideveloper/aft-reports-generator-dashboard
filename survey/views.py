@@ -106,6 +106,7 @@ class ReportView(APIView):
         
         # Temp folder for images
         temp_folder = os.path.join(settings.BASE_DIR, "media", "temp")
+        os.makedirs(temp_folder, exist_ok=True)
         
         # Save company logo as local file
         company = participant.company
