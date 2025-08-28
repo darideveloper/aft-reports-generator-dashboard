@@ -149,7 +149,7 @@ def generate_report(
         date (str): report issue date
         grade_code (str): acronym for rating-based description
         final_score (str): applicant's final score
-        logo_path (str): path to business logo
+        logo_path (str | None): path to business logo (if None, no logo will be drawn)
         graph_path (str): path to scores path
         data (list): applicants scores list
         resulting_paragraphs (list): list of score and paragraph dicts
@@ -192,7 +192,8 @@ def generate_report(
 
     image_width = 130
     x = (width - image_width) / 2
-    c.drawImage(logo_path, x, 115, width=image_width, height=image_width)
+    if logo_path:
+        c.drawImage(logo_path, x, 115, width=image_width, height=image_width)
 
     # Draw footer content
     footer_setting(c, name, width, color_darkgrey)

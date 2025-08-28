@@ -110,10 +110,13 @@ class ReportView(APIView):
         
         # Save company logo as local file
         company = participant.company
-        logo = company.logo
-        logo_path = os.path.join(temp_folder, f"logo-{company.id}.png")
-        with open(logo_path, "wb") as f:
-            f.write(logo.read())
+        if (company.logo):
+            logo = company.logo
+            logo_path = os.path.join(temp_folder, f"logo-{company.id}.png")
+            with open(logo_path, "wb") as f:
+                f.write(logo.read())
+        else:
+            logo_path = None
 
         # Save logo in temp folder
         image_random_uuid = str(uuid.uuid4())
