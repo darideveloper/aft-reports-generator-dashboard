@@ -3,6 +3,8 @@ from django.contrib import admin
 
 from utils.text_generation import get_uuid
 
+from utils.survey_calcs import SurveyCalcs
+
 
 class Company(models.Model):
     id = models.AutoField(primary_key=True)
@@ -33,7 +35,10 @@ class Company(models.Model):
     use_average = models.BooleanField(
         default=True,
         verbose_name="Usar Promedio en Gráfico de Barras",
-        help_text="Si se desmarca esta casilla se hará uso del valor específicado en el grupo de preguntas dentro del gráfico de barras",
+        help_text=(
+            "Si se desmarca esta casilla se hará uso del valor específicado en el grupo"
+            " de preguntas dentro del gráfico de barras"
+        ),
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -303,6 +308,16 @@ class Report(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # Solo asignar un valor aleatorio si el objeto es nuevo
+        if not self.pk:
+            self.total = SurveyCalcs(
+                participant=self.participant,
+                survey=self.survey,
+            ).get_participant_total()  # número aleatorio
+            # Si prefieres número entero: random.randint(0, 100)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.participant.name} - {self.survey.name}"

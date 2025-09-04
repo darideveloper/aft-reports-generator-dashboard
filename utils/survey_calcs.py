@@ -1,18 +1,20 @@
 import numpy as np
-
-from survey import models
+import random
 
 
 class SurveyCalcs:
 
     def __init__(
         self,
-        participant: models.Participant,
-        survey: models.Survey,
+        participant: object,
+        survey: object,
     ):
         self.participant = participant
         self.survey = survey
         self.company = participant.company
+
+    def get_participant_total(self) -> float:
+        return random.randint(0, 100)
 
     def get_company_totals(self) -> np.ndarray:
         """

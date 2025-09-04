@@ -143,6 +143,7 @@ class ReportView(APIView):
             participant=participant,
             survey=survey,
         )
+
         pdf_path = pdf_generator.generate_report(
             name=name,
             date=report.created_at.strftime("%d/%m/%Y"),
