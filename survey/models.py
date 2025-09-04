@@ -30,6 +30,11 @@ class Company(models.Model):
         "Ejemplo: LeadForwardNissan2025",
     )
     is_active = models.BooleanField(default=True, verbose_name="Activo")
+    use_average = models.BooleanField(
+        default=True,
+        verbose_name="Usar Promedio en Gráfico de Barras",
+        help_text="Si se desmarca esta casilla se hará uso del valor específicado en el grupo de preguntas dentro del gráfico de barras",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -83,11 +88,11 @@ class QuestionGroupModifier(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = "Modificador de Grupo de Preguntas"
         verbose_name_plural = "Modificadores de Grupos de Preguntas"
-        
+
 
 class QuestionGroup(models.Model):
     id = models.AutoField(primary_key=True)
@@ -110,6 +115,11 @@ class QuestionGroup(models.Model):
         help_text="Modificadores del grupo de preguntas",
         null=True,
         blank=True,
+    )
+    goal_rate = models.FloatField(
+        default=0,
+        verbose_name="Valor Esperado",
+        help_text="Valor esperado a usar en el gráfico de barras",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -293,10 +303,10 @@ class Report(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"{self.participant.name} - {self.survey.name}"
-    
+
     class Meta:
         verbose_name = "Reporte"
         verbose_name_plural = "Reportes"
