@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib import admin
+from django.db.models import Avg
 
 from utils.text_generation import get_uuid
 
@@ -39,6 +40,10 @@ class Company(models.Model):
             "Si se desmarca esta casilla se hará uso del valor específicado en el grupo"
             " de preguntas dentro del gráfico de barras"
         ),
+    )
+    average_total = models.FloatField(
+        default=0,
+        verbose_name="Promedio Total",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -316,7 +321,11 @@ class Report(models.Model):
                 participant=self.participant,
                 survey=self.survey,
             ).get_participant_total()  # número aleatorio
-            # Si prefieres número entero: random.randint(0, 100)
+            
+        average_total = models.Report.objects.filter(
+            participant__company=self.participant.company
+        ).aggregate(promedio=Avg("total"))["promedio"]
+        
         super().save(*args, **kwargs)
 
     def __str__(self):

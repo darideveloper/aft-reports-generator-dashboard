@@ -103,14 +103,14 @@ class ReportView(APIView):
         participant = serializer.validated_data["report_id"].participant
         survey = serializer.validated_data["report_id"].survey
         name = participant.name
-        
+
         # Temp folder for images
         temp_folder = os.path.join(settings.BASE_DIR, "media", "temp")
         os.makedirs(temp_folder, exist_ok=True)
-        
+
         # Save company logo as local file
         company = participant.company
-        if (company.logo):
+        if company.logo:
             logo = company.logo
             logo_path = os.path.join(temp_folder, f"logo-{company.id}.png")
             with open(logo_path, "wb") as f:
@@ -148,7 +148,7 @@ class ReportView(APIView):
             name=name,
             date=report.created_at.strftime("%d/%m/%Y"),
             grade_code="MDP",
-            final_score=9.9,
+            final_score=report.total,
             logo_path=logo_path,
             graph_path=image_temp_path,
             data=survey_calcs.get_company_totals(),
