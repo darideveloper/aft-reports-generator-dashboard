@@ -321,10 +321,14 @@ class Report(models.Model):
                 participant=self.participant,
                 survey=self.survey,
             ).get_participant_total()  # número aleatorio
-            
-        average_total = models.Report.objects.filter(
-            participant__company=self.participant.company
+        
+        company = self.participant.company
+        average_total = Report.objects.filter(
+            participant__company=company
         ).aggregate(promedio=Avg("total"))["promedio"]
+
+        company.average_total = average_total if average_total is not None else 0
+        company.save()
         
         super().save(*args, **kwargs)
 
