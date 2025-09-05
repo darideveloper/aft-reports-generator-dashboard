@@ -28,10 +28,10 @@ arial_bold = os.path.join(fonts_folder, "ARIALBD.TTF")
 # Open JSON with mockup data
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-with open(os.path.join(BASE_DIR, "mock_up_scores.json"), 'r', encoding='utf-8') as f:
+with open(os.path.join(BASE_DIR, "mock_up_scores.json"), "r", encoding="utf-8") as f:
     mock_up_data = json.load(f)
 
-with open(os.path.join(BASE_DIR, "mock_up_results.json"), 'r', encoding='utf-8') as f:
+with open(os.path.join(BASE_DIR, "mock_up_results.json"), "r", encoding="utf-8") as f:
     mock_up_results = json.load(f)
 
 
@@ -141,6 +141,7 @@ def generate_report(
     data: list,
     resulting_paragraphs: list,
     resulting_titles: dict,
+    company_average_total: float,
 ) -> str:
     """Generate PDF report from data
 
@@ -154,6 +155,7 @@ def generate_report(
         data (list): applicants scores list
         resulting_paragraphs (list): list of score and paragraph dicts
         resulting_titles (dict): dict of subtitles and paragraphs for final section
+        company_average_total (float): global company average
 
     Returns:
         str: Generated path file
@@ -212,7 +214,12 @@ def generate_report(
 
     data = np.array(data)
 
-    bell_plot_path = generate_bell_curve_plot(final_score, data.mean(), data)
+    bell_plot_path = generate_bell_curve_plot(
+        grade=final_score,
+        mean_grades=data.mean(),
+        grades=data,
+        company_average_total=company_average_total,
+    )
     image_width = 400
     x = (width - image_width) / 2
     c.drawImage(bell_plot_path, x, 390, width=image_width, height=200)
@@ -282,7 +289,7 @@ def generate_report(
         footer_setting(c, name, width, color_darkgrey)
 
         c.showPage()
-    
+
     # Page 4
     # Draw footer content
     footer_setting(c, name, width, color_darkgrey)
@@ -304,7 +311,7 @@ def generate_report(
     for element in list(resulting_titles.keys())[:4]:
         c.setFont("arialbd", 14)
         c.drawString(title_x, title_y, f"{resulting_titles[element]['subtitle']}")
-        text = resulting_titles[element]['paragraph']
+        text = resulting_titles[element]["paragraph"]
         justify_text(c, text, x=paragraph_x, y=paragraph_y)
         title_y -= 145
         paragraph_y -= 145
@@ -323,7 +330,7 @@ def generate_report(
     for element in list(resulting_titles.keys())[4:6]:
         c.setFont("arialbd", 14)
         c.drawString(title_x, title_y, f"{resulting_titles[element]['subtitle']}")
-        text = resulting_titles[element]['paragraph']
+        text = resulting_titles[element]["paragraph"]
         justify_text(c, text, x=paragraph_x, y=paragraph_y)
         title_y -= 161
         paragraph_y -= 161
@@ -390,6 +397,7 @@ if __name__ == "__main__":
         ),
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
+        company_average_total=50,
     )
 
     generate_report(
@@ -424,6 +432,7 @@ if __name__ == "__main__":
         ),
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
+        company_average_total=50,
     )
 
     generate_report(
@@ -458,6 +467,7 @@ if __name__ == "__main__":
         ),
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
+        company_average_total=50,
     )
 
     generate_report(
@@ -492,4 +502,5 @@ if __name__ == "__main__":
         ),
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
+        company_average_total=50,
     )

@@ -154,6 +154,7 @@ class ReportView(APIView):
             data=survey_calcs.get_company_totals(),
             resulting_paragraphs=survey_calcs.get_resulting_paragraphs(),
             resulting_titles=survey_calcs.get_resulting_titles(),
+            company_average_total=company.average_total,
         )
 
         if not os.path.exists(pdf_path):

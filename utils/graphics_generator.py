@@ -16,6 +16,7 @@ def generate_bell_curve_plot(
     mean_grades: str,
     grades: np.array,
     file_name: str = "grafico_campana.png",
+    company_average_total: float = 0,
 ):
     """Generate bell curve plot
 
@@ -24,6 +25,7 @@ def generate_bell_curve_plot(
         mean_grades (str): score's mean
         grades (str): applicants score list data
         file_name (str): plot image file's name
+        company_average_total (float): global company average
 
     Returns:
         str: Generated path plot
@@ -54,6 +56,13 @@ def generate_bell_curve_plot(
         linestyle="--",
         linewidth=2,
         label=f"Participante ({grade})",
+    )
+    plt.axvline(
+        x=company_average_total,
+        color="#7465BF",
+        linestyle="--",
+        linewidth=2,
+        label=f"Media Global ({company_average_total})",
     )
 
     # Fill area under the curve
