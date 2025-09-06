@@ -123,13 +123,11 @@ class QuestionGroup(models.Model):
         QuestionGroupModifier,
         verbose_name="Modificadores",
         help_text="Modificadores del grupo de preguntas",
-        null=True,
-        blank=True,
     )
     goal_rate = models.FloatField(
         default=0,
         verbose_name="Valor Esperado",
-        help_text="Valor esperado a usar en el gráfico de barras",
+        help_text="Valor esperado a usar en el gráfico de barras (del 1 al 10)",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
