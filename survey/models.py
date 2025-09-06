@@ -43,7 +43,8 @@ class Company(models.Model):
     )
     average_total = models.FloatField(
         default=0,
-        verbose_name="Promedio Total",
+        verbose_name="Promedio",
+        help_text="Promedio de los reportes de la empresa (automáticamente calculado)",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
