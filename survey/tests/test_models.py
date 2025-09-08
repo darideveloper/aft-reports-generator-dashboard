@@ -7,6 +7,12 @@ class ReportTestCase(TestSurveyModelBase):
     def setUp(self):
         super().setUp()
         self.endpoint = "/admin/survey/report/"
-    
-    
-    
+
+    def test_save_single_report(self):
+        """Validate save single report"""
+        report = self.create_report(total=50)
+
+        company = report.participant.company
+        
+        self.assertEqual(report.total, company.average_total)
+        
