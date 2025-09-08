@@ -158,7 +158,7 @@ class TestSurveyModelBase(TestCase):
         question_group_index: int = 0,
     ) -> survey_models.Question:
         """Create a question object
-        
+
         Args:
             question_group (survey_models.QuestionGroup): The question group of the
                 question.
@@ -190,7 +190,7 @@ class TestSurveyModelBase(TestCase):
         points: int = 0,
     ) -> survey_models.QuestionOption:
         """Create a question option object
-        
+
         Args:
             question (survey_models.Question): The question of the question option
             text (str): The text of the question option
@@ -223,7 +223,7 @@ class TestSurveyModelBase(TestCase):
         company: survey_models.Company = None,
     ) -> survey_models.Participant:
         """Create a participant object
-        
+
         Args:
             name (str): The name of the participant
             email (str): The email of the participant
@@ -257,10 +257,10 @@ class TestSurveyModelBase(TestCase):
         question_option: survey_models.QuestionOption = None,
     ) -> survey_models.Answer:
         """Create an answer object
-        
+
         Args:
             participant (survey_models.Participant): The participant of the answer
-            question_option (survey_models.QuestionOption): The question option of 
+            question_option (survey_models.QuestionOption): The question option of
                 the answer
 
         Returns:
@@ -280,11 +280,12 @@ class TestSurveyModelBase(TestCase):
 
     def create_report(
         self,
+        total: int,
         survey: survey_models.Survey = None,
         participant: survey_models.Participant = None,
     ) -> survey_models.Report:
         """Create a report object
-        
+
         Args:
             survey (survey_models.Survey): The survey of the report
             participant (survey_models.Participant): The participant of the report
@@ -299,7 +300,13 @@ class TestSurveyModelBase(TestCase):
         if not participant:
             participant = self.create_participant()
 
-        return survey_models.Report.objects.create(
+        report = survey_models.Report.objects.create(
             survey=survey,
             participant=participant,
         )
+        
+        if total:
+            report.total = total
+            report.save()
+
+        return report
