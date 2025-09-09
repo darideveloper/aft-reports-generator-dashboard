@@ -306,8 +306,6 @@ class TestSurveyModelBase(TestCase):
         )
         report.save()
         
-        if total:
-            report.total = total
-            report.save()
+        report.save()
 
         return report
