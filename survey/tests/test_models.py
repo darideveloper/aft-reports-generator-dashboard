@@ -33,5 +33,32 @@ class ReportTestCase(TestSurveyModelBase):
 
         self.assertEqual(average, company.average_total)
 
+    def test_save_many_report_multi_company(self):
+        """Validate save many reports for multi company"""
+        company_1 = self.create_company()
+        company_2 = self.create_company()
+        
+        participant_1 = self.create_participant(company=company_1)
+        participant_2 = self.create_participant(company=company_1)
+        participant_3 = self.create_participant(company=company_2)
+        participant_4 = self.create_participant(company=company_2)
+
+        report_1 = self.create_report(participant=participant_1)
+        report_2 = self.create_report(participant=participant_2)
+        report_3 = self.create_report(participant=participant_3)
+        report_4 = self.create_report(participant=participant_4)
+
+        average_1 = report_1.total + report_2.total
+        average_1 = average_1 / 2
+
+        average_2 = report_3.total + report_4.total
+        average_2 = average_2 / 2
+
+        self.assertEqual(average_1, company_1.average_total)
+        self.assertEqual(average_2, company_2.average_total)
+
+
+        
+
         
         
