@@ -124,6 +124,7 @@ class QuestionGroup(models.Model):
         QuestionGroupModifier,
         verbose_name="Modificadores",
         help_text="Modificadores del grupo de preguntas",
+        blank=True,
     )
     goal_rate = models.FloatField(
         default=0,
