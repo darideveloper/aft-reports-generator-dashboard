@@ -180,10 +180,25 @@ class SurveyCalcs:
             },
         }
 
-    def get_bar_chart_data(self) -> list[dict]:
+    def get_bar_chart_data(self, use_average: bool) -> list[dict]:
         """
         DUMMY FUNCTION
         Get the bar chart data for a participant in a survey.
+        
+        Args:
+            use_average (bool): Whether to use the average or the specific value
+
+        Returns:
+            list[dict]: List of dictionaries with the bar chart data
+                {
+                    "titulo": str,
+                    "valor": int,
+                    "promedio": float,
+                    "minimo": int,
+                    "maximo": int,
+                    "descripcion": str,
+                    "color": str,
+                }
         """
         return [
             {

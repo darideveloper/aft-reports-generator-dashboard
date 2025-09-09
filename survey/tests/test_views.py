@@ -692,5 +692,65 @@ class ReportViewTestCase(TestSurveyViewsBase):
         # Validate pdf response
         self.assertEqual(response["Content-Type"], "application/pdf")
         self.assertIn(
-            ".pdf", response["Content-Disposition"],
+            ".pdf",
+            response["Content-Disposition"],
         )
+
+
+class BarChartViewTestCase(TestSurveyViewsBase):
+    def setUp(self):
+        # Set endpoint
+        super().setUp(endpoint="/api/bar-chart/")
+
+        # Create data
+        self.survey = self.create_survey()
+        self.company = self.create_company()
+        self.participant = self.create_participant(
+            email="test@test.com", company=self.company
+        )
+        self.report = self.create_report(
+            survey=self.survey, participant=self.participant
+        )
+
+    def test_get_use_average_true(self):
+        """Test get request with valid data"""
+
+        # Set company use average to true
+        self.company.use_average = True
+        self.company.save()
+
+        # Get response
+        endpoint = self.endpoint
+        endpoint += f"?survey_id={self.survey.id}&participant_id={self.participant.id}"
+        response = self.client.get(endpoint, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Validate response structure
+        self.assertIn("ok", response.data["status"])
+        self.assertIn("Bar chart data generated successfully", response.data["message"])
+        self.assertIn("chart_data", response.data["data"])
+        self.assertIn("use_average", response.data["data"])
+        self.assertTrue(response.data["data"]["use_average"])
+
+        # TODO: Validate chart data
+
+    def test_get_use_average_false(self):
+
+        # Set company use average to false
+        self.company.use_average = False
+        self.company.save()
+
+        # Get response
+        endpoint = self.endpoint
+        endpoint += f"?survey_id={self.survey.id}&participant_id={self.participant.id}"
+        response = self.client.get(endpoint, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Validate response structure
+        self.assertIn("ok", response.data["status"])
+        self.assertIn("Bar chart data generated successfully", response.data["message"])
+        self.assertIn("chart_data", response.data["data"])
+        self.assertIn("use_average", response.data["data"])
+        self.assertFalse(response.data["data"]["use_average"])
+
+        # TODO: Validate chart data

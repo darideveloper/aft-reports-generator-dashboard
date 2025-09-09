@@ -273,13 +273,17 @@ class BarChartView(APIView):
             participant=participant,
             survey=survey,
         )
-        data = survey_calcs.get_bar_chart_data()
+        use_average = participant.company.use_average
+        chart_data = survey_calcs.get_bar_chart_data(use_average)
 
         return Response(
             {
                 "status": "ok",
                 "message": "Bar chart data generated successfully",
-                "data": data,
+                "data": {
+                    "chart_data": chart_data,
+                    "use_average": use_average,
+                }
             },
             status=status.HTTP_200_OK,
         )
