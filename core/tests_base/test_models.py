@@ -282,7 +282,6 @@ class TestSurveyModelBase(TestCase):
         self,
         survey: survey_models.Survey = None,
         participant: survey_models.Participant = None,
-        total: int = None,
     ) -> survey_models.Report:
         """Create a report object
 
@@ -304,9 +303,6 @@ class TestSurveyModelBase(TestCase):
             survey=survey,
             participant=participant,
         )
-        
-        if total:
-            report.total = total
         
         report.save()
 
