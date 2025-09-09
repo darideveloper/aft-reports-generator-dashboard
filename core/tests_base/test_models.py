@@ -97,7 +97,7 @@ class TestSurveyModelBase(TestCase):
             data (dict): The data of the question group modifier
 
         Returns:
-            survey_models.QuestionGroupModifier: The created question group modifier object
+            survey_models.QuestionGroupModifier: The created question group modifier
         """
 
         name = self.__replace_random_string__(name)
@@ -282,7 +282,6 @@ class TestSurveyModelBase(TestCase):
         self,
         survey: survey_models.Survey = None,
         participant: survey_models.Participant = None,
-        total: int = None,
     ) -> survey_models.Report:
         """Create a report object
 
@@ -300,12 +299,10 @@ class TestSurveyModelBase(TestCase):
         if not participant:
             participant = self.create_participant()
 
-        report = survey_models.Report.objects.create(
+        survey = survey_models.Report.objects.create(
             survey=survey,
             participant=participant,
         )
-        report.save()
-        
-        report.save()
+        survey.save()
 
-        return report
+        return survey
