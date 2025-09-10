@@ -48,7 +48,7 @@ def generate_bell_curve_plot(
         color="#ff9900",
         linestyle="--",
         linewidth=2,
-        label=f"Media General ({mean_grades})",
+        label=f"Media de grupo ({mean_grades})",
     )
     plt.axvline(
         x=grade,
