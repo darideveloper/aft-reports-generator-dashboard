@@ -84,98 +84,6 @@ class SurveyDetailView(viewsets.ReadOnlyModelViewSet):
         return self.queryset
 
 
-class ReportView(APIView):
-    """
-    API endpoint to generate and render PDF reports from query params.
-    """
-
-    def get(self, request, report_id=None):
-        serializer = serializers.ReportSerializer(data={"report_id": report_id})
-        if not serializer.is_valid():
-            # Return html response with error message
-            return HttpResponse(
-                f"<h1>Error: reporte no encontrado</h1>"
-                f"<code>Detalles: {str(serializer.errors)}</code>",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Get participant
-        participant = serializer.validated_data["report_id"].participant
-        survey = serializer.validated_data["report_id"].survey
-        name = participant.name
-
-        # Temp folder for images
-        temp_folder = os.path.join(settings.BASE_DIR, "media", "temp")
-        os.makedirs(temp_folder, exist_ok=True)
-
-        # Save company logo as local file
-        company = participant.company
-        if company.logo:
-            logo = company.logo
-            logo_path = os.path.join(temp_folder, f"logo-{company.id}.png")
-            with open(logo_path, "wb") as f:
-                f.write(logo.read())
-        else:
-            logo_path = None
-
-        # Save logo in temp folder
-        image_random_uuid = str(uuid.uuid4())
-        os.makedirs(temp_folder, exist_ok=True)
-        image_temp_path = os.path.join(
-            temp_folder, f"bar-chart-{image_random_uuid}.jpg"
-        )
-
-        # Generate bar chart, also rendering css
-        url_params = f"?survey_id={survey.id}&participant_id={participant.id}"
-        url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
-        render_image_from_url(url, image_temp_path, width=1000, height=1300)
-
-        report = models.Report.objects.get(
-            survey=survey,
-            participant=participant,
-        )
-
-        # Generar el PDF (dummy data)
-        survey_calcs = SurveyCalcs(
-            participant=participant,
-            survey=survey,
-        )
-
-        pdf_path = pdf_generator.generate_report(
-            name=name,
-            date=report.created_at.strftime("%d/%m/%Y"),
-            grade_code="MDP",
-            final_score=report.total,
-            logo_path=logo_path,
-            graph_path=image_temp_path,
-            data=survey_calcs.get_company_totals(),
-            resulting_paragraphs=survey_calcs.get_resulting_paragraphs(),
-            resulting_titles=survey_calcs.get_resulting_titles(),
-            company_average_total=company.average_total,
-        )
-
-        if not os.path.exists(pdf_path):
-            raise Http404("El reporte no fue generado correctamente.")
-
-        # Save file in database
-        report, _ = models.Report.objects.get_or_create(
-            survey=survey,
-            participant=participant,
-        )
-
-        # Open the file and save it to FileField
-        with open(pdf_path, "rb") as f:
-            report.pdf_file.save(os.path.basename(pdf_path), File(f), save=True)
-
-        # Devolver el PDF para renderizado en el navegador
-        return FileResponse(
-            open(pdf_path, "rb"),
-            content_type="application/pdf",
-            as_attachment=False,
-            filename=f"{name}.pdf",
-        )
-
-
 class HasAnswerView(APIView):
     """Validate if the user already answered the survey, to avoid duplicate answers"""
 
@@ -280,7 +188,7 @@ class BarChartView(APIView):
                 "data": {
                     "chart_data": chart_data,
                     "use_average": use_average,
-                }
+                },
             },
             status=status.HTTP_200_OK,
         )

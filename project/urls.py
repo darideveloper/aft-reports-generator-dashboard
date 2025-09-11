@@ -37,9 +37,6 @@ urlpatterns = [
         name="participant-has-answer",
     ),
     path("api/bar-chart/", survey_views.BarChartView.as_view(), name="bar-chart"),
-    # No api endpoints
-    path("report/<int:report_id>/", survey_views.ReportView.as_view()),
-    path("report/", survey_views.ReportView.as_view()),
 ]
 
 if not settings.STORAGE_AWS:
