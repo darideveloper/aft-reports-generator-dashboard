@@ -177,10 +177,17 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(models.Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ("participant", "survey", "created_at", "custom_links")
-    list_filter = ("participant__company", "survey", "created_at", "updated_at")
+    list_display = ("participant", "survey", "status", "created_at", "custom_links")
+    list_filter = (
+        "participant__company",
+        "survey",
+        "status",
+        "created_at",
+        "updated_at",
+    )
     search_fields = ("participant__name", "survey__name")
     readonly_fields = ("created_at", "updated_at")
+    ordering = ("status", "created_at")
 
     # CUSTOM FIELDS
     def custom_links(self, obj):

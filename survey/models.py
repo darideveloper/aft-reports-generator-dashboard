@@ -292,6 +292,14 @@ class Participant(models.Model):
 
 
 class Report(models.Model):
+    
+    STATUS_CHOICES = [
+        ("pending", "⏳ Pendiente"),
+        ("processing", "⚡ Procesando"),
+        ("completed", "✔ Completado"),
+        ("error", "✖ Error"),
+    ]
+    
     id = models.AutoField(primary_key=True)
     survey = models.ForeignKey(
         Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
@@ -310,6 +318,18 @@ class Report(models.Model):
         default=0,
         verbose_name="Calificación final",
         help_text="Calificación final del participante en la encuesta",
+    )
+    status = models.CharField(
+        max_length=255,
+        choices=STATUS_CHOICES,
+        default="pending",
+        verbose_name="Estado",
+        help_text="Estado del reporte",
+    )
+    logs = models.TextField(
+        blank=True,
+        verbose_name="Logs",
+        help_text="Logs del reporte",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

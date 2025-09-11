@@ -282,12 +282,15 @@ class TestSurveyModelBase(TestCase):
         self,
         survey: survey_models.Survey = None,
         participant: survey_models.Participant = None,
+        status: str = "pending",
     ) -> survey_models.Report:
         """Create a report object
 
         Args:
             survey (survey_models.Survey): The survey of the report
             participant (survey_models.Participant): The participant of the report
+            status (str): The status of the report:
+                (pending, processing, completed, error)
 
         Returns:
             survey_models.Report: The created report object
@@ -302,6 +305,7 @@ class TestSurveyModelBase(TestCase):
         survey = survey_models.Report.objects.create(
             survey=survey,
             participant=participant,
+            status=status,
         )
         survey.save()
 
