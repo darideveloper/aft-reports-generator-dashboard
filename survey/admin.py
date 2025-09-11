@@ -3,6 +3,8 @@ from django.utils.html import format_html
 
 from survey import models
 
+from utils.media import get_media_url
+
 
 # Custom filters for deep filtering relationships (3+ levels)
 class SurveyFilter(admin.SimpleListFilter):
@@ -192,9 +194,19 @@ class ReportAdmin(admin.ModelAdmin):
     # CUSTOM FIELDS
     def custom_links(self, obj):
         """Create custom Imprimir and Ver buttons"""
+
+        pdf_url = ""
+        if obj.status == "completed":
+            pdf_url = get_media_url(obj.pdf_file)
+
         return format_html(
-            '<a class="btn btn-primary my-1" href="{}" target="_blank">Ver Reporte</a>',
-            f"/report/{obj.id}/",
+            '<a class="btn my-1 {}" target="_blank" {} {}>Ver Reporte</a>',
+            (
+                # styles
+                "btn-primary" if obj.status == "completed" else "btn-secondary disabled"
+            ),
+            f'href={pdf_url}' if pdf_url else "",  # href
+            "disabled" if obj.status != "completed" else "",  # disabled
         )
 
 

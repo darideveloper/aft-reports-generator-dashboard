@@ -1,7 +1,14 @@
 from bs4 import BeautifulSoup
 
+from django.http import HttpResponse
+from django.core.management import call_command
+
 from core.tests_base.test_admin import TestAdminBase
 from core.tests_base.test_models import TestSurveyModelBase
+
+from survey import models as survey_models
+
+from utils.media import get_media_url
 
 
 class CompanyAdminTestCase(TestAdminBase):
@@ -170,25 +177,92 @@ class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
         super().setUp()
         self.endpoint = "/admin/survey/report/"
 
+        # Create required data
+        self.survey = self.create_survey()
+        self.participant = self.create_participant()
+        self.report = self.create_report(
+            survey=self.survey, participant=self.participant
+        )
+
     def test_search_bar(self):
         """Validate search bar working"""
 
         self.submit_search_bar(self.endpoint)
+        
+    def __validate_disabled_see_report_btn(self, response: HttpResponse):
+        """Validate disabled see report button
+        
+        Args:
+            response (HttpResponse): Response of the request
+        """
+        
+        # Validate http status
+        self.assertEqual(response.status_code, 200)
+        
+        # Validate link "Ver Reporte" disabled
+        soup = BeautifulSoup(response.content, "html.parser")
+        link = soup.select_one(".field-custom_links > a")
+        self.assertIsNotNone(link)
+        self.assertIn("disabled", link["class"])
+        self.assertIn("btn-secondary", link["class"])
+        self.assertIsNone(link.get("href"))
+        self.assertEqual(link.get("disabled"), "")
 
-    def test_custom_links(self):
-        """Validate custom links working"""
-
-        # Create required data
-        survey = self.create_survey()
-        participant = self.create_participant()
-        report = self.create_report(survey=survey, participant=participant)
+    def test_custom_links_see_report_pending(self):
+        """Validate custom link "Ver Reporte" working for pending report"""
+        
+        # Update report status
+        self.report.status = "pending"
+        self.report.save()
 
         # Validate response
         response = self.client.get(f"{self.endpoint}")
+        
+        self.__validate_disabled_see_report_btn(response)
+        
+    def test_custom_links_see_report_processing(self):
+        """Validate custom link "Ver Reporte" working for processing report"""
+        
+        # Update report status
+        self.report.status = "processing"
+        self.report.save()
+        
+        # Validate response
+        response = self.client.get(f"{self.endpoint}")
+        
+        self.__validate_disabled_see_report_btn(response)
+        
+    def test_custom_links_see_report_error(self):
+        """Validate custom link "Ver Reporte" working for error report"""
+        
+        # Update report status
+        self.report.status = "error"
+        self.report.save()
+        
+        # Validate response
+        response = self.client.get(f"{self.endpoint}")
+        
+        self.__validate_disabled_see_report_btn(response)
+        
+    def test_custom_links_see_report_completed(self):
+        """Validate custom link "Ver Reporte" working for completed report"""
+        
+        # create real report with command
+        call_command("generate_next_report")
+        
+        response = self.client.get(f"{self.endpoint}")
+        
+        report = survey_models.Report.objects.get(id=self.report.id)
+        pdf_url = get_media_url(report.pdf_file)
+        
+        # Validate response
         self.assertEqual(response.status_code, 200)
-
-        # Validate link "Ver Reporte" to /report/1/
+        
+        # Validate link "Ver Reporte" disabled
         soup = BeautifulSoup(response.content, "html.parser")
-        link = soup.select_one("#result_list a.btn-primary")
+        link = soup.select_one(".field-custom_links > a")
         self.assertIsNotNone(link)
-        self.assertEqual(link["href"], f"/report/{report.id}/")
+        self.assertNotIn("disabled", link["class"])
+        self.assertIn("btn-primary", link["class"])
+        self.assertEqual(link.get("href"), pdf_url)
+        self.assertIsNone(link.get("disabled"))
