@@ -126,12 +126,9 @@ class ReportView(APIView):
         )
 
         # Generate bar chart, also rendering css
-        render_image_from_url(
-            f"{settings.BAR_CHART_ENDPOINT}",
-            image_temp_path,
-            width=1000,
-            height=1000,
-        )
+        url_params = f"?survey_id={survey.id}&participant_id={participant.id}"
+        url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
+        render_image_from_url(url, image_temp_path, width=1000, height=1300)
 
         report = models.Report.objects.get(
             survey=survey,

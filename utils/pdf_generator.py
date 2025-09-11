@@ -267,9 +267,9 @@ def generate_report(
     c.setFont("arialbd", 14)
     c.drawString(215, 707, f'"{name}"')
 
-    image_width = width - 140
+    image_width = width - 120
     x = (width - image_width) / 2
-    c.drawImage(graph_path, x, 230, width=image_width, height=image_width)
+    c.drawImage(graph_path, x, 100, width=image_width, height=image_width + 100)
 
     # Draw footer content
     footer_setting(c, name, width, color_darkgrey)
