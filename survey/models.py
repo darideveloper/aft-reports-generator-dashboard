@@ -4,8 +4,6 @@ from django.db.models import Avg
 
 from utils.text_generation import get_uuid
 
-from utils.survey_calcs import SurveyCalcs
-
 
 class Company(models.Model):
     id = models.AutoField(primary_key=True)

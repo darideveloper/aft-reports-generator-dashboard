@@ -51,17 +51,20 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
         # Single survey
         survey = self.create_survey()
 
-        # Create 2 question groups
+        # Create 4 question groups (but only 2 will be used)
         question_groups = []
-        for _ in range(2):
-            question_groups.append(self.create_question_group(survey=survey))
+        for _ in range(4):
+            question_groups.append(
+                self.create_question_group(survey=survey, survey_percentage=25)
+            )
+        question_groups = question_groups[:2]
 
         # Create 2 questions in each question group
         questions = []
         for question_group in question_groups:
             for _ in range(2):
                 questions.append(self.create_question(question_group=question_group))
-                
+
                 # Create 2 options in each question (yes and no)
         options = []
         for question in questions:
@@ -74,7 +77,7 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
                     )
                 )
 
-        return survey, options
+        return survey, options, question_groups
 
     def test_many_pending_reports(self):
         """Test with many pending reports
@@ -146,7 +149,9 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
         (100% of the questions are correct)"""
 
         # Create report question group totals data
-        survey, options = self.__create_report_question_group_totals_data()
+        survey, options, question_groups = (
+            self.__create_report_question_group_totals_data()
+        )
 
         # set CORRECT andser to each question
         selected_options = [
@@ -163,23 +168,33 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
         call_command("generate_next_report")
 
         # Get report question group totals
-        report_question_group_totals = (
-            survey_models.ReportQuestionGroupTotal.objects.filter(report=report)
-        )
+        report_question_group_totals = []
+        for question_group in question_groups:
+            report_question_group_totals.append(
+                survey_models.ReportQuestionGroupTotal.objects.get(
+                    report=report, question_group=question_group
+                )
+            )
 
         # Validate report question group totals
-        self.assertEqual(len(report_question_group_totals), 2)
         for report_question_group_total in report_question_group_totals:
 
             # Validate aprox value
             self.assertIsNotNone(report_question_group_total.total)
             self.assertEqual(report_question_group_total.total, 100)
 
+        # Validate final score (2 question groups are 0)
+        report.refresh_from_db()
+        self.assertEqual(report.total, 50)
+
     def test_saved_report_question_group_totals_50(self):
-        """Validate single question group total is saved"""
+        """Validate question group totals are calculated and saved
+        (50% of the questions are correct)"""
 
         # Generate initial data
-        survey, options = self.__create_report_question_group_totals_data()
+        survey, options, question_groups = (
+            self.__create_report_question_group_totals_data()
+        )
 
         # select one answer correct and one answer incorrect
         selected_options = [
@@ -194,22 +209,32 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
         # Create a report
         report = self.create_report(survey=survey, participant=self.participant)
         call_command("generate_next_report")
-        
-        # Get report question group totals
-        report_question_group_totals = (
-            survey_models.ReportQuestionGroupTotal.objects.filter(report=report)
-        )
 
-        # Validate report question group totals
-        self.assertEqual(len(report_question_group_totals), 2)
+        # Get report question group totals
+        report_question_group_totals = []
+        for question_group in question_groups:
+            report_question_group_totals.append(
+                survey_models.ReportQuestionGroupTotal.objects.get(
+                    report=report, question_group=question_group
+                )
+            )
+
+        # Validate report question group totals (only 2 with answers)
         for report_question_group_total in report_question_group_totals:
             self.assertEqual(report_question_group_total.total, 50)
-            
+
+        # Validate final score (2 question groups are 0)
+        report.refresh_from_db()
+        self.assertEqual(report.total, 25)
+
     def test_saved_report_question_group_totals_0(self):
-        """Validate single question group total is saved"""
+        """Validate question group totals are calculated and saved
+        (0% of the questions are correct)"""
 
         # Generate initial data
-        survey, options = self.__create_report_question_group_totals_data()
+        survey, options, question_groups = (
+            self.__create_report_question_group_totals_data()
+        )
 
         # select one answer correct and one answer incorrect
         selected_options = [
@@ -224,13 +249,20 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
         # Create a report
         report = self.create_report(survey=survey, participant=self.participant)
         call_command("generate_next_report")
-        
+
         # Get report question group totals
-        report_question_group_totals = (
-            survey_models.ReportQuestionGroupTotal.objects.filter(report=report)
-        )
+        report_question_group_totals = []
+        for question_group in question_groups:
+            report_question_group_totals.append(
+                survey_models.ReportQuestionGroupTotal.objects.get(
+                    report=report, question_group=question_group
+                )
+            )
 
         # Validate report question group totals
-        self.assertEqual(len(report_question_group_totals), 2)
         for report_question_group_total in report_question_group_totals:
             self.assertEqual(report_question_group_total.total, 0)
+
+        # Validate final score (2 question groups are 0)
+        report.refresh_from_db()
+        self.assertEqual(report.total, 0)

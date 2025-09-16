@@ -85,8 +85,16 @@ class SurveyCalcs:
         question_groups_total = ReportQuestionGroupTotal.objects.filter(
             report=self.report,
         )
+        
+        total_score = 0
+        for question_group_total in question_groups_total:
+            question_group = question_group_total.question_group
+            survey_percentage = question_group.survey_percentage
+            total = question_group_total.total
+            total = total * survey_percentage / 100
+            total_score += total
 
-        return 0
+        return total_score
 
     def get_company_totals(self) -> np.ndarray:
         """

@@ -119,7 +119,12 @@ class Command(BaseCommand):
             message = f"Report {report.id} completed"
             logs += f"{message}\n"
             print(message)
-
+            
+            # Get final score (total)
+            total = survey_calcs.get_participant_total()
+            report.total = total
+            
+            # Save and add logs
             report.logs = logs
             report.save()
 
