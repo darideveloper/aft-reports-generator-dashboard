@@ -1,5 +1,4 @@
 import numpy as np
-import random
 
 
 class SurveyCalcs:
@@ -43,13 +42,11 @@ class SurveyCalcs:
             question_option__question__question_group=question_group,
             participant=participant,
         )
-        # user_points = sum(answer.question_option.points for answer in answers)
-        # total_points = sum(option.points for option in options)
-        # TODO: dummy calc, waiting for real points in db
-        total_points = len(options)
-        user_points = int(len(options) * random.randint(1, 10) / 10)
-        # input("total_points" + str(total_points))
-        # input("user_points" + str(user_points))
+        
+        user_points = sum(answer.question_option.points for answer in answers)
+        total_points = sum(option.points for option in options)
+        if total_points == 0:
+            return 0
 
         return int(user_points / total_points * 100 * 100) / 100
 
@@ -57,10 +54,12 @@ class SurveyCalcs:
         """Calculate and save totals for the current report"""
 
         # Local import to avoid circular import
-        from survey.models import ReportQuestionGroupTotal
+        from survey.models import ReportQuestionGroupTotal, QuestionGroup
 
         # Get question groups of current survey
-        question_groups = self.survey.questiongroup_set.all().order_by("survey_index")
+        question_groups = QuestionGroup.objects.filter(survey=self.survey).order_by(
+            "survey_index"
+        )
 
         # Calculate totals for each question group
         for question_group in question_groups:
@@ -75,11 +74,19 @@ class SurveyCalcs:
             )
             report_question_group_total.total = total
             report_question_group_total.save()
-            
-            input("report_question_group_total: " + str(report_question_group_total))
 
     def get_participant_total(self) -> float:
-        return random.randint(0, 100)
+        """Get the total for the current participant"""
+
+        # Local import to avoid circular import
+        from survey.models import ReportQuestionGroupTotal
+
+        # Calculate percentage of total in each question group
+        question_groups_total = ReportQuestionGroupTotal.objects.filter(
+            report=self.report,
+        )
+
+        return 0
 
     def get_company_totals(self) -> np.ndarray:
         """

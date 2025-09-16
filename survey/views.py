@@ -162,11 +162,15 @@ class BarChartView(APIView):
 
         survey = serializer.validated_data["survey"]
         participant = serializer.validated_data["participant"]
+        report = models.Report.objects.get(
+            survey=survey, participant=participant
+        )
 
         # Dummy data
         survey_calcs = SurveyCalcs(
             participant=participant,
             survey=survey,
+            report=report,
         )
         use_average = participant.company.use_average
         chart_data = survey_calcs.get_bar_chart_data(use_average)

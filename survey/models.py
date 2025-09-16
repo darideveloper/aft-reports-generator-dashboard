@@ -118,7 +118,9 @@ class QuestionGroup(models.Model):
         help_text="Posición del grupo en la encuesta",
     )
     survey_percentage = models.FloatField(
-        default=0, verbose_name="Porcentaje", help_text="Porcentaje de la encuesta"
+        default=0,
+        verbose_name="Porcentaje",
+        help_text="Porcentaje de la encuesta (del 0 al 100)",
     )
     modifiers = models.ManyToManyField(
         QuestionGroupModifier,
@@ -335,12 +337,6 @@ class Report(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        # Solo asignar un valor aleatorio si el objeto es nuevo
-        if not self.pk:
-            self.total = SurveyCalcs(
-                participant=self.participant,
-                survey=self.survey,
-            ).get_participant_total()  # número aleatorio
 
         company = self.participant.company
         average_total = Report.objects.filter(participant__company=company).aggregate(

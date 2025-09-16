@@ -306,6 +306,7 @@ class TestSurveyModelBase(TestCase):
             survey=survey,
             participant=participant,
             status=status,
+            total=0,
         )
         survey.save()
 
