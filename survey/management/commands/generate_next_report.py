@@ -18,10 +18,10 @@ class Command(BaseCommand):
     help = "Generate next report ready to be processed"
 
     def handle(self, *args, **kwargs):
-        
+
         # Process logs
         logs = ""
-        
+
         try:
             # Get oldest report ready to be processed
             reports = models.Report.objects.filter(status="pending").order_by("id")
@@ -72,6 +72,14 @@ class Command(BaseCommand):
                 temp_folder, f"bar-chart-{image_random_uuid}.jpg"
             )
 
+            # Generar el PDF (dummy data)
+            print("Generating survey calcs")
+            survey_calcs = SurveyCalcs(
+                participant=participant,
+                survey=survey,
+                report=report,
+            )
+
             # Generate bar chart, also rendering css
             message = "Generating bar chart"
             logs += f"{message}\n"
@@ -79,12 +87,6 @@ class Command(BaseCommand):
             url_params = f"?survey_id={survey.id}&participant_id={participant.id}"
             url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
             render_image_from_url(url, image_temp_path, width=1000, height=1300)
-
-            # Generar el PDF (dummy data)
-            survey_calcs = SurveyCalcs(
-                participant=participant,
-                survey=survey,
-            )
 
             pdf_path = pdf_generator.generate_report(
                 name=name,
@@ -104,7 +106,7 @@ class Command(BaseCommand):
                 report.logs = logs + "\nEl reporte no fue generado correctamente."
                 report.save()
                 return
-            
+
             message = "Generating PDF"
             logs += f"{message}\n"
             print(message)
@@ -117,7 +119,7 @@ class Command(BaseCommand):
             message = f"Report {report.id} completed"
             logs += f"{message}\n"
             print(message)
-            
+
             report.logs = logs
             report.save()
 

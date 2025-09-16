@@ -387,7 +387,7 @@ class ReportQuestionGroupTotal(models.Model):
     question_group = models.ForeignKey(
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
     )
-    total = models.FloatField(verbose_name="Total")
+    total = models.FloatField(verbose_name="Total", default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

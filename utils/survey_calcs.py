@@ -8,10 +8,75 @@ class SurveyCalcs:
         self,
         participant: object,
         survey: object,
+        report: object,
     ):
+        # Save data
         self.participant = participant
         self.survey = survey
         self.company = participant.company
+        self.report = report
+
+        # Calculate totals
+        self.__save_report_question_group_totals()
+
+    def __get_question_group_total(
+        self, question_group: object, participant: object
+    ) -> float:
+        """Get participant total in specific question group, based on answers
+
+        Args:
+            question_group: QuestionGroup object
+            participant: Participant object
+
+        Returns:
+            float: Total
+        """
+
+        # Local import to avoid circular import
+        from survey.models import Answer, QuestionOption
+
+        # Return points of answers
+        options = QuestionOption.objects.filter(
+            question__question_group=question_group,
+        )
+        answers = Answer.objects.filter(
+            question_option__question__question_group=question_group,
+            participant=participant,
+        )
+        # user_points = sum(answer.question_option.points for answer in answers)
+        # total_points = sum(option.points for option in options)
+        # TODO: dummy calc, waiting for real points in db
+        total_points = len(options)
+        user_points = int(len(options) * random.randint(1, 10) / 10)
+        # input("total_points" + str(total_points))
+        # input("user_points" + str(user_points))
+
+        return int(user_points / total_points * 100 * 100) / 100
+
+    def __save_report_question_group_totals(self):
+        """Calculate and save totals for the current report"""
+
+        # Local import to avoid circular import
+        from survey.models import ReportQuestionGroupTotal
+
+        # Get question groups of current survey
+        question_groups = self.survey.questiongroup_set.all().order_by("survey_index")
+
+        # Calculate totals for each question group
+        for question_group in question_groups:
+            total = self.__get_question_group_total(question_group, self.participant)
+            # input(total)
+
+            report_question_group_total, _ = (
+                ReportQuestionGroupTotal.objects.get_or_create(
+                    report=self.report,
+                    question_group=question_group,
+                )
+            )
+            report_question_group_total.total = total
+            report_question_group_total.save()
+            
+            input("report_question_group_total: " + str(report_question_group_total))
 
     def get_participant_total(self) -> float:
         return random.randint(0, 100)
@@ -184,7 +249,7 @@ class SurveyCalcs:
         """
         DUMMY FUNCTION
         Get the bar chart data for a participant in a survey.
-        
+
         Args:
             use_average (bool): Whether to use the average or the specific value
 
