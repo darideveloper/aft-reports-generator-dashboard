@@ -292,14 +292,14 @@ class Participant(models.Model):
 
 
 class Report(models.Model):
-    
+
     STATUS_CHOICES = [
         ("pending", "⏳ Pendiente"),
         ("processing", "⚡ Procesando"),
         ("completed", "✔ Completado"),
         ("error", "✖ Error"),
     ]
-    
+
     id = models.AutoField(primary_key=True)
     survey = models.ForeignKey(
         Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
@@ -341,15 +341,15 @@ class Report(models.Model):
                 participant=self.participant,
                 survey=self.survey,
             ).get_participant_total()  # número aleatorio
-        
+
         company = self.participant.company
-        average_total = Report.objects.filter(
-            participant__company=company
-        ).aggregate(average_total=Avg("total"))["average_total"]
+        average_total = Report.objects.filter(participant__company=company).aggregate(
+            average_total=Avg("total")
+        )["average_total"]
 
         company.average_total = average_total if average_total is not None else 0
         company.save()
-        
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -379,3 +379,21 @@ class Answer(models.Model):
     class Meta:
         verbose_name = "Respuesta"
         verbose_name_plural = "Respuestas"
+
+
+class ReportQuestionGroupTotal(models.Model):
+    id = models.AutoField(primary_key=True)
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, verbose_name="Reporte")
+    question_group = models.ForeignKey(
+        QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
+    )
+    total = models.FloatField(verbose_name="Total")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.report} - {self.total}"
+
+    class Meta:
+        verbose_name = "Total de Grupo de Pregunta"
+        verbose_name_plural = "Totales de Grupos de Preguntas"

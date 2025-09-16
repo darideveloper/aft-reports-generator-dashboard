@@ -266,3 +266,15 @@ class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
         self.assertIn("btn-primary", link["class"])
         self.assertEqual(link.get("href"), pdf_url)
         self.assertIsNone(link.get("disabled"))
+
+
+class ReportQuestionGroupTotalAdminTestCase(TestAdminBase, TestSurveyModelBase):
+    """Testing report question group total admin"""
+
+    def setUp(self):
+        super().setUp()
+        self.endpoint = "/admin/survey/reportquestiongrouptotal/"
+
+    def test_search_bar(self):
+        """Validate search bar working"""
+        self.submit_search_bar(self.endpoint)

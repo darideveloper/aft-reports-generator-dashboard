@@ -203,9 +203,11 @@ class ReportAdmin(admin.ModelAdmin):
             '<a class="btn my-1 {}" target="_blank" {} {}>Ver Reporte</a>',
             (
                 # styles
-                "btn-primary" if obj.status == "completed" else "btn-secondary disabled"
+                "btn-primary"
+                if obj.status == "completed"
+                else "btn-secondary disabled"
             ),
-            f'href={pdf_url}' if pdf_url else "",  # href
+            f"href={pdf_url}" if pdf_url else "",  # href
             "disabled" if obj.status != "completed" else "",  # disabled
         )
 
@@ -226,4 +228,18 @@ class AnswerAdmin(admin.ModelAdmin):
     search_fields = ("participant__name", "question_option__text")
     readonly_fields = ("created_at", "updated_at")
     ordering = ("participant", "question_option__question__question_group_index")
+    list_per_page = 30
+
+
+@admin.register(models.ReportQuestionGroupTotal)
+class ReportQuestionGroupTotalAdmin(admin.ModelAdmin):
+    list_display = ("report", "question_group", "total", "created_at")
+    list_filter = ("report", "question_group", "created_at", "updated_at")
+    search_fields = (
+        "report__participant__name",
+        "report__participant__email",
+        "question_group__name",
+    )
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("report", "question_group")
     list_per_page = 30
