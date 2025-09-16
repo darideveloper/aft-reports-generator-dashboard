@@ -397,3 +397,4 @@ class ReportQuestionGroupTotal(models.Model):
     class Meta:
         verbose_name = "Total de Grupo de Pregunta"
         verbose_name_plural = "Totales de Grupos de Preguntas"
+        unique_together = ("report", "question_group")
