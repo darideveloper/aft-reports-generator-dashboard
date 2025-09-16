@@ -11,6 +11,10 @@ class ReportTestCase(TestSurveyModelBase):
     def test_save_single_report(self):
         """Validate save single report"""
         report = self.create_report()
+        
+        # Set total to report
+        report.total = 100
+        report.save()
 
         company = report.participant.company
 
@@ -27,6 +31,14 @@ class ReportTestCase(TestSurveyModelBase):
         report_1 = self.create_report(participant=participant_1)
         report_2 = self.create_report(participant=participant_2)
         report_3 = self.create_report(participant=participant_3)
+        
+        # Set total to each report
+        report_1.total = 100
+        report_2.total = 100
+        report_3.total = 100
+        report_1.save()
+        report_2.save()
+        report_3.save()
 
         average = report_1.total + report_2.total + report_3.total
         average = average / 3
@@ -47,6 +59,16 @@ class ReportTestCase(TestSurveyModelBase):
         report_2 = self.create_report(participant=participant_2)
         report_3 = self.create_report(participant=participant_3)
         report_4 = self.create_report(participant=participant_4)
+        
+        # Set total to each report
+        report_1.total = 100
+        report_2.total = 100
+        report_3.total = 100
+        report_4.total = 100
+        report_1.save()
+        report_2.save()
+        report_3.save()
+        report_4.save()
 
         average_1 = report_1.total + report_2.total
         average_1 = average_1 / 2

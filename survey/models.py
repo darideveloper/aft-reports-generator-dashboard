@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib import admin
-from django.db.models import Avg
 
 from utils.text_generation import get_uuid
 
@@ -333,18 +332,6 @@ class Report(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-
-        company = self.participant.company
-        average_total = Report.objects.filter(participant__company=company).aggregate(
-            average_total=Avg("total")
-        )["average_total"]
-
-        company.average_total = average_total if average_total is not None else 0
-        company.save()
-
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.participant.name} - {self.survey.name}"
