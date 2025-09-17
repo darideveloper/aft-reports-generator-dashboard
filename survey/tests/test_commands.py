@@ -266,3 +266,36 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
         # Validate final score (2 question groups are 0)
         report.refresh_from_db()
         self.assertEqual(report.total, 0)
+
+    def test_total_is_rounded(self):
+        """Validate total is rounded to 2 decimal places"""
+        
+        # Generate initial data
+        survey, options, question_groups = (
+            self.__create_report_question_group_totals_data()
+        )
+        
+        # Change wight of first question group to 33.33333
+        question_groups[0].survey_percentage = 33.33333
+        question_groups[0].save()
+        
+        # select one answer correct and one answer incorrect
+        selected_options = [
+            options[0],  # question 1, yes
+            options[2],  # question 2, yes
+            options[4],  # question 3, yes
+            options[6],  # question 4, yes
+        ]
+        
+        for option in selected_options:
+            self.create_answer(participant=self.participant, question_option=option)
+
+        # Create a report
+        report = self.create_report(survey=survey, participant=self.participant)
+        call_command("generate_next_report")
+
+        # Validate total is rounded to 2 decimal places
+        report.refresh_from_db()
+        decimals = str(report.total).split(".")[1]
+        print(decimals, report.total)
+        self.assertEqual(len(decimals), 2)

@@ -122,7 +122,7 @@ class Command(BaseCommand):
             
             # Get final score (total)
             total = survey_calcs.get_participant_total()
-            report.total = total
+            report.total = round(total, 2)
             
             # Save and add logs
             report.logs = logs
