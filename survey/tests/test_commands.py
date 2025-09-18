@@ -362,7 +362,6 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
         # Validate total is rounded to 2 decimal places
         report.refresh_from_db()
         decimals = str(report.total).split(".")[1]
-        print(decimals, report.total)
         self.assertEqual(len(decimals), 2)
 
 

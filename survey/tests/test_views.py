@@ -1,11 +1,12 @@
 import json
+import random
+
+from django.http import HttpResponse
 
 from rest_framework import status
 
 from core.tests_base.test_views import TestSurveyViewsBase
-
 from survey import models as survey_models
-import random
 
 
 class InvitationCodeViewTestCase(TestSurveyViewsBase):
@@ -658,12 +659,129 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         # Create data
         self.survey = self.create_survey()
         self.company = self.create_company()
-        self.participant = self.create_participant(
-            email="test@test.com", company=self.company
-        )
-        self.report = self.create_report(
+
+        # Data
+        self.question_groups_data = [
+            {
+                "title": "1 - Question group 1",
+                "value": 90,
+                "description": "Question group 1 description",
+            },
+            {
+                "title": "2 - Question group 2",
+                "value": 75,
+                "description": "Question group 2 description",
+            },
+            {
+                "title": "3 - Question group 3",
+                "value": 80,
+                "description": "Question group 3 description",
+            },
+        ]
+
+        self.question_groups_totals = {}
+
+        # Create question groups
+        question_groups = []
+        for question_group_data in self.question_groups_data:
+            question_group = self.create_question_group(
+                survey=self.survey,
+                name=question_group_data["title"],
+                details_bar_chart=question_group_data["description"],
+                goal_rate=question_group_data["value"],
+            )
+            question_groups.append(question_group)
+            
+            # Save emoty arrays of totals
+            self.question_groups_totals[question_group.id] = []
+
+        # Create data for 2 participants
+        for _ in range(2):
+            # Create participant and report
+            participant = self.create_participant(company=self.company)
+            report = self.create_report(survey=self.survey, participant=participant)
+
+            # Create question groups and set totals
+            for question_group in question_groups:
+                # Calculate and save total
+                total = random.randint(0, 100)
+                self.question_groups_totals[question_group.id].append(total)
+
+                self.create_report_question_group_total(
+                    report=report,
+                    question_group=question_group,
+                    total=total,
+                )
+
+        # Get random participant and report
+        self.participant = survey_models.Participant.objects.all().order_by("?").first()
+        self.report = survey_models.Report.objects.get(
             survey=self.survey, participant=self.participant
         )
+        
+    def __validate_general_response(self, response: HttpResponse, use_average: bool):
+        """Validate general response structure
+        
+        Args:
+            response: Response object
+        """
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Validate response structure
+        self.assertIn("ok", response.data["status"])
+        self.assertIn("Bar chart data generated successfully", response.data["message"])
+        self.assertIn("chart_data", response.data["data"])
+        self.assertIn("use_average", response.data["data"])
+        self.assertEqual(response.data["data"]["use_average"], use_average)
+
+    def __validate_chart_data(self, chart_data: list, use_average: bool):
+        """
+        Validate chart data structure
+        
+        Args:
+            chart_data: Chart data
+            use_average: Use average
+        """
+        
+        self.assertEqual(len(chart_data), len(self.question_groups_data))
+        for question_group_json in chart_data:
+
+            # Get objects
+            question_group = survey_models.QuestionGroup.objects.get(
+                name__icontains=question_group_json["titulo"]
+            )
+            question_group_total = survey_models.ReportQuestionGroupTotal.objects.get(
+                report=self.report, question_group=question_group
+            )
+
+            # Validate general data
+            self.assertIn(question_group_json["titulo"], question_group.name)
+            self.assertEqual(question_group_json["valor"], question_group_total.total)
+            self.assertEqual(
+                question_group_json["descripcion"], question_group.details_bar_chart
+            )
+
+            # Validate fixed data
+            self.assertEqual(question_group_json["maximo"], 100)
+            self.assertEqual(question_group_json["minimo"], 0)
+
+            if use_average:
+                # Validate reference line as avg
+                question_groups_totals_current = self.question_groups_totals[
+                    question_group.id
+                ]
+                question_groups_totals_avg = sum(
+                    question_groups_totals_current
+                ) / len(question_groups_totals_current)
+                self.assertEqual(
+                    question_group_json["promedio"], question_groups_totals_avg
+                )
+            else:
+                # Validate reference line as fixed
+                self.assertEqual(
+                    question_group_json["promedio"], question_group.goal_rate
+                )
 
     def test_get_use_average_true(self):
         """Test get request with valid data"""
@@ -676,16 +794,11 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         endpoint = self.endpoint
         endpoint += f"?survey_id={self.survey.id}&participant_id={self.participant.id}"
         response = self.client.get(endpoint, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # Validate response structure
-        self.assertIn("ok", response.data["status"])
-        self.assertIn("Bar chart data generated successfully", response.data["message"])
-        self.assertIn("chart_data", response.data["data"])
-        self.assertIn("use_average", response.data["data"])
-        self.assertTrue(response.data["data"]["use_average"])
-
-        # TODO: Validate chart data
+        self.__validate_general_response(response, use_average=True)
+        
+        # Validate chart data
+        chart_data = response.data["data"]["chart_data"]
+        self.__validate_chart_data(chart_data, use_average=True)
 
     def test_get_use_average_false(self):
 
@@ -697,13 +810,8 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         endpoint = self.endpoint
         endpoint += f"?survey_id={self.survey.id}&participant_id={self.participant.id}"
         response = self.client.get(endpoint, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # Validate response structure
-        self.assertIn("ok", response.data["status"])
-        self.assertIn("Bar chart data generated successfully", response.data["message"])
-        self.assertIn("chart_data", response.data["data"])
-        self.assertIn("use_average", response.data["data"])
-        self.assertFalse(response.data["data"]["use_average"])
-
-        # TODO: Validate chart data
+        self.__validate_general_response(response, use_average=False)
+        
+        # Validate chart data
+        chart_data = response.data["data"]["chart_data"]
+        self.__validate_chart_data(chart_data, use_average=False)

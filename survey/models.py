@@ -82,7 +82,7 @@ class QuestionGroupModifier(models.Model):
         blank=True,
         null=True,
         verbose_name="Detalles",
-        help_text="Detalles adicionales del modificador del formulario. ",
+        help_text="Información adicional del modificador.",
     )
     data = models.JSONField(
         blank=True,
@@ -105,7 +105,15 @@ class QuestionGroupModifier(models.Model):
 class QuestionGroup(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, verbose_name="Nombre")
-    details = models.TextField(blank=True, null=True, verbose_name="Detalles")
+    details = models.TextField(
+        blank=True, null=True, verbose_name="Detalles (formulario)"
+    )
+    details_bar_chart = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Detalles (gráfico de barras)",
+        help_text="Detalles adicionales para el gráfico de barras. ",
+    )
     survey = models.ForeignKey(
         Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
     )
@@ -373,7 +381,7 @@ class ReportQuestionGroupTotal(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.report} - {self.total}"
+        return f"{self.report} - {self.question_group} - {self.total}"
 
     class Meta:
         verbose_name = "Total de Grupo de Pregunta"

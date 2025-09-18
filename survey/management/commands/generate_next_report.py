@@ -58,6 +58,7 @@ class Command(BaseCommand):
                 survey=survey,
                 report=report,
             )
+            survey_calcs.save_report_question_group_totals()
             
             # Get final score (total)
             total = survey_calcs.get_participant_total()

@@ -99,7 +99,6 @@ class TestAdminBase(TestCase):
         response = self.client.get(url, HTTP_REFERER=referer_url)
         message = f"Testing custom filter in {url} with filter"
         message += f" '{filter_name}' and value '{filter_value}'"
-        print(message)
 
         # Check if the response is valid
         self.assertEqual(response.status_code, 200)

@@ -113,9 +113,11 @@ class TestSurveyModelBase(TestCase):
         survey: survey_models.Survey = None,
         name: str = "Question group test {x}",
         details: str = "",
+        details_bar_chart: str = "",
         survey_index: int = 0,
         survey_percentage: float = 0,
         modifiers: list[survey_models.QuestionGroupModifier] = [],
+        goal_rate: float = 0,
     ) -> survey_models.QuestionGroup:
         """Create a question group object
 
@@ -123,10 +125,12 @@ class TestSurveyModelBase(TestCase):
             survey (survey_models.Survey): The survey of the question group
             name (str): The name of the question group
             details (str): The details of the question group
+            details_bar_chart (str): The details of the question group for the bar chart
             survey_index (int): The index of the question group in the survey
             survey_percentage (float): The percentage of the question group in the survey
             modifiers (list[survey_models.QuestionGroupModifier]): Modifiers of the
                 question group.
+            goal_rate (float): The goal rate of the question group
 
         Returns:
             survey_models.QuestionGroup: The created question group object
@@ -143,6 +147,8 @@ class TestSurveyModelBase(TestCase):
             survey_index=survey_index,
             survey_percentage=survey_percentage,
             details=details,
+            details_bar_chart=details_bar_chart,
+            goal_rate=goal_rate,
         )
 
         for modifier in modifiers:
@@ -311,3 +317,33 @@ class TestSurveyModelBase(TestCase):
         survey.save()
 
         return survey
+
+    def create_report_question_group_total(
+        self,
+        report: survey_models.Report = None,
+        question_group: survey_models.QuestionGroup = None,
+        total: float = 0,
+    ) -> survey_models.ReportQuestionGroupTotal:
+        """
+        Create a report question group total object
+
+        Args:
+            report (survey_models.Report): The report of the report question group total
+            question_group (survey_models.QuestionGroup): The question group of the
+                report question group total
+            total (float): The total of the report question group total
+
+        Returns:
+            survey_models.ReportQuestionGroupTotal: The created report question group
+                total object
+        """
+
+        if not report:
+            report = self.create_report()
+
+        if not question_group:
+            question_group = self.create_question_group()
+
+        return survey_models.ReportQuestionGroupTotal.objects.create(
+            report=report, question_group=question_group, total=total
+        )

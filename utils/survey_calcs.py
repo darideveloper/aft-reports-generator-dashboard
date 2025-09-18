@@ -1,3 +1,6 @@
+from django.db.models import Avg
+
+
 from survey import models
 
 
@@ -14,9 +17,6 @@ class SurveyCalcs:
         self.survey = survey
         self.company = participant.company
         self.report = report
-
-        # Calculate totals
-        self.__save_report_question_group_totals()
 
     def __get_question_group_total(
         self, question_group: object, participant: object
@@ -51,7 +51,7 @@ class SurveyCalcs:
 
         return int(user_points / total_points * 100 * 100) / 100
 
-    def __save_report_question_group_totals(self):
+    def save_report_question_group_totals(self):
         """
         Calculate and save totals for the current report
         """
@@ -232,7 +232,6 @@ class SurveyCalcs:
 
     def get_bar_chart_data(self, use_average: bool) -> list[dict]:
         """
-        DUMMY FUNCTION
         Get the bar chart data for a participant in a survey.
 
         Args:
@@ -247,128 +246,52 @@ class SurveyCalcs:
                     "minimo": int,
                     "maximo": int,
                     "descripcion": str,
-                    "color": str,
                 }
         """
-        return [
-            {
-                "titulo": "Antecedentes tecnológicos",
-                "valor": 1,
-                "promedio": 6,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Comprender cómo funcionan las tecnologías y sus efectos sociales fortalece el liderazgo estratégico.",
-                "color": "text-tech-red bg-tech-red border-tech-red",
-            },
-            {
-                "titulo": "Evolución tecnológica",
-                "valor": 2,
-                "promedio": 6,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Conocer la evolución tecnológica permite anticipar cambios y liderar la innovación.",
-                "color": "text-tech-red bg-tech-red border-tech-red",
-            },
-            {
-                "titulo": "Internet y conectividad",
-                "valor": 3,
-                "promedio": 7,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Diferenciar Web e Internet ayuda a planear mejor la infraestructura y seguridad digital.",
-                "color": "text-tech-red bg-tech-red border-tech-red",
-            },
-            {
-                "titulo": "Dispositivos digitales",
-                "valor": 4,
-                "promedio": 7.88,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Usar correctamente dispositivos digitales mejora productividad y colaboración en tiempo real.",
-                "color": "text-tech-red bg-tech-red border-tech-red",
-            },
-            {
-                "titulo": "Ciberseguridad",
-                "valor": 5,
-                "promedio": 6,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Proteger los datos y gestionar riesgos es clave para mantener la resiliencia organizacional.",
-                "color": "text-tech-red bg-tech-red border-tech-red",
-            },
-            {
-                "titulo": "Huella digital",
-                "valor": 6,
-                "promedio": 7.5,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Controlar la huella digital protege la privacidad personal y corporativa frente a amenazas.",
-                "color": "text-tech-green bg-tech-green border-tech-green",
-            },
-            {
-                "titulo": "Uso de la tecnología",
-                "valor": 7,
-                "promedio": 8,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Un liderazgo ético y responsable en lo digital genera confianza y respeto.",
-                "color": "text-tech-green bg-tech-green border-tech-green",
-            },
-            {
-                "titulo": "Herramientas de colaboración",
-                "valor": 8,
-                "promedio": 8,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Usar bien las herramientas colaborativas mejora flujos de trabajo y eficiencia.",
-                "color": "text-tech-green bg-tech-green border-tech-green",
-            },
-            {
-                "titulo": "Tecnologías emergentes",
-                "valor": 9,
-                "promedio": 9,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Conocer y aplicar tecnologías emergentes permite innovar y mantenerse competitivo.",
-                "color": "text-tech-green bg-tech-green border-tech-green",
-            },
-            {
-                "titulo": "Tecnologías de asistencia",
-                "valor": 10,
-                "promedio": 5,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Fomentar su uso promueve la inclusión y la equidad para todos.",
-                "color": "text-tech-green bg-tech-green border-tech-green",
-            },
-            {
-                "titulo": "Rol del líder y la tecnología",
-                "valor": 10,
-                "promedio": 7,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Gestionar redes sociales de forma consciente protege la imagen y el equipo.",
-                "color": "text-tech-blue bg-tech-blue border-tech-blue",
-            },
-            {
-                "titulo": "Tecnología y medio ambiente",
-                "valor": 7,
-                "promedio": 6,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Adoptar prácticas sostenibles reduce el impacto ambiental de la tecnología.",
-                "color": "text-tech-blue bg-tech-blue border-tech-blue",
-            },
-            {
-                "titulo": "Etiqueta digital",
-                "valor": 7,
-                "promedio": 8,
-                "minimo": 1,
-                "maximo": 10,
-                "descripcion": "Mantener una comunicación respetuosa en línea mejora relaciones y confianza.",
-                "color": "text-tech-blue bg-tech-blue border-tech-blue",
-            },
-        ]
+        
+        # get question groups
+        question_groups = models.QuestionGroup.objects.filter(
+            survey=self.survey
+        ).order_by("survey_index")
+        
+        # Get title and description from question groups
+        data = []
+        for question_group in question_groups:
+            data.append({
+                "titulo": question_group.name.split("-")[1].strip(),
+                "descripcion": question_group.details_bar_chart,
+            })
+        
+        # Add max 100 and min 0 to each item
+        for item in data:
+            item["maximo"] = 100
+            item["minimo"] = 0
+
+        # Get avg from category from ReportQuestionGroupTotal
+        for item in data:
+            
+            question_group = models.QuestionGroup.objects.get(
+                name__icontains=item["titulo"]
+            )
+            
+            # Add item avg to data
+            if use_average:
+                # Calculate value
+                question_group_totals = models.ReportQuestionGroupTotal.objects.filter(
+                    question_group=question_group
+                )
+                avg = question_group_totals.aggregate(total=Avg("total"))["total"]
+                item["promedio"] = avg
+            else:
+                # Get fixed value from question_group
+                item["promedio"] = question_group.goal_rate
+                
+            # Set value (user group score)
+            item["valor"] = models.ReportQuestionGroupTotal.objects.filter(
+                report=self.report, question_group=question_group
+            ).first().total
+
+        return data
 
     def get_grade_code(self):
         """
@@ -394,10 +317,10 @@ class SurveyCalcs:
             "AP": totals_shorted[total_count_quintet_4],
             "MEP": totals_shorted[-1],
         }
-        
+
         # Refresh report to get total
         self.report.refresh_from_db()
-        
+
         for grade_code, min_total in grade_codes_mins.items():
             if self.report.total <= min_total:
                 return grade_code
