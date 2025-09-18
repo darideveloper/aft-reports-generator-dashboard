@@ -229,36 +229,21 @@ def generate_report(
     x = (width - image_width) / 2
     c.drawImage(bell_plot_path, x, 390, width=image_width, height=200)
 
+    # Define checkbox positions and corresponding grade codes
+    checkbox_positions = [
+        (328, "MDP"),  # Most Developed Performance
+        (295, "DP"),   # Developed Performance
+        (263, "P"),    # Performance
+        (231, "AP"),   # Advanced Performance
+        (200, "MEP")   # Most Excellent Performance
+    ]
+    
     c.setFont("arialbd", 30)
-    c.drawString(68, 328, "□")
-
-    c.setFont("arialbd", 30)
-    c.drawString(68, 295, "□")
-
-    c.setFont("arialbd", 30)
-    c.drawString(68, 263, "□")
-
-    c.setFont("arialbd", 30)
-    c.drawString(68, 231, "□")
-
-    c.setFont("arialbd", 30)
-    c.drawString(68, 200, "□")
-
-    if grade_code == "MDP":
-        c.setFont("arialbd", 30)
-        c.drawString(68, 328, "■")
-    elif grade_code == "DP":
-        c.setFont("arialbd", 30)
-        c.drawString(68, 295, "■")
-    elif grade_code == "P":
-        c.setFont("arialbd", 30)
-        c.drawString(68, 263, "■")
-    elif grade_code == "AP":
-        c.setFont("arialbd", 30)
-        c.drawString(68, 231, "■")
-    elif grade_code == "MEP":
-        c.setFont("arialbd", 30)
-        c.drawString(68, 200, "■")
+    
+    # Draw each checkbox with correct symbol based on grade_code
+    for y_position, grade in checkbox_positions:
+        symbol = "■" if grade_code == grade else "□"
+        c.drawString(68, y_position, symbol)
 
     c.setFont("arialbd", 11)
     c.drawString(275, 150, f'"{name}".')
