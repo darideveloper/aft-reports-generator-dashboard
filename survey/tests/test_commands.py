@@ -25,15 +25,15 @@ class GenerateNextReportBase(TestSurveyModelBase):
         self.company = self.create_company()
         self.survey = self.create_survey()
         self.participant = self.create_participant(company=self.company)
-        
+
     def create_get_pdf(self):
         """
         Create pdf report with generate_next_report command and return local path
-        
+
         Returns:
             os.path: Local path of the new pdf file
         """
-        
+
         # Detect files already in pdf folder
         pdf_folder = os.path.join(settings.BASE_DIR, "media", "reports")
         pdf_files = os.listdir(pdf_folder)
@@ -49,8 +49,57 @@ class GenerateNextReportBase(TestSurveyModelBase):
         self.assertEqual(len(new_files), 1)
         new_file = new_files[0]
         pdf_path = os.path.join(pdf_folder, new_file)
-        
+
         return pdf_path
+
+    def create_report_question_group_totals_data(
+        self, survey: survey_models.Survey = None
+    ):
+        """
+        Create report question group totals data
+
+        Args:
+            survey: Survey object (if not provided, a new survey will be created)
+
+        Returns:
+            survey: Survey object (if not provided, a new survey will be created)
+            options: List of QuestionOption objects
+            question_groups: List of QuestionGroup objects
+        """
+
+        # Generate initial data
+
+        # Single survey
+        if not survey:
+            survey = self.create_survey()
+
+        # Create 4 question groups (but only 2 will be used)
+        question_groups = []
+        for _ in range(4):
+            question_groups.append(
+                self.create_question_group(survey=survey, survey_percentage=25)
+            )
+        question_groups = question_groups[:2]
+
+        # Create 2 questions in each question group
+        questions = []
+        for question_group in question_groups:
+            for _ in range(2):
+                questions.append(self.create_question(question_group=question_group))
+
+                # Create 2 options in each question (yes and no)
+        options = []
+        for question in questions:
+            for option in ["yes", "no"]:
+                options.append(
+                    self.create_question_option(
+                        question=question,
+                        text=option,
+                        points=1 if option == "yes" else 0,
+                    )
+                )
+
+        return survey, options, question_groups
 
 
 class GenerateNextReportReportTestCase(GenerateNextReportBase):
@@ -152,7 +201,7 @@ class GenerateNextReportReportTestCase(GenerateNextReportBase):
         company_2 = self.create_company()
 
         # Simillate responses
-        _, options, _ = self.__create_report_question_group_totals_data(
+        _, options, _ = self.create_report_question_group_totals_data(
             survey=self.survey
         )
         selected_options = [
@@ -210,55 +259,6 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
     Test pdf report data is generated correctly (question group totals)
     """
 
-    def __create_report_question_group_totals_data(
-        self, survey: survey_models.Survey = None
-    ):
-        """
-        Create report question group totals data
-
-        Args:
-            survey: Survey object (if not provided, a new survey will be created)
-
-        Returns:
-            survey: Survey object (if not provided, a new survey will be created)
-            options: List of QuestionOption objects
-            question_groups: List of QuestionGroup objects
-        """
-
-        # Generate initial data
-
-        # Single survey
-        if not survey:
-            survey = self.create_survey()
-
-        # Create 4 question groups (but only 2 will be used)
-        question_groups = []
-        for _ in range(4):
-            question_groups.append(
-                self.create_question_group(survey=survey, survey_percentage=25)
-            )
-        question_groups = question_groups[:2]
-
-        # Create 2 questions in each question group
-        questions = []
-        for question_group in question_groups:
-            for _ in range(2):
-                questions.append(self.create_question(question_group=question_group))
-
-                # Create 2 options in each question (yes and no)
-        options = []
-        for question in questions:
-            for option in ["yes", "no"]:
-                options.append(
-                    self.create_question_option(
-                        question=question,
-                        text=option,
-                        points=1 if option == "yes" else 0,
-                    )
-                )
-
-        return survey, options, question_groups
-
     def test_totals_100(self):
         """
         Validate question group totals are calculated and saved
@@ -267,7 +267,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
 
         # Create report question group totals data
         survey, options, question_groups = (
-            self.__create_report_question_group_totals_data()
+            self.create_report_question_group_totals_data()
         )
 
         # set CORRECT andser to each question
@@ -312,7 +312,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
 
         # Generate initial data
         survey, options, question_groups = (
-            self.__create_report_question_group_totals_data()
+            self.create_report_question_group_totals_data()
         )
 
         # select one answer correct and one answer incorrect
@@ -354,7 +354,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
 
         # Generate initial data
         survey, options, question_groups = (
-            self.__create_report_question_group_totals_data()
+            self.create_report_question_group_totals_data()
         )
 
         # select one answer correct and one answer incorrect
@@ -395,7 +395,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
 
         # Generate initial data
         survey, options, question_groups = (
-            self.__create_report_question_group_totals_data()
+            self.create_report_question_group_totals_data()
         )
 
         # Change wight of first question group to 33.33333
@@ -438,7 +438,7 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
         company_2 = self.create_company()
 
         # Simillate responses
-        _, options, _ = self.__create_report_question_group_totals_data(
+        _, options, _ = self.create_report_question_group_totals_data(
             survey=self.survey
         )
         selected_options = [
@@ -471,7 +471,7 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
 
         # create and get pdf
         pdf_path = self.create_get_pdf()
-        
+
         # Request to the user to validate
         input(
             "New file url: "
@@ -516,9 +516,9 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
             self.create_answer(
                 participant=self.participant, question_option=options[question_index]
             )
-            
+
         self.create_report(survey=self.survey, participant=self.participant)
-        
+
     def __create_other_100_reports(self):
         """
         Create 100 reports with scores from score 0 to 100
@@ -530,14 +530,14 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
             )
             report.total = score
             report.save()
-            
+
     def __get_pdf_squares(self, pdf_path: str):
         """
         Get squares from pdf
-        
+
         Args:
             pdf_path: Path to the pdf file
-            
+
         Returns:
             list: List of squares (reversed)
                 Example: ["■", "□", "□", "□", "□", "□"]
@@ -550,14 +550,13 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
 
         # get range squaresç
         range_squares = page_3_lines[16:22]
-        range_squares.reverse()
-        
+
         return range_squares
-        
+
     def __test_square_position(self, score: int, position: int):
         """
         Base test to validate square position (correct greade code)
-        
+
         Args:
             score: Score to test
             position: Position of the square
@@ -565,17 +564,47 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
         # Setup data
         self.__create_report_with_score(score=score)
         self.__create_other_100_reports()
-     
+
         # create and get pdf
         pdf_path = self.create_get_pdf()
-        
+
         # Get squares from pdf text
         squares = self.__get_pdf_squares(pdf_path)
-    
+
         # Validate mdp aquare position
         self.assertEqual(squares[position], "■")
-            
+
     def test_mdp_0(self):
         """Validate grade code mdp for score 0"""
 
         self.__test_square_position(score=0, position=0)
+
+    def test_mdp_19(self):
+        """Validate grade code mdp for score 19"""
+
+        self.__test_square_position(score=19, position=0)
+
+    def test_mdp_20(self):
+        """Validate grade code mdp for score 20"""
+
+        self.__test_square_position(score=20, position=0)
+        
+    def test_dp_40(self):
+        """Validate grade code dp for score 40"""
+
+        self.__test_square_position(score=40, position=1)
+
+    def test_p_60(self):
+        """Validate grade code p for score 60"""
+
+        self.__test_square_position(score=60, position=2)
+    
+    def test_ap_80(self):
+        """Validate grade code ap for score 80"""
+
+        self.__test_square_position(score=80, position=3)
+    
+    def test_mep_100(self):
+        """Validate grade code mep for score 100"""
+
+        self.__test_square_position(score=100, position=4)

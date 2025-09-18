@@ -372,7 +372,7 @@ class SurveyCalcs:
 
     def get_grade_code(self):
         """
-        Return grate code identifier based on total score and quentil of scores
+        Return grate code identifier based on total score and quintet of scores
 
         Returns:
             str: Grade code (MDP, DP, P, AP, MEP)
@@ -381,17 +381,18 @@ class SurveyCalcs:
         all_totals = self.get_all_participants_totals()
         totals_shorted = sorted(all_totals)
         total_count = len(all_totals)
-        total_count_half = total_count // 2
-        total_count_quarter = total_count // 4
-        total_count_three_quarters = (total_count * 3) // 4
+        total_count_quintet_1 = total_count // 5
+        total_count_quintet_2 = (total_count * 2) // 5
+        total_count_quintet_3 = (total_count * 3) // 5
+        total_count_quintet_4 = (total_count * 4) // 5
 
         # Detect grade code based on total score and quentil of scores
         grade_codes_mins = {
-            "MDP": totals_shorted[total_count_quarter],
-            "DP": totals_shorted[total_count_half],
-            "P": totals_shorted[total_count_three_quarters],
-            "AP": totals_shorted[total_count_three_quarters],
-            "MEP": totals_shorted[total_count - 1],
+            "MDP": totals_shorted[total_count_quintet_1],
+            "DP": totals_shorted[total_count_quintet_2],
+            "P": totals_shorted[total_count_quintet_3],
+            "AP": totals_shorted[total_count_quintet_4],
+            "MEP": totals_shorted[-1],
         }
         
         # Refresh report to get total
