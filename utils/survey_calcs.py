@@ -1,4 +1,4 @@
-import numpy as np
+from survey import models
 
 
 class SurveyCalcs:
@@ -21,7 +21,8 @@ class SurveyCalcs:
     def __get_question_group_total(
         self, question_group: object, participant: object
     ) -> float:
-        """Get participant total in specific question group, based on answers
+        """
+        Get participant total in specific question group, based on answers
 
         Args:
             question_group: QuestionGroup object
@@ -42,7 +43,7 @@ class SurveyCalcs:
             question_option__question__question_group=question_group,
             participant=participant,
         )
-        
+
         user_points = sum(answer.question_option.points for answer in answers)
         total_points = sum(option.points for option in options)
         if total_points == 0:
@@ -51,7 +52,9 @@ class SurveyCalcs:
         return int(user_points / total_points * 100 * 100) / 100
 
     def __save_report_question_group_totals(self):
-        """Calculate and save totals for the current report"""
+        """
+        Calculate and save totals for the current report
+        """
 
         # Local import to avoid circular import
         from survey.models import ReportQuestionGroupTotal, QuestionGroup
@@ -64,7 +67,6 @@ class SurveyCalcs:
         # Calculate totals for each question group
         for question_group in question_groups:
             total = self.__get_question_group_total(question_group, self.participant)
-            # input(total)
 
             report_question_group_total, _ = (
                 ReportQuestionGroupTotal.objects.get_or_create(
@@ -76,7 +78,9 @@ class SurveyCalcs:
             report_question_group_total.save()
 
     def get_participant_total(self) -> float:
-        """Get the total for the current participant"""
+        """
+        Get the total for the current participant
+        """
 
         # Local import to avoid circular import
         from survey.models import ReportQuestionGroupTotal
@@ -85,7 +89,7 @@ class SurveyCalcs:
         question_groups_total = ReportQuestionGroupTotal.objects.filter(
             report=self.report,
         )
-        
+
         total_score = 0
         for question_group_total in question_groups_total:
             question_group = question_group_total.question_group
@@ -96,51 +100,17 @@ class SurveyCalcs:
 
         return total_score
 
-    def get_company_totals(self) -> np.ndarray:
+    def get_all_participants_totals(self) -> list:
         """
-        DUMMY FUNCTION
         Get the total number of participants for each company in a survey.
 
-        Args:
-            survey: Survey object
-            company: Company object
-
         Returns:
-            np.ndarray: Array of totals
+            list: List of totals
         """
-        # participants = models.Participant.objects.filter(
-        #     company=self.company,
-        #     survey=self.survey,
-        # )
-
-        # totals = np.array([participant.total for participant in participants])
-
-        # return totals
-
-        return np.array(
-            [
-                85.1,
-                90.2,
-                80.3,
-                85.4,
-                90.5,
-                85.6,
-                90.7,
-                85.8,
-                90.9,
-                85.0,
-                90.1,
-                60.2,
-                70.3,
-                80.4,
-                90.5,
-                85.6,
-                90.7,
-                85.8,
-                90.9,
-                85.0,
-            ]
-        )
+        reports = models.Report.objects.all()
+        
+        totals = [report.total for report in reports]
+        return totals
 
     def get_resulting_paragraphs(self) -> list[dict]:
         """

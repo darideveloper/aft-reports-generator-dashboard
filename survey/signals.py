@@ -7,6 +7,7 @@ from survey import models
 
 @receiver(post_save, sender=models.Report)
 def after_report_save(sender, instance, created, **kwargs):
+    """ Update company average total """
 
     company = instance.participant.company
     total_sum = models.Report.objects.filter(participant__company=company).aggregate(
@@ -19,6 +20,7 @@ def after_report_save(sender, instance, created, **kwargs):
 
     # Calculate total
     average_total = total_sum["total_sum"] / total_sum["total_count"]
+    average_total = round(average_total, 2)
 
     # Save total
     company.average_total = average_total

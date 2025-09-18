@@ -46,10 +46,23 @@ class Command(BaseCommand):
             report.pdf_file = None
             report.total = 0
             report.save()
-
+            
             participant = report.participant
             survey = report.survey
             name = participant.name
+            
+            # Generate survey calcs
+            print("Generating survey calcs")
+            survey_calcs = SurveyCalcs(
+                participant=participant,
+                survey=survey,
+                report=report,
+            )
+            
+            # Get final score (total)
+            total = survey_calcs.get_participant_total()
+            report.total = round(total, 2)
+            report.save()
 
             # Temp folder for images
             temp_folder = os.path.join(settings.BASE_DIR, "media", "temp")
@@ -72,14 +85,6 @@ class Command(BaseCommand):
                 temp_folder, f"bar-chart-{image_random_uuid}.jpg"
             )
 
-            # Generar el PDF (dummy data)
-            print("Generating survey calcs")
-            survey_calcs = SurveyCalcs(
-                participant=participant,
-                survey=survey,
-                report=report,
-            )
-
             # Generate bar chart, also rendering css
             message = "Generating bar chart"
             logs += f"{message}\n"
@@ -87,15 +92,15 @@ class Command(BaseCommand):
             url_params = f"?survey_id={survey.id}&participant_id={participant.id}"
             url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
             render_image_from_url(url, image_temp_path, width=1000, height=1300)
-
+            
             pdf_path = pdf_generator.generate_report(
                 name=name,
                 date=report.created_at.strftime("%d/%m/%Y"),
                 grade_code="MDP",
-                final_score=report.total,
+                final_score=total,
                 logo_path=logo_path,
                 graph_path=image_temp_path,
-                data=survey_calcs.get_company_totals(),
+                data=survey_calcs.get_all_participants_totals(),
                 resulting_paragraphs=survey_calcs.get_resulting_paragraphs(),
                 resulting_titles=survey_calcs.get_resulting_titles(),
                 company_average_total=company.average_total,
@@ -119,10 +124,6 @@ class Command(BaseCommand):
             message = f"Report {report.id} completed"
             logs += f"{message}\n"
             print(message)
-            
-            # Get final score (total)
-            total = survey_calcs.get_participant_total()
-            report.total = round(total, 2)
             
             # Save and add logs
             report.logs = logs

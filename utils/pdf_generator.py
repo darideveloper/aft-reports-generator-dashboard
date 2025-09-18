@@ -213,10 +213,15 @@ def generate_report(
     c.drawString(73, 675, f'"{name}".')
 
     data = np.array(data)
-
+    if (len(data) > 1):
+        mean_grades = np.mean(data)
+    else:
+        mean_grades = data[0]
+    mean_grades = round(mean_grades, 2)
+    
     bell_plot_path = generate_bell_curve_plot(
         grade=final_score,
-        mean_grades=data.mean(),
+        mean_grades=mean_grades,
         grades=data,
         company_average_total=company_average_total,
     )
