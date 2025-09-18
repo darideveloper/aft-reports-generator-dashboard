@@ -8,6 +8,8 @@ from core.tests_base.test_models import TestSurveyModelBase
 from survey import models as survey_models
 from utils.media import get_media_url
 
+from PyPDF2 import PdfReader
+
 
 class GenerateNextReportCommandTestCase(TestSurveyModelBase):
     """Test generate next report command"""
@@ -340,7 +342,7 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
             )
             report.total = random.randint(40, 90)
             report.save()
-            
+
         for _ in range(random.randint(100, 200)):
             report = self.create_report(
                 survey=self.survey,
@@ -369,3 +371,66 @@ class GenerateNextReportCommandTestCase(TestSurveyModelBase):
             + pdf_path
             + "\nCheck bell chart and press enter to continue"
         )
+
+    def test_check_boxes_generation_mdp(self):
+        """Validate bell chart data is generated correctly (manually)"""
+
+        company = self.participant.company
+
+        # Create 1 question group with many questions
+        question_group = self.create_question_group(
+            survey=self.survey, survey_percentage=100
+        )
+        options = []
+        for _ in range(5):
+            question = self.create_question(question_group=question_group)
+            options.append(
+                self.create_question_option(question=question, text="yes", points=1)
+            )
+
+        # Get first option of first question grouo and set as only correct answer
+        option = options[0]
+        self.create_answer(participant=self.participant, question_option=option)
+        
+        # Create first user report
+        report = self.create_report(
+            survey=self.survey,
+            participant=self.participant,
+        )
+        
+        # Create 100 reports with scores from 0 to 100
+        for score in range(0, 100):
+            report = self.create_report(
+                survey=self.survey,
+                participant=self.create_participant(company=company),
+            )
+            report.total = score
+            report.save()
+
+        # Detect files already in pdf folder
+        pdf_folder = os.path.join(settings.BASE_DIR, "media", "reports")
+        pdf_files = os.listdir(pdf_folder)
+        old_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
+
+        # Generate next pdf
+        call_command("generate_next_report")
+
+        # delect new report
+        pdf_files = os.listdir(pdf_folder)
+        new_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
+        new_files = [file for file in new_pdf_files if file not in old_pdf_files]
+        self.assertEqual(len(new_files), 1)
+        new_file = new_files[0]
+        pdf_path = os.path.join(pdf_folder, new_file)
+
+        # Read pdf text content
+        with open(pdf_path, "rb") as f:
+            pdf_reader = PdfReader(f)
+            page_3_text = pdf_reader.pages[2].extract_text()
+        page_3_lines = page_3_text.split("\n")
+
+        # get range squaresç
+        range_squares = page_3_lines[16:22]
+        range_squares.reverse()
+
+        self.assertEqual(range_squares[0], "■")

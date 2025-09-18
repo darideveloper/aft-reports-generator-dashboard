@@ -92,11 +92,11 @@ class Command(BaseCommand):
             url_params = f"?survey_id={survey.id}&participant_id={participant.id}"
             url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
             render_image_from_url(url, image_temp_path, width=1000, height=1300)
-            
+                        
             pdf_path = pdf_generator.generate_report(
                 name=name,
                 date=report.created_at.strftime("%d/%m/%Y"),
-                grade_code="MDP",
+                grade_code=survey_calcs.get_grade_code(),
                 final_score=total,
                 logo_path=logo_path,
                 graph_path=image_temp_path,

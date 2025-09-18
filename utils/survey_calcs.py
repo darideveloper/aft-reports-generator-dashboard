@@ -108,7 +108,7 @@ class SurveyCalcs:
             list: List of totals
         """
         reports = models.Report.objects.all()
-        
+
         totals = [report.total for report in reports]
         return totals
 
@@ -369,3 +369,35 @@ class SurveyCalcs:
                 "color": "text-tech-blue bg-tech-blue border-tech-blue",
             },
         ]
+
+    def get_grade_code(self):
+        """
+        Return grate code identifier based on total score and quentil of scores
+
+        Returns:
+            str: Grade code (MDP, DP, P, AP, MEP)
+        """
+
+        all_totals = self.get_all_participants_totals()
+        totals_shorted = sorted(all_totals)
+        total_count = len(all_totals)
+        total_count_half = total_count // 2
+        total_count_quarter = total_count // 4
+        total_count_three_quarters = (total_count * 3) // 4
+
+        # Detect grade code based on total score and quentil of scores
+        grade_codes_mins = {
+            "MDP": totals_shorted[total_count_quarter],
+            "DP": totals_shorted[total_count_half],
+            "P": totals_shorted[total_count_three_quarters],
+            "AP": totals_shorted[total_count_three_quarters],
+            "MEP": totals_shorted[total_count - 1],
+        }
+        
+        # Refresh report to get total
+        self.report.refresh_from_db()
+        
+        for grade_code, min_total in grade_codes_mins.items():
+            if self.report.total <= min_total:
+                return grade_code
+        return "MEP"
