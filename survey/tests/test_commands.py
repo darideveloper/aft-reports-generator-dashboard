@@ -1,5 +1,6 @@
 import os
 import random
+from time import sleep
 
 from django.core.management import call_command
 from django.conf import settings
@@ -102,7 +103,7 @@ class GenerateNextReportBase(TestSurveyModelBase):
         return survey, options, question_groups
 
 
-class GenerateNextReportReportTestCase(GenerateNextReportBase):
+class GenerateNextReportCreationTestCase(GenerateNextReportBase):
     """
     Test pdf report created with generate_next_report command
     """
@@ -193,65 +194,6 @@ class GenerateNextReportReportTestCase(GenerateNextReportBase):
             survey_models.Report.objects.filter(status="completed").count(), 0
         )
         self.assertEqual(survey_models.Report.objects.filter(status="error").count(), 0)
-
-    def test_bell_chart_generation(self):
-        """Validate bell chart data is generated correctly (manually)"""
-
-        company_1 = self.participant.company
-        company_2 = self.create_company()
-
-        # Simillate responses
-        _, options, _ = self.create_report_question_group_totals_data(
-            survey=self.survey
-        )
-        selected_options = [
-            options[1],  # question 1, np
-            options[2],  # question 2, yes
-            options[4],  # question 3, yes
-            options[6],  # question 4, yes
-        ]
-        for option in selected_options:
-            self.create_answer(participant=self.participant, question_option=option)
-        self.create_report(survey=self.survey, participant=self.participant)
-
-        # Create a random number of reports with random score from 40 to 90
-        # set random company in each one
-        for _ in range(random.randint(100, 200)):
-            report = self.create_report(
-                survey=self.survey,
-                participant=self.create_participant(company=company_1),
-            )
-            report.total = random.randint(40, 90)
-            report.save()
-
-        for _ in range(random.randint(100, 200)):
-            report = self.create_report(
-                survey=self.survey,
-                participant=self.create_participant(company=company_2),
-            )
-            report.total = random.randint(30, 70)
-            report.save()
-
-        # Detect files already in pdf folder
-        pdf_folder = os.path.join(settings.BASE_DIR, "media", "reports")
-        pdf_files = os.listdir(pdf_folder)
-        old_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
-
-        # Generate next pdf
-        call_command("generate_next_report")
-
-        # delect new report
-        pdf_files = os.listdir(pdf_folder)
-        new_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
-        new_files = [file for file in new_pdf_files if file not in old_pdf_files]
-        self.assertEqual(len(new_files), 1)
-        new_file = new_files[0]
-        pdf_path = os.path.join(pdf_folder, new_file)
-        input(
-            "New file url: "
-            + pdf_path
-            + "\nCheck bell chart and press enter to continue"
-        )
 
 
 class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
@@ -473,11 +415,12 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
         pdf_path = self.create_get_pdf()
 
         # Request to the user to validate
-        input(
-            "New file url: "
+        print(
+            ">>> New file url: "
             + pdf_path
-            + "\nCheck bell chart and press enter to continue"
+            + "\nManual check of bell chart required"
         )
+        sleep(60)
 
 
 class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
@@ -588,7 +531,7 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
         """Validate grade code mdp for score 20"""
 
         self.__test_square_position(score=20, position=0)
-        
+
     def test_dp_40(self):
         """Validate grade code dp for score 40"""
 
@@ -598,12 +541,12 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
         """Validate grade code p for score 60"""
 
         self.__test_square_position(score=60, position=2)
-    
+
     def test_ap_80(self):
         """Validate grade code ap for score 80"""
 
         self.__test_square_position(score=80, position=3)
-    
+
     def test_mep_100(self):
         """Validate grade code mep for score 100"""
 
