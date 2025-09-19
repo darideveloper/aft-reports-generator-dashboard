@@ -23,6 +23,9 @@ TEST_HEADLESS = os.getenv("TEST_HEADLESS", "False") == "True"
 PAGE_SIZE = int(os.getenv("PAGE_SIZE", 10))
 BAR_CHART_ENDPOINT = os.getenv("BAR_CHART_ENDPOINT")
 
+# Testing env variables
+TEST_BAR_CHART_ENDPOINT = os.getenv("TEST_BAR_CHART_ENDPOINT")
+
 print(f"DEBUG: {DEBUG}")
 print(f"STORAGE_AWS: {STORAGE_AWS}")
 print(f"HOST: {HOST}")

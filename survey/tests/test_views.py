@@ -1,11 +1,16 @@
+import os
 import json
 import random
 
+from django.conf import settings
 from django.http import HttpResponse
 from rest_framework import status
 
 from core.tests_base.test_views import TestSurveyViewsBase
 from survey import models as survey_models
+
+import requests
+from playwright.sync_api import sync_playwright
 
 
 class InvitationCodeViewTestCase(TestSurveyViewsBase):
@@ -651,7 +656,9 @@ class ResponseViewTestCase(TestSurveyViewsBase):
 
 
 class BarChartViewTestCase(TestSurveyViewsBase):
-        
+
+    host = "localhost"
+
     def setUp(self):
         # Set endpoint
         super().setUp(endpoint="/api/bar-chart/")
@@ -829,3 +836,70 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         # Validate chart data
         chart_data = response.data["data"]["chart_data"]
         self.__validate_chart_data(chart_data, use_average=False)
+
+    def test_chart_rendered_use_average_true(self):
+        """
+        Test chart rendered as html from external service
+        """
+
+        # Get json data to submit to external service, from endpoint
+        endpoint = self.endpoint
+        endpoint += f"?survey_id={self.survey.id}&participant_id={self.participant.id}"
+        response = self.client.get(endpoint, format="json")
+        json_data = response.data["data"]
+        json_data_encoded = json.dumps(json_data)
+
+        self.company.use_average = True
+        self.company.save()
+
+        # Validate graph generation running
+        error_service_down = (
+            f"Graph generation not running in {settings.TEST_BAR_CHART_ENDPOINT}"
+        )
+        remote_endpoint = settings.TEST_BAR_CHART_ENDPOINT
+        try:
+            response = requests.get(remote_endpoint)
+            response.raise_for_status()
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_200_OK,
+                error_service_down,
+            )
+        except Exception as e:
+            self.fail(f"{error_service_down}: {e}")
+
+        # Add param
+        remote_endpoint += f"?data={json_data_encoded}"
+
+        # Add svg to each question group in data
+        for question_group in self.question_groups_data:
+            question_group_obj = survey_models.QuestionGroup.objects.get(
+                name__icontains=question_group["title"]
+            )
+            question_group_total_avg = self.__get_question_group_total_avg(
+                question_group_obj.id
+            )
+            avg_attrib_tag = f'data-avg="{question_group_total_avg}"'
+            question_group["avg_attrib_tag"] = avg_attrib_tag
+
+        # Open page with playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=False)
+            page = browser.new_page()
+            page.goto(remote_endpoint)
+            page.wait_for_timeout(2000)
+
+            # Save screenshot of the page in "/temp.png"
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            temp_path = os.path.join(current_dir, "temp.png")
+            page.screenshot(path=temp_path)
+
+            # Test visible data in web page
+            for question_group in self.question_groups_data:
+
+                # Check alreayd generated data
+                title_clean = question_group["title"].split("-")[1].strip()
+                self.assertIn(title_clean, page.content())
+                self.assertIn(question_group["description"], page.content())
+                self.assertIn(str(question_group["value"]), page.content())
+                self.assertIn(question_group["avg_attrib_tag"], page.content())
