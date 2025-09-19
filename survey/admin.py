@@ -189,7 +189,6 @@ class ReportAdmin(admin.ModelAdmin):
     )
     search_fields = ("participant__name", "survey__name")
     readonly_fields = ("created_at", "updated_at")
-    ordering = ("status", "created_at")
 
     # CUSTOM FIELDS
     def custom_links(self, obj):
