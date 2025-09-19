@@ -2,7 +2,6 @@ import json
 import random
 
 from django.http import HttpResponse
-
 from rest_framework import status
 
 from core.tests_base.test_views import TestSurveyViewsBase
@@ -652,6 +651,7 @@ class ResponseViewTestCase(TestSurveyViewsBase):
 
 
 class BarChartViewTestCase(TestSurveyViewsBase):
+        
     def setUp(self):
         # Set endpoint
         super().setUp(endpoint="/api/bar-chart/")
@@ -691,7 +691,7 @@ class BarChartViewTestCase(TestSurveyViewsBase):
                 goal_rate=question_group_data["value"],
             )
             question_groups.append(question_group)
-            
+
             # Save emoty arrays of totals
             self.question_groups_totals[question_group.id] = []
 
@@ -718,14 +718,14 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         self.report = survey_models.Report.objects.get(
             survey=self.survey, participant=self.participant
         )
-        
+
     def __validate_general_response(self, response: HttpResponse, use_average: bool):
         """Validate general response structure
-        
+
         Args:
             response: Response object
         """
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Validate response structure
@@ -735,15 +735,32 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         self.assertIn("use_average", response.data["data"])
         self.assertEqual(response.data["data"]["use_average"], use_average)
 
+    def __get_question_group_total_avg(self, question_group_id: int):
+        """
+        Get question group total average
+
+        Args:
+            question_group_id: Question group id
+
+        Returns:
+            float: Question group total average
+        """
+        # Validate reference line as avg
+        question_groups_totals_current = self.question_groups_totals[question_group_id]
+        question_groups_totals_avg = sum(question_groups_totals_current) / len(
+            question_groups_totals_current
+        )
+        return question_groups_totals_avg
+
     def __validate_chart_data(self, chart_data: list, use_average: bool):
         """
         Validate chart data structure
-        
+
         Args:
             chart_data: Chart data
             use_average: Use average
         """
-        
+
         self.assertEqual(len(chart_data), len(self.question_groups_data))
         for question_group_json in chart_data:
 
@@ -767,13 +784,10 @@ class BarChartViewTestCase(TestSurveyViewsBase):
             self.assertEqual(question_group_json["minimo"], 0)
 
             if use_average:
-                # Validate reference line as avg
-                question_groups_totals_current = self.question_groups_totals[
+
+                question_groups_totals_avg = self.__get_question_group_total_avg(
                     question_group.id
-                ]
-                question_groups_totals_avg = sum(
-                    question_groups_totals_current
-                ) / len(question_groups_totals_current)
+                )
                 self.assertEqual(
                     question_group_json["promedio"], question_groups_totals_avg
                 )
@@ -795,7 +809,7 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         endpoint += f"?survey_id={self.survey.id}&participant_id={self.participant.id}"
         response = self.client.get(endpoint, format="json")
         self.__validate_general_response(response, use_average=True)
-        
+
         # Validate chart data
         chart_data = response.data["data"]["chart_data"]
         self.__validate_chart_data(chart_data, use_average=True)
@@ -811,7 +825,7 @@ class BarChartViewTestCase(TestSurveyViewsBase):
         endpoint += f"?survey_id={self.survey.id}&participant_id={self.participant.id}"
         response = self.client.get(endpoint, format="json")
         self.__validate_general_response(response, use_average=False)
-        
+
         # Validate chart data
         chart_data = response.data["data"]["chart_data"]
         self.__validate_chart_data(chart_data, use_average=False)
