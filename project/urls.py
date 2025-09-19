@@ -36,7 +36,6 @@ urlpatterns = [
         survey_views.HasAnswerView.as_view(),
         name="participant-has-answer",
     ),
-    path("api/bar-chart/", survey_views.BarChartView.as_view(), name="bar-chart"),
 ]
 
 if not settings.STORAGE_AWS:

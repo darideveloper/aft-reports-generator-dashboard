@@ -1,15 +1,20 @@
 import os
+import json
 import random
 from time import sleep
 
 from django.core.management import call_command
 from django.conf import settings
+from rest_framework import status
 
 from core.tests_base.test_models import TestSurveyModelBase
 from survey import models as survey_models
 from utils.media import get_media_url
+from utils.survey_calcs import SurveyCalcs
 
+import requests
 from PyPDF2 import PdfReader
+from playwright.sync_api import sync_playwright
 
 
 class GenerateNextReportBase(TestSurveyModelBase):
@@ -414,11 +419,7 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
         pdf_path = self.create_get_pdf()
 
         # Request to the user to validate
-        print(
-            ">>> New file url: "
-            + pdf_path
-            + "\nManual check of bell chart required"
-        )
+        print(">>> New file url: " + pdf_path + "\nManual check of bell chart required")
         sleep(60)
 
 
@@ -550,3 +551,239 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
         """Validate grade code mep for score 100"""
 
         self.__test_square_position(score=100, position=4)
+
+
+class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
+    """
+    Test pdf report data is generated correctly (bar chart)
+    """
+
+    def setUp(self):
+
+        # Create data
+        self.survey = self.create_survey()
+        self.company = self.create_company()
+
+        # Data
+        self.question_groups_data = [
+            {
+                "title": "1 - Question group 1",
+                "promedio": 90,
+                "description": "Question group 1 description",
+            },
+            {
+                "title": "2 - Question group 2",
+                "promedio": 75,
+                "description": "Question group 2 description",
+            },
+            {
+                "title": "3 - Question group 3",
+                "promedio": 80,
+                "description": "Question group 3 description",
+            },
+        ]
+
+        self.question_groups_totals = {}
+
+        # Create question groups
+        question_groups = []
+        for question_group_data in self.question_groups_data:
+            question_group = self.create_question_group(
+                survey=self.survey,
+                name=question_group_data["title"],
+                details_bar_chart=question_group_data["description"],
+                goal_rate=question_group_data["promedio"],
+            )
+            question_groups.append(question_group)
+
+            # Save emoty arrays of totals
+            self.question_groups_totals[question_group.id] = []
+
+        # Create data for 2 participants
+        for _ in range(2):
+            # Create participant and report
+            participant = self.create_participant(company=self.company)
+            report = self.create_report(survey=self.survey, participant=participant)
+
+            # Create question groups and set totals
+            for question_group in question_groups:
+                # Calculate and save total
+                total = random.randint(0, 100)
+                self.question_groups_totals[question_group.id].append(total)
+
+                self.create_report_question_group_total(
+                    report=report,
+                    question_group=question_group,
+                    total=total,
+                )
+
+        # Get random participant and report
+        self.participant = survey_models.Participant.objects.all().order_by("?").first()
+        self.report = survey_models.Report.objects.get(
+            survey=self.survey, participant=self.participant
+        )
+
+        # Run parent setUp
+        super().setUp()
+
+    def __get_question_group_total_avg(self, question_group_id: int):
+        """
+        Get question group total average
+
+        Args:
+            question_group_id: Question group id
+
+        Returns:
+            float: Question group total average
+        """
+        # Validate reference line as avg
+        question_groups_totals_current = self.question_groups_totals[question_group_id]
+        question_groups_totals_avg = sum(question_groups_totals_current) / len(
+            question_groups_totals_current
+        )
+        return question_groups_totals_avg
+
+    def __validate_chart_data(self, chart_data: list, use_average: bool):
+        """
+        Validate chart data structure
+
+        Args:
+            chart_data: Chart data
+            use_average: Use average
+        """
+
+        self.assertEqual(len(chart_data), len(self.question_groups_data))
+        for question_group_json in chart_data:
+
+            # Get objects
+            question_group = survey_models.QuestionGroup.objects.get(
+                name__icontains=question_group_json["titulo"]
+            )
+            question_group_total = survey_models.ReportQuestionGroupTotal.objects.get(
+                report=self.report, question_group=question_group
+            )
+
+            # Validate general data
+            self.assertIn(question_group_json["titulo"], question_group.name)
+            self.assertEqual(question_group_json["valor"], question_group_total.total)
+            self.assertEqual(
+                question_group_json["descripcion"], question_group.details_bar_chart
+            )
+
+            # Validate fixed data
+            self.assertEqual(question_group_json["maximo"], 100)
+            self.assertEqual(question_group_json["minimo"], 0)
+
+            if use_average:
+
+                question_groups_totals_avg = self.__get_question_group_total_avg(
+                    question_group.id
+                )
+                self.assertEqual(
+                    question_group_json["promedio"], question_groups_totals_avg
+                )
+            else:
+                # Validate reference line as fixed
+                self.assertEqual(
+                    question_group_json["promedio"], question_group.goal_rate
+                )
+
+    def test_get_bar_chart_data_use_average_true(self):
+        """Test get request with valid data"""
+
+        # Set company use average to true
+        self.company.use_average = True
+        self.company.save()
+
+        # Get data from surv
+        survey_calcs = SurveyCalcs(
+            participant=self.report.participant,
+            survey=self.report.survey,
+            report=self.report,
+        )
+        chart_data = survey_calcs.get_bar_chart_data(use_average=True)
+        
+        # Validate chart data
+        self.__validate_chart_data(chart_data, use_average=True)
+        
+    def test_get_bar_chart_data_use_average_false(self):
+        """Test get request with valid data"""
+
+        # Set company use average to false
+        self.company.use_average = False
+        self.company.save()
+        
+        # Get data from survey_calcs
+        survey_calcs = SurveyCalcs(
+            participant=self.report.participant,
+            survey=self.report.survey,
+            report=self.report,
+        )
+        chart_data = survey_calcs.get_bar_chart_data(use_average=False)
+        
+        # Validate chart data
+        self.__validate_chart_data(chart_data, use_average=False)
+
+    def test_chart_rendered(self):
+        """
+        Test chart rendered as html from external service
+        """
+        
+        # Validate with avg and fixed goal rate
+        use_averages = [True, False]
+        
+        for use_average in use_averages:
+            self.company.use_average = use_average
+            self.company.save()
+
+            # Get json data to submit to external service, from endpoint
+            survey_calcs = SurveyCalcs(
+                participant=self.report.participant,
+                survey=self.report.survey,
+                report=self.report,
+            )
+            chart_data = survey_calcs.get_bar_chart_data(use_average=use_average)
+            json_data = {
+                "chart_data": chart_data,
+                "use_average": True,
+            }
+            json_data_encoded = json.dumps(json_data)
+
+            # Validate graph generation running
+            error_service_down = (
+                f"Graph generation not running in {settings.TEST_BAR_CHART_ENDPOINT}"
+            )
+            remote_endpoint = settings.TEST_BAR_CHART_ENDPOINT
+            try:
+                response = requests.get(remote_endpoint)
+                response.raise_for_status()
+                self.assertEqual(
+                    response.status_code,
+                    status.HTTP_200_OK,
+                    error_service_down,
+                )
+            except Exception as e:
+                self.fail(f"{error_service_down}: {e}")
+
+            # Add param
+            remote_endpoint += f"?data={json_data_encoded}"
+
+            # Open page with playwright
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.goto(remote_endpoint)
+                page.wait_for_timeout(2000)
+
+                # Save screenshot of the page in "/temp.png"
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                temp_path = os.path.join(current_dir, "temp.png")
+                page.screenshot(path=temp_path)
+
+                # Test visible data in web page
+                for question_group in chart_data:
+
+                    # Check alreayd generated data
+                    self.assertIn(question_group["titulo"], page.content())
+                    self.assertIn(question_group["descripcion"], page.content())
+                    self.assertIn(str(int(question_group["promedio"])), page.content())

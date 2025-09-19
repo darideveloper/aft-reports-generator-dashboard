@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -85,15 +86,28 @@ class Command(BaseCommand):
             image_temp_path = os.path.join(
                 temp_folder, f"bar-chart-{image_random_uuid}.jpg"
             )
+            
+            # Get data to submit to bar chart
+            use_average = participant.company.use_average
+            chart_data = survey_calcs.get_bar_chart_data(use_average=use_average)
+            json_data = {
+                "chart_data": chart_data,
+                "use_average": use_average,
+            }
+            json_raw = json.dumps(json_data)
 
             # Generate bar chart, also rendering css
             message = "Generating bar chart"
             logs += f"{message}\n"
             print(message)
-            url_params = f"?survey_id={survey.id}&participant_id={participant.id}"
+            url_params = f"?data={json_raw}"
             url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
             render_image_from_url(url, image_temp_path, width=1000, height=1300)
-                        
+            
+            message = "Generating PDF"
+            logs += f"{message}\n"
+            print(message)
+
             pdf_path = pdf_generator.generate_report(
                 name=name,
                 date=report.created_at.strftime("%d/%m/%Y"),
@@ -112,8 +126,8 @@ class Command(BaseCommand):
                 report.logs = logs + "\nEl reporte no fue generado correctamente."
                 report.save()
                 return
-
-            message = "Generating PDF"
+            
+            message = "PDF generated"
             logs += f"{message}\n"
             print(message)
 

@@ -3,8 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from utils.survey_calcs import SurveyCalcs
-
 from survey import serializers, models
 
 
@@ -144,45 +142,4 @@ class ResponseView(APIView):
                 },
             },
             status=status.HTTP_201_CREATED,
-        )
-
-
-class BarChartView(APIView):
-    def get(self, request):
-        serializer = serializers.BarChartSerializer(data=request.query_params)
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "status": "error",
-                    "message": "Invalid data",
-                    "data": serializer.errors,
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        survey = serializer.validated_data["survey"]
-        participant = serializer.validated_data["participant"]
-        report = models.Report.objects.get(
-            survey=survey, participant=participant
-        )
-
-        # Dummy data
-        survey_calcs = SurveyCalcs(
-            participant=participant,
-            survey=survey,
-            report=report,
-        )
-        use_average = participant.company.use_average
-        chart_data = survey_calcs.get_bar_chart_data(use_average)
-
-        return Response(
-            {
-                "status": "ok",
-                "message": "Bar chart data generated successfully",
-                "data": {
-                    "chart_data": chart_data,
-                    "use_average": use_average,
-                },
-            },
-            status=status.HTTP_200_OK,
         )
