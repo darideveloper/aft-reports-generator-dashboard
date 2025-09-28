@@ -1,0 +1,12 @@
+[
+    {
+        "model": "survey.Survey",
+        "pk": 1,
+        "fields": {
+            "name": "Evaluación LeadForward Prueba empresa v1",
+            "instructions": "Tómese el tiempo necesario para leer instrucciones y contestar\n\n© 2024 LeadForward Global Solutions MJ. Todos los Derechos Reservados. Esta encuesta ha sido desarrollada para fines formativos y/o de diagnóstico. Su contenido es confidencial. No está permitida su reproducción, difusión o modificación sin autorización escrita.\n\nMonterrey N. L. México. 2024",
+            "created_at": "2025-08-21T00:00:00Z",
+            "updated_at": "2025-08-21T00:00:00Z"
+        }
+    }
+]
