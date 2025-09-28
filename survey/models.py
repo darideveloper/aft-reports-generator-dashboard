@@ -387,3 +387,48 @@ class ReportQuestionGroupTotal(models.Model):
         verbose_name = "Total de Grupo de Pregunta"
         verbose_name_plural = "Totales de Grupos de Preguntas"
         unique_together = ("report", "question_group")
+
+
+class TextPDFQuestionGroup(models.Model):
+    id = models.AutoField(primary_key=True)
+    text = models.CharField(max_length=1500, verbose_name="Texto")
+    question_group = models.ForeignKey(
+        QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
+    )
+    min_score = models.FloatField(verbose_name="Calificación Mínima", default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.text}"
+
+    class Meta:
+        verbose_name = "Párrafo en PDF"
+        verbose_name_plural = "Párrafos en PDF"
+
+
+class TextPDFSummary(models.Model):
+    TEXT_TYPE_CHOICES = [
+        ("CD", "Cultura digital"),
+        ("TN", "Tecnología y negocios"),
+        ("CS", "Ciber seguridad"),
+        ("IP", "Impacto personal"),
+        ("TMA", "Tecnología y medio ambiente"),
+        ("EDC", "Ecosistema digital de colaboración"),
+    ]
+
+    id = models.AutoField(primary_key=True)
+    text = models.CharField(max_length=1500, verbose_name="Texto")
+    min_score = models.FloatField(verbose_name="Calificación Mínima", default=0)
+    paragraph_type = models.CharField(
+        max_length=50, choices=TEXT_TYPE_CHOICES, verbose_name="Tipo de Párrafo"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.text}"
+
+    class Meta:
+        verbose_name = "Resumen en PDF"
+        verbose_name_plural = "Resumen en PDF"

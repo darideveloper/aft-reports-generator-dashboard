@@ -195,7 +195,10 @@ def generate_report(
     image_width = 130
     x = (width - image_width) / 2
     if logo_path:
-        c.drawImage(logo_path, x, 115, width=image_width, height=image_width)
+        try:
+            c.drawImage(logo_path, x, 115, width=image_width, height=image_width)
+        except Exception as e:
+            print(f"Error al cargar la imagen: {e}")
 
     # Draw footer content
     footer_setting(c, name, width, color_darkgrey)
