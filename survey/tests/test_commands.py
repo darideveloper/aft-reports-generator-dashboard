@@ -31,6 +31,8 @@ class GenerateNextReportBase(TestSurveyModelBase):
         self.company = self.create_company()
         self.survey = self.create_survey()
         self.participant = self.create_participant(company=self.company)
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
 
     def create_get_pdf(self):
         """

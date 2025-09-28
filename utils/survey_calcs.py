@@ -276,6 +276,8 @@ class SurveyCalcs:
                 name__icontains=item["titulo"]
             )
 
+            print(question_group)
+
             # Add item avg to data
             if use_average:
                 # Calculate value
