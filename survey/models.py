@@ -391,7 +391,7 @@ class ReportQuestionGroupTotal(models.Model):
 
 class PdfText(models.Model):
     TEXT_TYPE_CHOICES = [
-        ("txt", "Text"),
+        ("tlt", "Title"),
         ("prph", "Paragraph"),
     ]
 
