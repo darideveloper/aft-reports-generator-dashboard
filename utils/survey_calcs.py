@@ -29,7 +29,7 @@ class SurveyCalcs:
             participant: Participant object
 
         Returns:
-            float: Total
+            float: Total (from 0 to 100)
         """
 
         # Local import to avoid circular import
@@ -80,6 +80,9 @@ class SurveyCalcs:
     def get_participant_total(self) -> float:
         """
         Get the total for the current participant
+        
+        Returns:
+            float: Total (from 0 to 100%)
         """
 
         # Local import to avoid circular import
@@ -102,8 +105,8 @@ class SurveyCalcs:
 
     def get_all_participants_totals(self) -> list:
         """
-        Get the total number of participants for each company in a survey.
-
+        Get the total scores of participants in the survey
+        
         Returns:
             list: List of totals
         """
