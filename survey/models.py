@@ -408,9 +408,21 @@ class TextPDFQuestionGroup(models.Model):
 
 
 class TextPDFSummary(models.Model):
+    TEXT_TYPE_CHOICES = [
+        ("CD", "Cultura digital"),
+        ("TN", "Tecnología y negocios"),
+        ("CS", "Ciber seguridad"),
+        ("IP", "Impacto personal"),
+        ("TMA", "Tecnología y medio ambiente"),
+        ("EDC", "Ecosistema digital de colaboración"),
+    ]
+
     id = models.AutoField(primary_key=True)
     text = models.CharField(max_length=255, verbose_name="Texto")
     min_score = models.FloatField(verbose_name="Calificación Mínima", default=0)
+    paragraph_type = models.CharField(
+        max_length=50, choices=TEXT_TYPE_CHOICES, verbose_name="Tipo de Párrafo"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
