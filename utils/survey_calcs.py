@@ -112,9 +112,23 @@ class SurveyCalcs:
         totals = [report.total for report in reports]
         return totals
 
+    def get_target_threshold(self, score):
+        """
+        Get the min score value to recover a text
+        Args:
+            score: Participant Score on a given Question Group
+        Returns:
+            int: min score value to recover text
+        """
+        if score < 50:
+            return 50
+        elif score < 70:
+            return 70
+        else:
+            return 100
+
     def get_resulting_paragraphs(self) -> list[dict]:
         """
-        DUMMY FUNCTION
         Get the resulting paragraphs for a participant in a survey.
 
         Args:
@@ -128,32 +142,40 @@ class SurveyCalcs:
                     "text": str,
                 }
         """
-        total = models.Report.objects.filter(participant=self.participant)[0].total
+        # Get the participant's report (assuming one report per participant)
+        report = models.Report.objects.filter(participant=self.participant).first()
+        if not report:
+            return []
 
-        # Decide which threshold applies
-        if total < 50:
-            target_score = 50
-        elif total < 70:
-            target_score = 70
-        else:
-            target_score = 100
+        result = []
 
-        # Query texts with that min_score
-        queryset = models.TextPDFQuestionGroup.objects.filter(
-            min_score=target_score
-        ).values_list("text", flat=True)
+        # Get all group totals
+        group_totals = models.ReportQuestionGroupTotal.objects.filter(report=report)
 
-        # Build the response structure
-        result = [
-            {"score": total, "text": text}  # always the input score, not the threshold
-            for text in queryset
-        ]
+        for group_total in group_totals:
+            score = group_total.total
+            question_group = group_total.question_group
+
+            # Pick threshold
+            threshold = self.get_target_threshold(score)
+
+            # Get corresponding text
+            text_entry = models.TextPDFQuestionGroup.objects.filter(
+                question_group=question_group, min_score=threshold
+            ).first()
+
+            if text_entry:
+                result.append(
+                    {
+                        "score": score,
+                        "text": text_entry.text,
+                    }
+                )
 
         return result
 
     def get_resulting_titles(self) -> dict:
         """
-        DUMMY FUNCTION
         Get the resulting titles for a participant in a survey.
 
         Args:
