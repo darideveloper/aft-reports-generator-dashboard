@@ -391,7 +391,7 @@ class ReportQuestionGroupTotal(models.Model):
 
 class TextPDFQuestionGroup(models.Model):
     id = models.AutoField(primary_key=True)
-    text = models.CharField(max_length=255, verbose_name="Texto")
+    text = models.CharField(max_length=1500, verbose_name="Texto")
     question_group = models.ForeignKey(
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
     )
@@ -418,7 +418,7 @@ class TextPDFSummary(models.Model):
     ]
 
     id = models.AutoField(primary_key=True)
-    text = models.CharField(max_length=255, verbose_name="Texto")
+    text = models.CharField(max_length=1500, verbose_name="Texto")
     min_score = models.FloatField(verbose_name="Calificación Mínima", default=0)
     paragraph_type = models.CharField(
         max_length=50, choices=TEXT_TYPE_CHOICES, verbose_name="Tipo de Párrafo"

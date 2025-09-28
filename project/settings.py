@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+FIXTURE_DIRS = [
+    os.path.join(BASE_DIR, 'survey', 'fixtures', 'survey'),
+]
+
 # Setup .env file
 load_dotenv()
 ENV = os.getenv("ENV")
