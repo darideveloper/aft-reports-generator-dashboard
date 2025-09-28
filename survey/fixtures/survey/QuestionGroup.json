@@ -1,7 +1,7 @@
 [
     {
         "model": "survey.QuestionGroup",
-        "pk": 1,
+        "pk": 2,
         "fields": {
             "name": "TEMA 1 - Antecedentes tecnológicos",
             "details": "Al adquirir conocimientos tecnológicos, los líderes se posicionan para liderar de manera eficaz en un mundo digital que evoluciona constantemente.\n\n_Lea los siguientes enunciados e identifique si estos enunciados son **verdaderos** o **falsos**._",
@@ -17,7 +17,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 2,
+        "pk": 3,
         "fields": {
             "name": "TEMA 2 -  Evolución de la tecnología",
             "details": "Desde los primeros inventos, como la rueda, hasta la revolución digital, la tecnología ha evolucionado para satisfacer las necesidades humanas. Los hitos clave incluyen la imprenta, la electricidad e Internet.\n\n*Elija la mejor respuesta.*",
@@ -33,7 +33,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 3,
+        "pk": 4,
         "fields": {
             "name": "TEMA 3 -  Internet y conectividad",
             "details": "Es fundamental que los líderes comprendan la diferencia entre Internet y la World Wide Web (WWW) porque afecta directamente a su toma de decisiones estratégicas, sus esfuerzos de transformación digital y la forma en que aprovechan la tecnología para el crecimiento empresarial.\n\nEn este apartado hay dos posibles respuestas:\n1. **Internet**\n2. **World Wide Web (WWW)**",
@@ -49,7 +49,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 4,
+        "pk": 5,
         "fields": {
             "name": "TEMA 4 - Dispositivos digitales",
             "details": "Dispositivos como teléfonos inteligentes, computadoras portátiles y tabletas son parte de nuestra vida cotidiana. Comprender sus funciones básicas es fundamental.\n\n*Autoevalúese en estos conceptos como: \n1 Casi Nunca\n2 Algunas veces\n3 Siempre.*",
@@ -65,7 +65,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 5,
+        "pk": 7,
         "fields": {
             "name": "TEMA 5 - Ciberseguridad",
             "details": "Como líder que no tiene experiencia en TI, tener un conocimiento sólido de los conceptos básicos de ciberseguridad es esencial para tomar decisiones organizacionales informadas, gestionar los riesgos y garantizar la protección de los activos digitales de su empresa.\n\n Si está completamente seguro responda “**Sí**” a los enunciados siguientes, de lo contrario responda “**No**”_",
@@ -81,7 +81,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 6,
+        "pk": 8,
         "fields": {
             "name": "TEMA 6 - Huella digital",
             "details": "Sus acciones cotidianas pueden generar una huella digital significativa, que puede ser aprovechada por atacantes o terceros si no se gestiona adecuadamente.\n\n_En los siguientes ejemplos clasifique el riesgo para su organización en **Bajo**, **Mediano** y **Alto** de dejar una huella digital_",
@@ -97,7 +97,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 7,
+        "pk": 9,
         "fields": {
             "name": "TEMA 7 - Uso de la tecnología",
             "details": "Ser un ciudadano digital responsable significa utilizar la tecnología de manera ética, evitar el plagio, el acoso cibernético y respetar la privacidad de los demás.\n\n_Si está completamente seguro responda “**Sí**” a los enunciados siguientes, de lo contrario responda “**No**”_",
@@ -113,7 +113,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 8,
+        "pk": 10,
         "fields": {
             "name": "TEMA 8 - Herramientas de colaboración",
             "details": "Un líder debe saber sobre las herramientas de colaboración en línea y el impacto de las mismas. \n\n_Defina si los siguientes enunciados son **Verdaderos** o **Falsos**._",
@@ -129,7 +129,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 9,
+        "pk": 11,
         "fields": {
             "name": "TEMA 9 - Tecnologías emergentes",
             "details": "Las innovaciones como la inteligencia artificial (IA), la realidad virtual (RV) y la cadena de bloques están dando forma al futuro. Comprenderlas puede ayudarle a mantenerse a la vanguardia en el panorama tecnológico.\n\n*Seleccione la opción correcta*",
@@ -145,7 +145,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 10,
+        "pk": 12,
         "fields": {
             "name": "TEMA 10 - Tecnologías de asistencia",
             "details": "Las tecnologías de asistencia (lectores de pantalla, comandos de voz) mejoran la accesibilidad para las personas con capacidades diferentes. Estas son un factor clave para construir una sociedad más inclusiva y equitativa.\n\n_Si está completamente seguro responda “**Sí**” a los enunciados siguientes, de lo contrario responda “**No**”_",
@@ -161,7 +161,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 11,
+        "pk": 13,
         "fields": {
             "name": "TEMA 11 - Rol del líder y la tecnología",
             "details": "En la era digital, las redes sociales se han convertido en una herramienta indispensable tanto en la vida personal como profesional. Sin embargo, su uso indiscriminado puede tener consecuencias negativas para los líderes y sus equipos.\n\n*Elija la mejor respuesta:*",
@@ -177,7 +177,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 12,
+        "pk": 14,
         "fields": {
             "name": "TEMA 12 - Tecnología y medio ambiente",
             "details": "El impacto de la tecnología en el medio ambiente incluye el consumo de energía, los desechos electrónicos y el agotamiento de los recursos.\n\nA continuación, se indican ocho prácticas recomendadas para mitigar los efectos negativos en el medio ambiente. Priorice utilizando los números del 1 al 8, donde el 1 es el más importante. **No utilice 2 veces el mismo número.**",
@@ -193,7 +193,7 @@
     },
     {
         "model": "survey.QuestionGroup",
-        "pk": 13,
+        "pk": 15,
         "fields": {
             "name": "TEMA 13 - Etiqueta digital",
             "details": "La etiqueta digital, o \"netiqueta\", se refiere al uso apropiado y responsable de la tecnología y la comunicación en línea. Como líder, dominar la etiqueta digital es crucial para una comunicación eficaz, fomentar la colaboración y generar confianza entre generaciones.\n\nConsiderar la brecha generacional es imperativo para ser efectivo en el uso efectivo de algunas herramientas.\n\n*A continuación, elija la respuesta correcta según la generación que se menciona.*\na) Baby Boomers (1946-1964)\nb) Generación X (1965-1980)\nc) Millennials (1981-1996)\nd) Generación Z (1997-2012)",
