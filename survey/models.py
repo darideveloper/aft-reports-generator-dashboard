@@ -389,22 +389,13 @@ class ReportQuestionGroupTotal(models.Model):
         unique_together = ("report", "question_group")
 
 
-class PdfText(models.Model):
-    TEXT_TYPE_CHOICES = [
-        ("tlt", "Title"),
-        ("prph", "Paragraph"),
-    ]
-
+class TextPDFQuestionGroup(models.Model):
     id = models.AutoField(primary_key=True)
     text = models.CharField(max_length=255, verbose_name="Texto")
     question_group = models.ForeignKey(
         QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
     )
     min_score = models.FloatField(verbose_name="Calificación Mínima", default=0)
-    section = models.CharField(
-        max_length=255, choices=TEXT_TYPE_CHOICES, verbose_name="Sección"
-    )
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -412,5 +403,20 @@ class PdfText(models.Model):
         return f"{self.text}"
 
     class Meta:
-        verbose_name = "Texto en PDF"
-        verbose_name_plural = "Textos en PDF"
+        verbose_name = "Párrafo en PDF"
+        verbose_name_plural = "Párrafos en PDF"
+
+
+class TextPDFSummary(models.Model):
+    id = models.AutoField(primary_key=True)
+    text = models.CharField(max_length=255, verbose_name="Texto")
+    min_score = models.FloatField(verbose_name="Calificación Mínima", default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.text}"
+
+    class Meta:
+        verbose_name = "Resumen en PDF"
+        verbose_name_plural = "Resumen en PDF"
