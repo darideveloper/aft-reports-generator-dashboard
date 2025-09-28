@@ -387,3 +387,30 @@ class ReportQuestionGroupTotal(models.Model):
         verbose_name = "Total de Grupo de Pregunta"
         verbose_name_plural = "Totales de Grupos de Preguntas"
         unique_together = ("report", "question_group")
+
+
+class PdfText(models.Model):
+    TEXT_TYPE_CHOICES = [
+        ("txt", "Text"),
+        ("prph", "Paragraph"),
+    ]
+
+    id = models.AutoField(primary_key=True)
+    text = models.CharField(max_length=255, verbose_name="Texto")
+    question_group = models.ForeignKey(
+        QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
+    )
+    min_score = models.FloatField(verbose_name="Calificación Mínima", default=0)
+    section = models.CharField(
+        max_length=255, choices=TEXT_TYPE_CHOICES, verbose_name="Sección"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.text}"
+
+    class Meta:
+        verbose_name = "Texto en PDF"
+        verbose_name_plural = "Textos en PDF"
