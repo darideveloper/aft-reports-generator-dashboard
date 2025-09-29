@@ -27,12 +27,17 @@ class GenerateNextReportBase(TestSurveyModelBase):
         """Set up test data"""
         super().setUp()
 
-        # Create 3 recports with default status
-        self.company = self.create_company()
-        self.survey = self.create_survey()
-        self.participant = self.create_participant(company=self.company)
+        # Load data
         call_command("apps_loaddata")
         call_command("initial_loaddata")
+
+        # Create 3 recports with default status
+        self.company = self.create_company()
+        self.participant = self.create_participant(company=self.company)
+        self.survey = survey_models.Survey.objects.get(id=1)
+        self.report = self.create_report(
+            survey=self.survey, participant=self.participant
+        )
 
     def create_get_pdf(self):
         """
@@ -60,14 +65,9 @@ class GenerateNextReportBase(TestSurveyModelBase):
 
         return pdf_path
 
-    def create_report_question_group_totals_data(
-        self, survey: survey_models.Survey = None
-    ):
+    def create_report_question_group_totals_data(self):
         """
         Create report question group totals data
-
-        Args:
-            survey: Survey object (if not provided, a new survey will be created)
 
         Returns:
             survey: Survey object (if not provided, a new survey will be created)
@@ -77,17 +77,16 @@ class GenerateNextReportBase(TestSurveyModelBase):
 
         # Generate initial data
 
-        # Single survey
-        if not survey:
-            survey = self.create_survey()
-
-        # Create 4 question groups (but only 2 will be used)
-        question_groups = []
-        for _ in range(4):
-            question_groups.append(
-                self.create_question_group(survey=survey, survey_percentage=25)
-            )
-        question_groups = question_groups[:2]
+        # Get question groups from survey
+        # (only 2 will be used, and 2 will be empty)
+        question_groups = survey_models.QuestionGroup.objects.filter(
+            survey=self.survey
+        ).order_by("survey_index")
+        
+        # delete unrequired question groups (to simplify the tests)
+        question_groups_to_delete = question_groups[4:]
+        for question_group in question_groups_to_delete:
+            question_group.delete()
 
         # Create 2 questions in each question group
         questions = []
@@ -107,7 +106,7 @@ class GenerateNextReportBase(TestSurveyModelBase):
                     )
                 )
 
-        return survey, options, question_groups
+        return self.survey, options, question_groups
 
 
 class GenerateNextReportCreationTestCase(GenerateNextReportBase):
@@ -165,13 +164,10 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
             - The command should update the status of the report to completed
         """
 
-        # Create 1 report
-        report = self.create_report(survey=self.survey, participant=self.participant)
-
         call_command("generate_next_report")
 
         # Validate report data
-        self.validate_report(report)
+        self.validate_report(self.report)
 
     def test_no_pending_reports(self):
         """
@@ -230,7 +226,6 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.create_answer(participant=self.participant, question_option=option)
 
         # Create a report
-        report = self.create_report(survey=survey, participant=self.participant)
         call_command("generate_next_report")
 
         # Get report question group totals
@@ -238,7 +233,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
         for question_group in question_groups:
             report_question_group_totals.append(
                 survey_models.ReportQuestionGroupTotal.objects.get(
-                    report=report, question_group=question_group
+                    report=self.report, question_group=question_group
                 )
             )
 
@@ -250,8 +245,8 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.assertEqual(report_question_group_total.total, 100)
 
         # Validate final score (2 question groups are 0)
-        report.refresh_from_db()
-        self.assertEqual(report.total, 50)
+        self.report.refresh_from_db()
+        self.assertEqual(self.report.total, 50)
 
     def test_totals_50(self):
         """
@@ -317,7 +312,6 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.create_answer(participant=self.participant, question_option=option)
 
         # Create a report
-        report = self.create_report(survey=survey, participant=self.participant)
         call_command("generate_next_report")
 
         # Get report question group totals
@@ -325,7 +319,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
         for question_group in question_groups:
             report_question_group_totals.append(
                 survey_models.ReportQuestionGroupTotal.objects.get(
-                    report=report, question_group=question_group
+                    report=self.report, question_group=question_group
                 )
             )
 
@@ -334,8 +328,8 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.assertEqual(report_question_group_total.total, 0)
 
         # Validate final score (2 question groups are 0)
-        report.refresh_from_db()
-        self.assertEqual(report.total, 0)
+        self.report.refresh_from_db()
+        self.assertEqual(self.report.total, 0)
 
     def test_total_is_rounded(self):
         """
@@ -363,12 +357,11 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.create_answer(participant=self.participant, question_option=option)
 
         # Create a report
-        report = self.create_report(survey=survey, participant=self.participant)
         call_command("generate_next_report")
 
         # Validate total is rounded to 2 decimal places
-        report.refresh_from_db()
-        decimals = str(report.total).split(".")[1]
+        self.report.refresh_from_db()
+        decimals = str(self.report.total).split(".")[1]
         self.assertEqual(len(decimals), 2)
 
 
@@ -386,9 +379,7 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
         company_2 = self.create_company()
 
         # Simillate responses
-        _, options, _ = self.create_report_question_group_totals_data(
-            survey=self.survey
-        )
+        _, options, _ = self.create_report_question_group_totals_data()
         selected_options = [
             options[1],  # question 1, np
             options[2],  # question 2, yes
@@ -562,44 +553,18 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
 
     def setUp(self):
 
+        # Run parent setUp
+        super().setUp()
+
         # Create data
-        self.survey = self.create_survey()
         self.company = self.create_company()
 
-        # Data
-        self.question_groups_data = [
-            {
-                "title": "1 - Question group 1",
-                "promedio": 90,
-                "description": "Question group 1 description",
-            },
-            {
-                "title": "2 - Question group 2",
-                "promedio": 75,
-                "description": "Question group 2 description",
-            },
-            {
-                "title": "3 - Question group 3",
-                "promedio": 80,
-                "description": "Question group 3 description",
-            },
-        ]
-
-        self.question_groups_totals = {}
-
-        # Create question groups
-        question_groups = []
-        for question_group_data in self.question_groups_data:
-            question_group = self.create_question_group(
-                survey=self.survey,
-                name=question_group_data["title"],
-                details_bar_chart=question_group_data["description"],
-                goal_rate=question_group_data["promedio"],
-            )
-            question_groups.append(question_group)
-
-            # Save emoty arrays of totals
-            self.question_groups_totals[question_group.id] = []
+        self.question_groups = survey_models.QuestionGroup.objects.all().order_by(
+            "survey_index"
+        )
+        self.question_groups_totals = {
+            question_group.id: [] for question_group in self.question_groups
+        }
 
         # Create data for 2 participants
         for _ in range(2):
@@ -608,7 +573,7 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
             report = self.create_report(survey=self.survey, participant=participant)
 
             # Create question groups and set totals
-            for question_group in question_groups:
+            for question_group in self.question_groups:
                 # Calculate and save total
                 total = random.randint(0, 100)
                 self.question_groups_totals[question_group.id].append(total)
@@ -624,9 +589,6 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
         self.report = survey_models.Report.objects.get(
             survey=self.survey, participant=self.participant
         )
-
-        # Run parent setUp
-        super().setUp()
 
     def __get_question_group_total_avg(self, question_group_id: int):
         """
@@ -654,7 +616,7 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
             use_average: Use average
         """
 
-        self.assertEqual(len(chart_data), len(self.question_groups_data))
+        self.assertEqual(len(chart_data), len(self.question_groups))
         for question_group_json in chart_data:
 
             # Get objects
@@ -704,17 +666,17 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
             report=self.report,
         )
         chart_data = survey_calcs.get_bar_chart_data(use_average=True)
-        
+
         # Validate chart data
         self.__validate_chart_data(chart_data, use_average=True)
-        
+
     def test_get_bar_chart_data_use_average_false(self):
         """Test get request with valid data"""
 
         # Set company use average to false
         self.company.use_average = False
         self.company.save()
-        
+
         # Get data from survey_calcs
         survey_calcs = SurveyCalcs(
             participant=self.report.participant,
@@ -722,7 +684,7 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
             report=self.report,
         )
         chart_data = survey_calcs.get_bar_chart_data(use_average=False)
-        
+
         # Validate chart data
         self.__validate_chart_data(chart_data, use_average=False)
 
@@ -730,10 +692,10 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
         """
         Test chart rendered as html from external service
         """
-        
+
         # Validate with avg and fixed goal rate
         use_averages = [True, False]
-        
+
         for use_average in use_averages:
             self.company.use_average = use_average
             self.company.save()

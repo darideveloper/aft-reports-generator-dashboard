@@ -12,8 +12,8 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         commands_data = {
             "survey": [
-                "QuestionGroup",
                 "Survey",
+                "QuestionGroup",
                 "TextPDFQuestionGroup",
                 "TextPDFSummary",
             ],

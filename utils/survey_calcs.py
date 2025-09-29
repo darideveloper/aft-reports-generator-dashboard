@@ -80,7 +80,7 @@ class SurveyCalcs:
     def get_participant_total(self) -> float:
         """
         Get the total for the current participant
-        
+
         Returns:
             float: Total (from 0 to 100%)
         """
@@ -106,7 +106,7 @@ class SurveyCalcs:
     def get_all_participants_totals(self) -> list:
         """
         Get the total scores of participants in the survey
-        
+
         Returns:
             list: List of totals
         """
@@ -275,8 +275,6 @@ class SurveyCalcs:
             question_group = models.QuestionGroup.objects.get(
                 name__icontains=item["titulo"]
             )
-
-            print(question_group)
 
             # Add item avg to data
             if use_average:
