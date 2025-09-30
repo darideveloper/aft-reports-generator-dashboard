@@ -242,3 +242,21 @@ class ReportQuestionGroupTotalAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
     ordering = ("report", "question_group")
     list_per_page = 30
+
+
+@admin.register(models.TextPDFQuestionGroup)
+class TextPDFQuestionGroupAdmin(admin.ModelAdmin):
+    list_display = ("text", "question_group", "created_at")
+    list_filter = ("question_group", "created_at", "updated_at")
+    search_fields = ("text", "question_group__name")
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("question_group", "text")
+
+
+@admin.register(models.TextPDFSummary)
+class TextPDFSummaryAdmin(admin.ModelAdmin):
+    list_display = ("text", "created_at")
+    list_filter = ("created_at", "updated_at")
+    search_fields = ("text",)
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("text",)

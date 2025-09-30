@@ -403,8 +403,8 @@ class TextPDFQuestionGroup(models.Model):
         return f"{self.text}"
 
     class Meta:
-        verbose_name = "Párrafo en PDF"
-        verbose_name_plural = "Párrafos en PDF"
+        verbose_name = "PDF Párrafo"
+        verbose_name_plural = "PDF Párrafos"
 
 
 class TextPDFSummary(models.Model):
@@ -430,5 +430,5 @@ class TextPDFSummary(models.Model):
         return f"{self.text}"
 
     class Meta:
-        verbose_name = "Resumen en PDF"
-        verbose_name_plural = "Resumen en PDF"
+        verbose_name = "PDF Resumen"
+        verbose_name_plural = "PDF Resumen"
