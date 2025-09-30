@@ -289,13 +289,11 @@ class SurveyCalcs:
                 item["promedio"] = question_group.goal_rate
 
             # Set value (user group score)
-            item["valor"] = (
-                models.ReportQuestionGroupTotal.objects.filter(
-                    report=self.report, question_group=question_group
-                )
-                .first()
-                .total
+            totals = models.ReportQuestionGroupTotal.objects.filter(
+                report=self.report, question_group=question_group
             )
+            total = totals.first()
+            item["valor"] = total.total
 
         return data
 
@@ -308,26 +306,43 @@ class SurveyCalcs:
         """
 
         all_totals = self.get_all_participants_totals()
-        totals_shorted = sorted(all_totals)
+        totals_sorted = sorted(all_totals)
         total_count = len(all_totals)
-        total_count_quintet_1 = total_count // 5
-        total_count_quintet_2 = (total_count * 2) // 5
-        total_count_quintet_3 = (total_count * 3) // 5
-        total_count_quintet_4 = (total_count * 4) // 5
 
-        # Detect grade code based on total score and quentil of scores
-        grade_codes_mins = {
-            "MDP": totals_shorted[total_count_quintet_1],
-            "DP": totals_shorted[total_count_quintet_2],
-            "P": totals_shorted[total_count_quintet_3],
-            "AP": totals_shorted[total_count_quintet_4],
-            "MEP": totals_shorted[-1],
+        # Calculate quintile boundaries (percentiles)
+        quintile_1_boundary = int(total_count * 0.2)  # 20th percentile
+        quintile_2_boundary = int(total_count * 0.4)  # 40th percentile
+        quintile_3_boundary = int(total_count * 0.6)  # 60th percentile
+        quintile_4_boundary = int(total_count * 0.8)  # 80th percentile
+
+        # Get threshold values for each quintile
+        grade_thresholds = {
+            "MDP": (
+                totals_sorted[quintile_1_boundary]
+                if quintile_1_boundary > 0
+                else totals_sorted[0]
+            ),
+            "DP": (
+                totals_sorted[quintile_2_boundary]
+                if quintile_2_boundary > 0
+                else totals_sorted[0]
+            ),
+            "P": (
+                totals_sorted[quintile_3_boundary]
+                if quintile_3_boundary > 0
+                else totals_sorted[0]
+            ),
+            "AP": (
+                totals_sorted[quintile_4_boundary]
+                if quintile_4_boundary > 0
+                else totals_sorted[0]
+            ),
         }
 
         # Refresh report to get total
         self.report.refresh_from_db()
 
-        for grade_code, min_total in grade_codes_mins.items():
+        for grade_code, min_total in grade_thresholds.items():
             if self.report.total <= min_total:
                 return grade_code
         return "MEP"

@@ -1,4 +1,5 @@
 import os
+import math
 import json
 import random
 from time import sleep
@@ -78,33 +79,27 @@ class GenerateNextReportBase(TestSurveyModelBase):
         # Generate initial data
 
         # Get question groups from survey
-        # (only 2 will be used, and 2 will be empty)
         question_groups = survey_models.QuestionGroup.objects.filter(
             survey=self.survey
         ).order_by("survey_index")
-        
-        # delete unrequired question groups (to simplify the tests)
-        question_groups_to_delete = question_groups[4:]
-        for question_group in question_groups_to_delete:
-            question_group.delete()
 
         # Create 2 questions in each question group
-        questions = []
         for question_group in question_groups:
-            for _ in range(2):
-                questions.append(self.create_question(question_group=question_group))
+            for _ in range(10):
+                self.create_question(question_group=question_group)
 
-                # Create 2 options in each question (yes and no)
-        options = []
+        questions = survey_models.Question.objects.all()
+
+        # Create 2 options in each question (yes and no)
         for question in questions:
             for option in ["yes", "no"]:
-                options.append(
-                    self.create_question_option(
-                        question=question,
-                        text=option,
-                        points=1 if option == "yes" else 0,
-                    )
+                self.create_question_option(
+                    question=question,
+                    text=option,
+                    points=1 if option == "yes" else 0,
                 )
+
+        options = survey_models.QuestionOption.objects.all()
 
         return self.survey, options, question_groups
 
@@ -139,6 +134,9 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         Expect:
             - The command should update the status of the report to completed
         """
+
+        # delete initial reports
+        survey_models.Report.objects.all().delete()
 
         # Create 3 reports
         reports = []
@@ -175,6 +173,9 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         Expect:
             - The command should do nothing (skip all reports)
         """
+
+        # Delete initial reports
+        survey_models.Report.objects.all().delete()
 
         # Create 2 reports in processing status
         reports = []
@@ -216,12 +217,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
         )
 
         # set CORRECT andser to each question
-        selected_options = [
-            options[0],  # question 1, yes
-            options[2],  # question 2, yes
-            options[4],  # question 3, yes
-            options[6],  # question 4, yes
-        ]
+        selected_options = options.filter(points=1)
         for option in selected_options:
             self.create_answer(participant=self.participant, question_option=option)
 
@@ -246,7 +242,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
 
         # Validate final score (2 question groups are 0)
         self.report.refresh_from_db()
-        self.assertEqual(self.report.total, 50)
+        self.assertEqual(self.report.total, 100)
 
     def test_totals_50(self):
         """
@@ -259,18 +255,16 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.create_report_question_group_totals_data()
         )
 
-        # select one answer correct and one answer incorrect
-        selected_options = [
-            options[0],  # question 1, yes
-            options[3],  # question 2, no
-            options[4],  # question 3, yes
-            options[7],  # question 4, no
-        ]
-        for option in selected_options:
-            self.create_answer(participant=self.participant, question_option=option)
+        # select 50% of the options ins each question group
+        for question_group in question_groups:
+            selected_options = options.filter(
+                points=1, question__question_group=question_group
+            )
+            selected_options = selected_options[: len(selected_options) // 2]
+            for option in selected_options:
+                self.create_answer(participant=self.participant, question_option=option)
 
         # Create a report
-        report = self.create_report(survey=survey, participant=self.participant)
         call_command("generate_next_report")
 
         # Get report question group totals
@@ -278,7 +272,7 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
         for question_group in question_groups:
             report_question_group_totals.append(
                 survey_models.ReportQuestionGroupTotal.objects.get(
-                    report=report, question_group=question_group
+                    report=self.report, question_group=question_group
                 )
             )
 
@@ -287,8 +281,8 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.assertEqual(report_question_group_total.total, 50)
 
         # Validate final score (2 question groups are 0)
-        report.refresh_from_db()
-        self.assertEqual(report.total, 25)
+        self.report.refresh_from_db()
+        self.assertEqual(self.report.total, 50)
 
     def test_totals_0(self):
         """
@@ -301,13 +295,8 @@ class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
             self.create_report_question_group_totals_data()
         )
 
-        # select one answer correct and one answer incorrect
-        selected_options = [
-            options[1],  # question 1, no
-            options[3],  # question 2, no
-            options[5],  # question 3, no
-            options[7],  # question 4, no
-        ]
+        # select all incorrect options
+        selected_options = options.filter(points=0)
         for option in selected_options:
             self.create_answer(participant=self.participant, question_option=option)
 
@@ -380,12 +369,10 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
 
         # Simillate responses
         _, options, _ = self.create_report_question_group_totals_data()
-        selected_options = [
-            options[1],  # question 1, np
-            options[2],  # question 2, yes
-            options[4],  # question 3, yes
-            options[6],  # question 4, yes
-        ]
+        score = 80
+        selected_options_num = score * len(options) / 100
+        selected_options = options[: int(selected_options_num)]
+        
         for option in selected_options:
             self.create_answer(participant=self.participant, question_option=option)
         self.create_report(survey=self.survey, participant=self.participant)
@@ -420,6 +407,13 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
     """
     Test pdf report data is generated correctly (check boxes)
     """
+    
+    def setUp(self):
+        """Set up test data"""
+        super().setUp()
+        
+        # Delete initial reports
+        survey_models.Report.objects.all().delete()
 
     def __create_report_with_score(self, score: int = 100):
         """
@@ -430,25 +424,31 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
 
         Args:
             score: Final score to generate
-        """
 
-        # Create 1 question group with many questions
-        question_group = self.create_question_group(
-            survey=self.survey, survey_percentage=100
-        )
+        """
+        
+        # Set question gorup scores to same percentage
+        question_groups = survey_models.QuestionGroup.objects.all()
+        for question_group in question_groups:
+            question_group.survey_percentage = 100 / len(question_groups)
+            question_group.save()
+        
+        # Create 10 questions in each question group
         questions = []
         options = []
+        for question_group in question_groups:
+            for _ in range(10):
+                question = self.create_question(question_group=question_group)
+                questions.append(question)
+                options.append(
+                    self.create_question_option(question=question, text="yes", points=1)
+                )
 
-        # Create 100 questions
-        for _ in range(100):
-            question = self.create_question(question_group=question_group)
-            questions.append(question)
-            options.append(
-                self.create_question_option(question=question, text="yes", points=1)
-            )
+        # Calculate correct answers
+        correct_answers = math.floor(len(options) * score / 100)
 
         # Set required correct answers
-        for question_index in range(score):
+        for question_index in range(correct_answers):
             self.create_answer(
                 participant=self.participant, question_option=options[question_index]
             )
@@ -584,8 +584,9 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
                     total=total,
                 )
 
-        # Get random participant and report
-        self.participant = survey_models.Participant.objects.all().order_by("?").first()
+        # Use the first participant created in this test
+        participants = survey_models.Participant.objects.filter(company=self.company)
+        self.participant = participants.first()
         self.report = survey_models.Report.objects.get(
             survey=self.survey, participant=self.participant
         )
