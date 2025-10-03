@@ -32,7 +32,7 @@ class GenerateNextReportBase(TestSurveyModelBase):
         call_command("apps_loaddata")
         call_command("initial_loaddata")
 
-        # Create 3 recports with default status
+        # Create report
         self.company = self.create_company()
         self.participant = self.create_participant(company=self.company)
         self.survey = survey_models.Survey.objects.get(id=1)
@@ -56,7 +56,7 @@ class GenerateNextReportBase(TestSurveyModelBase):
         # Generate next pdf
         call_command("generate_next_report")
 
-        # delect new report
+        # detect new report
         pdf_files = os.listdir(pdf_folder)
         new_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
         new_files = [file for file in new_pdf_files if file not in old_pdf_files]
@@ -83,7 +83,7 @@ class GenerateNextReportBase(TestSurveyModelBase):
             survey=self.survey
         ).order_by("survey_index")
 
-        # Create 2 questions in each question group
+        # Create 10 questions in each question group
         for question_group in question_groups:
             for _ in range(10):
                 self.create_question(question_group=question_group)
