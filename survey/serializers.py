@@ -1,8 +1,11 @@
 from django.db import transaction
+from django.db.models import Sum, Count
 
 from rest_framework import serializers
 
 from survey import models
+
+from utils.survey_calcs import SurveyCalcs
 
 
 class InvitationCodeSerializer(serializers.Serializer):
@@ -156,8 +159,9 @@ class ResponseSerializer(serializers.Serializer):
         survey = validated_data.pop("survey")
 
         with transaction.atomic():
-            
+
             # Save participant and answers
+            print("Saving participant and answers")
             participant = models.Participant.objects.create(
                 company=company, **participant_data
             )
@@ -166,11 +170,43 @@ class ResponseSerializer(serializers.Serializer):
                     participant=participant,
                     question_option=option,
                 )
-                
+
             # Create report
             report = models.Report.objects.create(
                 participant=participant,
                 survey=survey,
             )
+
+            # Generate survey calcs
+            print("Generating survey calcs")
+            survey_calcs = SurveyCalcs(
+                participant=participant,
+                survey=survey,
+                report=report,
+            )
+            survey_calcs.save_report_question_group_totals()
+
+            # Get final score (total)
+            total = round(survey_calcs.get_participant_total(), 2)
+            report.total = total
+            report.save()
+
+            # Update company average total
+            print("Updating company average total")
+            total_sum = models.Report.objects.filter(
+                participant__company=participant.company
+            ).aggregate(total_sum=Sum("total"), total_count=Count("total"))
+
+            # Fix total None when 0 reports
+            if total_sum["total_sum"] is None:
+                total_sum["total_sum"] = 0
+
+            # Calculate total
+            average_total = total_sum["total_sum"] / total_sum["total_count"]
+            average_total = round(average_total, 2)
+
+            # Save total
+            participant.company.average_total = average_total
+            participant.company.save()
 
         return participant, selected_options, report
