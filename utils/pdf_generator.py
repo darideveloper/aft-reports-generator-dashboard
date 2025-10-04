@@ -216,12 +216,15 @@ def generate_report(
     c.drawString(73, 675, f'"{name}".')
 
     data = np.array(data)
-    if (len(data) > 1):
+    if len(data) > 1:
         mean_grades = np.mean(data)
-    else:
+    elif len(data) == 1:
         mean_grades = data[0]
+    else:
+        mean_grades = 0
+
     mean_grades = round(mean_grades, 2)
-    
+
     bell_plot_path = generate_bell_curve_plot(
         grade=final_score,
         mean_grades=mean_grades,
@@ -235,14 +238,14 @@ def generate_report(
     # Define checkbox positions and corresponding grade codes
     checkbox_positions = [
         (328, "MDP"),  # Most Developed Performance
-        (295, "DP"),   # Developed Performance
-        (263, "P"),    # Performance
-        (231, "AP"),   # Advanced Performance
-        (200, "MEP")   # Most Excellent Performance
+        (295, "DP"),  # Developed Performance
+        (263, "P"),  # Performance
+        (231, "AP"),  # Advanced Performance
+        (200, "MEP"),  # Most Excellent Performance
     ]
-    
+
     c.setFont("arialbd", 30)
-    
+
     # Draw each checkbox with correct symbol based on grade_code
     for y_position, grade in checkbox_positions:
         symbol = "■" if grade_code == grade else "□"
