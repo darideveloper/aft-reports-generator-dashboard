@@ -179,7 +179,14 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(models.Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ("participant", "survey", "status", "created_at", "custom_links")
+    list_display = (
+        "participant",
+        "survey",
+        "status",
+        "total",
+        "created_at",
+        "custom_links",
+    )
     list_filter = (
         "participant__company",
         "survey",
