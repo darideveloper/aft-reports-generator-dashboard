@@ -77,7 +77,7 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
         options = survey_models.QuestionOption.objects.all()
 
         return questions, options
-    
+
     def get_selected_options(self, score: int) -> list[int]:
         """
         Get selected options in each question group based on score
@@ -98,39 +98,6 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
             for option in selected_options:
                 selected_options_ids.append(option.id)
         return selected_options_ids
-
-    def create_report(self, options: list[int] = []):
-        """
-        Create report calling the api
-
-        Args:
-            options: List of QuestionOption ids
-
-        Returns:
-            survey_models.Report: The created report object
-        """
-
-        endpoint = "/api/response/"
-        random_chars = str(uuid.uuid4())
-        data = {
-            "invitation_code": self.company.invitation_code,
-            "survey_id": 1,
-            "participant": {
-                "email": f"test{random_chars}@test.com",
-                "name": f"Test User {random_chars}",
-                "gender": "m",
-                "birth_range": "1946-1964",
-                "position": "director",
-            },
-            "answers": options,
-        }
-
-        # Create report
-        response = self.client.post(endpoint, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        report = survey_models.Report.objects.all().last()
-
-        return report
 
     def create_get_pdf(self):
         """
@@ -294,39 +261,25 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
         """
         Validate bell chart data is generated correctly (manually user check required)
         """
-
-        company_1 = self.participant.company
+        company_1 = self.create_company()
         company_2 = self.create_company()
 
-        # Simillate responses
-        _, options, _ = self.create_report_question_group_totals_data()
-        score = 80
-        selected_options_num = score * len(options) / 100
-        selected_options = options[: int(selected_options_num)]
+        # Create reports with scores from 40 to 90, in each company
+        companies = [company_1, company_2]
+        for company in companies:
+            company_index = companies.index(company)
+            min_score = 40 + company_index * 10
+            max_score = 90 + company_index * 10
+            for score in range(min_score, max_score):
 
-        for option in selected_options:
-            self.create_answer(participant=self.participant, question_option=option)
-        self.create_report(survey=self.survey, participant=self.participant)
-
-        # Create a random number of reports with random score from 40 to 90
-        # set random company in each one
-        for _ in range(random.randint(100, 200)):
-            report = self.create_report(
-                survey=self.survey,
-                participant=self.create_participant(company=company_1),
-            )
-            report.total = random.randint(40, 90)
-            report.save()
-
-        for _ in range(random.randint(100, 200)):
-            report = self.create_report(
-                survey=self.survey,
-                participant=self.create_participant(company=company_2),
-            )
-            report.total = random.randint(30, 70)
-            report.save()
+                # Create report with score
+                selected_options = self.get_selected_options(score=score)
+                self.create_report(
+                    options=selected_options, invitation_code=company.invitation_code
+                )
 
         # create and get pdf
+        self.create_report(invitation_code=company_1.invitation_code)
         pdf_path = self.create_get_pdf()
 
         # Request to the user to validate
@@ -345,7 +298,7 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
 
         # Delete initial reports
         survey_models.Report.objects.all().delete()
-        
+
         # Create 100 reports
         for score in range(0, 100):
             self.create_report()
@@ -353,7 +306,7 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
             report.total = score
             report.status = "completed"
             report.save()
-        
+
     def __get_pdf_squares(self, pdf_path: str):
         """
         Get squares from pdf
@@ -384,7 +337,7 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
             score: Score to test
             position: Position of the square
         """
-        
+
         # Create report with specific score
         selected_options = self.get_selected_options(score=score)
         self.create_report(options=selected_options)
@@ -457,8 +410,7 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
         # Create data for 2 participants
         for _ in range(2):
             # Create participant and report
-            participant = self.create_participant(company=self.company)
-            report = self.create_report(survey=self.survey, participant=participant)
+            report = self.create_report()
 
             # Create question groups and set totals
             for question_group in self.question_groups:

@@ -2,14 +2,16 @@ import os
 import uuid
 import json
 
-from django.test import TestCase
 from django.conf import settings
 from django.core.files import File
+
+from rest_framework.test import APITestCase
+from rest_framework import status
 
 from survey import models as survey_models
 
 
-class TestSurveyModelBase(TestCase):
+class TestSurveyModelBase(APITestCase):
     """Test survey models"""
 
     def __replace_random_string__(self, string: str) -> str:
@@ -284,39 +286,42 @@ class TestSurveyModelBase(TestCase):
             question_option=question_option,
         )
 
-    def create_report(
-        self,
-        survey: survey_models.Survey = None,
-        participant: survey_models.Participant = None,
-        status: str = "pending",
-    ) -> survey_models.Report:
-        """Create a report object
+    def create_report(self, options: list[int] = [], invitation_code: str = None):
+        """
+        Create report calling the api
 
         Args:
-            survey (survey_models.Survey): The survey of the report
-            participant (survey_models.Participant): The participant of the report
-            status (str): The status of the report:
-                (pending, processing, completed, error)
+            options(list[int]): List of QuestionOption ids
+            invitation_code(str): Invitation code
 
         Returns:
             survey_models.Report: The created report object
         """
+        
+        if not invitation_code:
+            invitation_code = self.company.invitation_code
 
-        if not survey:
-            survey = self.create_survey()
+        endpoint = "/api/response/"
+        random_chars = str(uuid.uuid4())
+        data = {
+            "invitation_code": invitation_code,
+            "survey_id": 1,
+            "participant": {
+                "email": f"test{random_chars}@test.com",
+                "name": f"Test User {random_chars}",
+                "gender": "m",
+                "birth_range": "1946-1964",
+                "position": "director",
+            },
+            "answers": options,
+        }
 
-        if not participant:
-            participant = self.create_participant()
+        # Create report
+        response = self.client.post(endpoint, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        report = survey_models.Report.objects.all().last()
 
-        survey = survey_models.Report.objects.create(
-            survey=survey,
-            participant=participant,
-            status=status,
-            total=0,
-        )
-        survey.save()
-
-        return survey
+        return report
 
     def create_report_question_group_total(
         self,
