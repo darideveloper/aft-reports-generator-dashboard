@@ -2,7 +2,6 @@ import os
 import json
 import random
 from time import sleep
-import uuid
 
 from django.core.management import call_command
 from django.conf import settings
@@ -400,28 +399,22 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
         # Create data
         self.company = self.create_company()
 
-        self.question_groups = survey_models.QuestionGroup.objects.all().order_by(
-            "survey_index"
-        )
-        self.question_groups_totals = {
-            question_group.id: [] for question_group in self.question_groups
-        }
-
         # Create data for 2 participants
         for _ in range(2):
             # Create participant and report
-            report = self.create_report()
-
-            # Create question groups and set totals
+            random_score_question_group = random.randint(0, 100)
             for question_group in self.question_groups:
-                # Calculate and save total
-                total = random.randint(0, 100)
-                self.question_groups_totals[question_group.id].append(total)
-
-                self.create_report_question_group_total(
-                    report=report,
-                    question_group=question_group,
-                    total=total,
+                question_group_options = self.options.filter(
+                    question__question_group=question_group
+                )
+                selected_options_num = int(
+                    random_score_question_group * len(question_group_options) / 100
+                )
+                selected_options = question_group_options[:selected_options_num]
+                selected_options_ids = [option.id for option in selected_options]
+                self.create_report(
+                    options=selected_options_ids,
+                    invitation_code=self.company.invitation_code,
                 )
 
         # Use the first participant created in this test
@@ -441,12 +434,21 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
         Returns:
             float: Question group total average
         """
-        # Validate reference line as avg
-        question_groups_totals_current = self.question_groups_totals[question_group_id]
-        question_groups_totals_avg = sum(question_groups_totals_current) / len(
-            question_groups_totals_current
+        # Get question group
+        question_group = survey_models.QuestionGroup.objects.get(id=question_group_id)
+
+        # Get totals of the question group
+        question_group_totals_objs = (
+            survey_models.ReportQuestionGroupTotal.objects.filter(
+                question_group=question_group
+            )
         )
-        return question_groups_totals_avg
+        question_group_totals = [total.total for total in question_group_totals_objs]
+        question_group_totals_avg = sum(question_group_totals) / len(
+            question_group_totals
+        )
+
+        return question_group_totals_avg
 
     def __validate_chart_data(self, chart_data: list, use_average: bool):
         """
