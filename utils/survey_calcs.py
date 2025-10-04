@@ -308,6 +308,10 @@ class SurveyCalcs:
         all_totals = self.get_all_participants_totals()
         totals_sorted = sorted(all_totals)
         total_count = len(all_totals)
+        
+        # Return MEP if no totals
+        if total_count < 5:
+            return "MEP"
 
         # Calculate quintile boundaries (percentiles)
         quintile_1_boundary = int(total_count * 0.2)  # 20th percentile
