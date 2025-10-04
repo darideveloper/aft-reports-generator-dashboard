@@ -200,160 +200,6 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         self.assertEqual(survey_models.Report.objects.filter(status="error").count(), 0)
 
 
-class GenerateNextReportQuestionGroupTestCase(GenerateNextReportBase):
-    """
-    Test pdf report data is generated correctly (question group totals)
-    """
-
-    def test_totals_100(self):
-        """
-        Validate question group totals are calculated and saved
-        (100% of the questions are correct)
-        """
-
-        # Create report question group totals data
-        survey, options, question_groups = (
-            self.create_report_question_group_totals_data()
-        )
-
-        # set CORRECT andser to each question
-        selected_options = options.filter(points=1)
-        for option in selected_options:
-            self.create_answer(participant=self.participant, question_option=option)
-
-        # Create a report
-        call_command("generate_next_report")
-
-        # Get report question group totals
-        report_question_group_totals = []
-        for question_group in question_groups:
-            report_question_group_totals.append(
-                survey_models.ReportQuestionGroupTotal.objects.get(
-                    report=self.report, question_group=question_group
-                )
-            )
-
-        # Validate report question group totals
-        for report_question_group_total in report_question_group_totals:
-
-            # Validate aprox value
-            self.assertIsNotNone(report_question_group_total.total)
-            self.assertEqual(report_question_group_total.total, 100)
-
-        # Validate final score (2 question groups are 0)
-        self.report.refresh_from_db()
-        self.assertEqual(self.report.total, 100)
-
-    def test_totals_50(self):
-        """
-        Validate question group totals are calculated and saved
-        (50% of the questions are correct)
-        """
-
-        # Generate initial data
-        survey, options, question_groups = (
-            self.create_report_question_group_totals_data()
-        )
-
-        # select 50% of the options ins each question group
-        for question_group in question_groups:
-            selected_options = options.filter(
-                points=1, question__question_group=question_group
-            )
-            selected_options = selected_options[: len(selected_options) // 2]
-            for option in selected_options:
-                self.create_answer(participant=self.participant, question_option=option)
-
-        # Create a report
-        call_command("generate_next_report")
-
-        # Get report question group totals
-        report_question_group_totals = []
-        for question_group in question_groups:
-            report_question_group_totals.append(
-                survey_models.ReportQuestionGroupTotal.objects.get(
-                    report=self.report, question_group=question_group
-                )
-            )
-
-        # Validate report question group totals (only 2 with answers)
-        for report_question_group_total in report_question_group_totals:
-            self.assertEqual(report_question_group_total.total, 50)
-
-        # Validate final score (2 question groups are 0)
-        self.report.refresh_from_db()
-        self.assertEqual(self.report.total, 50)
-
-    def test_totals_0(self):
-        """
-        Validate question group totals are calculated and saved
-        (0% of the questions are correct)
-        """
-
-        # Generate initial data
-        survey, options, question_groups = (
-            self.create_report_question_group_totals_data()
-        )
-
-        # select all incorrect options
-        selected_options = options.filter(points=0)
-        for option in selected_options:
-            self.create_answer(participant=self.participant, question_option=option)
-
-        # Create a report
-        call_command("generate_next_report")
-
-        # Get report question group totals
-        report_question_group_totals = []
-        for question_group in question_groups:
-            report_question_group_totals.append(
-                survey_models.ReportQuestionGroupTotal.objects.get(
-                    report=self.report, question_group=question_group
-                )
-            )
-
-        # Validate report question group totals
-        for report_question_group_total in report_question_group_totals:
-            self.assertEqual(report_question_group_total.total, 0)
-
-        # Validate final score (2 question groups are 0)
-        self.report.refresh_from_db()
-        self.assertEqual(self.report.total, 0)
-
-    def test_total_is_rounded(self):
-        """
-        Validate total is rounded to 2 decimal places
-        """
-
-        # Generate initial data
-        survey, options, question_groups = (
-            self.create_report_question_group_totals_data()
-        )
-
-        # Change wight of first question group to 33.33333
-        question_groups[0].survey_percentage = 33.33333
-        question_groups[0].save()
-
-        # select one answer correct and one answer incorrect
-        selected_options = [
-            options[0],  # question 1, yes
-            options[2],  # question 2, yes
-            options[4],  # question 3, yes
-            options[6],  # question 4, yes
-        ]
-
-        for option in selected_options:
-            self.create_answer(participant=self.participant, question_option=option)
-
-        # Create a report
-        call_command("generate_next_report")
-
-        # Validate total is rounded to 2 decimal places
-        self.report.refresh_from_db()
-        decimals = str(self.report.total).split(".")[1]
-        self.assertEqual(len(decimals), 2)
-
-
 class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
     """
     Test pdf report data is generated correctly (bell chart)
@@ -372,7 +218,7 @@ class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
         score = 80
         selected_options_num = score * len(options) / 100
         selected_options = options[: int(selected_options_num)]
-        
+
         for option in selected_options:
             self.create_answer(participant=self.participant, question_option=option)
         self.create_report(survey=self.survey, participant=self.participant)
@@ -407,11 +253,11 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
     """
     Test pdf report data is generated correctly (check boxes)
     """
-    
+
     def setUp(self):
         """Set up test data"""
         super().setUp()
-        
+
         # Delete initial reports
         survey_models.Report.objects.all().delete()
 
@@ -426,13 +272,13 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
             score: Final score to generate
 
         """
-        
+
         # Set question gorup scores to same percentage
         question_groups = survey_models.QuestionGroup.objects.all()
         for question_group in question_groups:
             question_group.survey_percentage = 100 / len(question_groups)
             question_group.save()
-        
+
         # Create 10 questions in each question group
         questions = []
         options = []

@@ -513,6 +513,8 @@ class ResponseViewTestCase(TestSurveyViewsBase):
         # Create company with invitation code
         self.company = self.create_company(invitation_code=self.invitation_code)
 
+        self.question_groups = survey_models.QuestionGroup.objects.all()
+
     def __create_question_and_options(self) -> tuple:
         """
         Create questions and options in each question group
@@ -740,3 +742,175 @@ class ResponseViewTestCase(TestSurveyViewsBase):
             ).aggregate(average_total=Avg("total"))["average_total"]
             company.refresh_from_db()
             self.assertEqual(reports_average_total, company.average_total)
+
+
+class ResponseViewTotalsTestCase(TestSurveyViewsBase):
+    """
+    Test report totals are generated correctly (question group totals)
+    """
+
+    def setUp(self):
+        """Set up test data"""
+        super().setUp(
+            endpoint="/api/response/", restricted_get=True, restricted_post=False
+        )
+
+        # Load initial data
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+        self.questions, self.options = self.__create_question_and_options()
+
+        # Create apo data
+        self.invitation_code = "test"
+        self.data = {
+            "invitation_code": self.invitation_code,
+            "survey_id": 1,
+            "participant": {
+                "email": "test@test.com",
+                "name": "Test User",
+                "gender": "m",
+                "birth_range": "1946-1964",
+                "position": "director",
+            },
+            "answers": [],
+        }
+        self.company = self.create_company(invitation_code=self.invitation_code)
+        self.participant = self.create_participant(company=self.company)
+        self.question_groups = survey_models.QuestionGroup.objects.all()
+        self.endpoint = "/api/response/"
+
+    def __create_question_and_options(self) -> tuple:
+        """
+        Create questions and options in each question group
+
+        Returns:
+            tuple: questions and options
+        """
+
+        # Set question gorup scores to same percentage
+        question_groups = survey_models.QuestionGroup.objects.all()
+        for question_group in question_groups:
+            question_group.survey_percentage = 100 / len(question_groups)
+            question_group.save()
+
+        # Create 10 questions in each question group
+        for question_group in question_groups:
+            for _ in range(10):
+                question = self.create_question(question_group=question_group)
+                self.create_question_option(question=question, text="yes", points=1)
+
+        questions = survey_models.Question.objects.all()
+        options = survey_models.QuestionOption.objects.all()
+
+        return questions, options
+
+    def __get_selected_options(self, score: int) -> list[int]:
+        """
+        Get selected options in each question group based on score
+
+        Args:
+            score: Score to get selected options
+
+        Returns:
+            list[int]: Selected options ids
+        """
+        selected_options_ids = []
+        for question_group in self.question_groups:
+            selected_options = self.options.filter(
+                points=1, question__question_group=question_group
+            )
+            selected_options_num = int(score * len(selected_options) / 100)
+            selected_options = selected_options[:selected_options_num]
+            for option in selected_options:
+                selected_options_ids.append(option.id)
+        return selected_options_ids
+
+    def __validate_report_totals(self, report: survey_models.Report, score: int):
+        """
+        Validate report totals are calculated and saved
+
+        Args:
+            report (survey_models.Report): report created
+            score (int): score to check in report and question group totals
+        """
+
+        # Get report question group totals
+        for question_group in self.question_groups:
+            question_group_total = survey_models.ReportQuestionGroupTotal.objects.get(
+                report=report, question_group=question_group
+            )
+
+            # Validate aprox value
+            self.assertIsNotNone(question_group_total.total)
+            self.assertEqual(question_group_total.total, score)
+
+        # Validate final score (2 question groups are 0)
+        self.assertEqual(report.total, score)
+
+    def test_totals_100(self):
+        """
+        Validate question group totals are calculated and saved
+        (100% of the questions are correct)
+        """
+
+        # set CORRECT andser to each question
+        self.data["answers"] = self.__get_selected_options(100)
+
+        # Submit api data
+        response = self.client.post(self.endpoint, self.data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        report = survey_models.Report.objects.all().last()
+
+        self.__validate_report_totals(report, 100)
+
+    def test_totals_50(self):
+        """
+        Validate question group totals are calculated and saved
+        (50% of the questions are correct)
+        """
+
+        # Select 50% of correct option in each question group
+        self.data["answers"] = self.__get_selected_options(50)
+
+        # Submit api data
+        response = self.client.post(self.endpoint, self.data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        report = survey_models.Report.objects.all().last()
+
+        self.__validate_report_totals(report, 50)
+
+    def test_totals_0(self):
+        """
+        Validate question group totals are calculated and saved
+        (0% of the questions are correct)
+        """
+
+        # Select 0% of correct option in each question group
+        self.data["answers"] = self.__get_selected_options(0)
+
+        # Submit api data
+        response = self.client.post(self.endpoint, self.data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        report = survey_models.Report.objects.all().last()
+
+        self.__validate_report_totals(report, 0)
+
+    def test_total_is_rounded(self):
+        """
+        Validate total is rounded to 2 decimal places
+        """
+
+        # Select random number of options
+        options_to_select = len(self.options) - 1
+        random_options = [
+            random.choice(self.options) for _ in range(options_to_select)
+        ]
+        self.data["answers"] = [option.id for option in random_options]
+
+        # Submit api data
+        response = self.client.post(self.endpoint, self.data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        report = survey_models.Report.objects.all().last()
+
+        report_decimals = str(report.total).split(".")[1]
+        self.assertEqual(len(report_decimals), 2)
