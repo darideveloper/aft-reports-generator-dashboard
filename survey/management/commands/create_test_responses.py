@@ -21,7 +21,6 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
 
         # Get random company and survey
-        random_company = models.Company.objects.order_by("?").first()
         survey = models.Survey.objects.all().first()
 
         # Get number of users to create
@@ -32,6 +31,7 @@ class Command(BaseCommand):
         api_key = Token.objects.order_by("?").first()
 
         for _ in range(users_num):
+            random_company = models.Company.objects.order_by("?").first()
             random_string = str(uuid.uuid4())
 
             # Initial api data
