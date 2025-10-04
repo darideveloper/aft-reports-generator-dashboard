@@ -265,7 +265,7 @@ def generate_report(
 
     image_width = width - 120
     x = (width - image_width) / 2
-    c.drawImage(graph_path, x, 100, width=image_width, height=image_width + 100)
+    c.drawImage(graph_path, x, 100, width=image_width, height=image_width * 1.3)
 
     # Draw footer content
     footer_setting(c, name, width, color_darkgrey)
