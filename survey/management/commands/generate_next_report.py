@@ -47,11 +47,11 @@ class Command(BaseCommand):
             report.pdf_file = None
             report.total = 0
             report.save()
-            
+
             participant = report.participant
             survey = report.survey
             name = participant.name
-            
+
             # Generate survey calcs
             print("Generating survey calcs")
             survey_calcs = SurveyCalcs(
@@ -60,10 +60,10 @@ class Command(BaseCommand):
                 report=report,
             )
             survey_calcs.save_report_question_group_totals()
-            
+
             # Get final score (total)
-            total = survey_calcs.get_participant_total()
-            report.total = round(total, 2)
+            total = round(survey_calcs.get_participant_total(), 2)
+            report.total = total
             report.save()
 
             # Temp folder for images
@@ -86,7 +86,7 @@ class Command(BaseCommand):
             image_temp_path = os.path.join(
                 temp_folder, f"bar-chart-{image_random_uuid}.jpg"
             )
-            
+
             # Get data to submit to bar chart
             use_average = participant.company.use_average
             chart_data = survey_calcs.get_bar_chart_data(use_average=use_average)
@@ -103,7 +103,7 @@ class Command(BaseCommand):
             url_params = f"?data={json_raw}"
             url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
             render_image_from_url(url, image_temp_path, width=1000, height=1300)
-            
+
             message = "Generating PDF"
             logs += f"{message}\n"
             print(message)
@@ -126,7 +126,7 @@ class Command(BaseCommand):
                 report.logs = logs + "\nEl reporte no fue generado correctamente."
                 report.save()
                 return
-            
+
             message = "PDF generated"
             logs += f"{message}\n"
             print(message)
@@ -139,7 +139,7 @@ class Command(BaseCommand):
             message = f"Report {report.id} completed"
             logs += f"{message}\n"
             print(message)
-            
+
             # Save and add logs
             report.logs = logs
             report.save()
