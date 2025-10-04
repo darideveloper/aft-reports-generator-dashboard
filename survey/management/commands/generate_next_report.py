@@ -5,6 +5,7 @@ import json
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.core.files.base import File
+from django.db.models import Sum, Count
 
 from survey import models
 
@@ -103,7 +104,27 @@ class Command(BaseCommand):
             url_params = f"?data={json_raw}"
             url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
             render_image_from_url(url, image_temp_path, width=1000, height=1300)
+            
+            message = "Calculating company average total"
+            logs += f"{message}\n"
+            print(message)
+            total_sum = models.Report.objects.filter(
+                participant__company=company, status="completed"
+            ).aggregate(total_sum=Sum("total"), total_count=Count("total"))
 
+            # Fix total None when 0 reports
+            if total_sum["total_sum"] is None:
+                total_sum["total_sum"] = 0
+
+            # Calculate total
+            average_total = total_sum["total_sum"] / total_sum["total_count"]
+            average_total = round(average_total, 2)
+
+            # Save total
+            company.average_total = average_total
+            company.save()
+            
+            # Generate PDF
             message = "Generating PDF"
             logs += f"{message}\n"
             print(message)
