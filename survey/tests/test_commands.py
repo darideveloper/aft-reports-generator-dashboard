@@ -3,9 +3,13 @@ import math
 import json
 import random
 from time import sleep
+import uuid
 
 from django.core.management import call_command
 from django.conf import settings
+from django.contrib.auth.models import User
+
+from rest_framework.test import APITestCase
 from rest_framework import status
 
 from core.tests_base.test_models import TestSurveyModelBase
@@ -18,7 +22,7 @@ from PyPDF2 import PdfReader
 from playwright.sync_api import sync_playwright
 
 
-class GenerateNextReportBase(TestSurveyModelBase):
+class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
     """
     Base class with shared method and initial env variables to
     test generate_next_report command
@@ -36,9 +40,51 @@ class GenerateNextReportBase(TestSurveyModelBase):
         self.company = self.create_company()
         self.participant = self.create_participant(company=self.company)
         self.survey = survey_models.Survey.objects.get(id=1)
-        self.report = self.create_report(
-            survey=self.survey, participant=self.participant
+        
+        # Login to client with session
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
         )
+        self.client.login(username=username, password=password)
+
+    def create_report(self, options: list[survey_models.QuestionOption] = []):
+        """
+        Create report calling the api
+
+        Args:
+            options: List of QuestionOption objects
+            
+        Returns:
+            survey_models.Report: The created report object
+        """
+        
+        options_ids = [option.id for option in options]
+
+        endpoint = "/api/response/"
+        random_chars = str(uuid.uuid4())
+        data = {
+            "invitation_code": self.company.invitation_code,
+            "survey_id": 1,
+            "participant": {
+                "email": f"test{random_chars}@test.com",
+                "name": f"Test User {random_chars}",
+                "gender": "m",
+                "birth_range": "1946-1964",
+                "position": "director",
+            },
+            "answers": options_ids,
+        }
+
+        # Create report
+        response = self.client.post(endpoint, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        report = survey_models.Report.objects.all().last()
+
+        return report
 
     def create_get_pdf(self):
         """
@@ -119,7 +165,7 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
 
         # Update report data
         report.refresh_from_db()
-
+        
         # Validate status
         self.assertEqual(report.status, "completed")
         self.assertIsNotNone(report.pdf_file)
@@ -142,7 +188,7 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         reports = []
         for _ in range(3):
             reports.append(
-                self.create_report(survey=self.survey, participant=self.participant)
+                self.create_report()
             )
 
         call_command("generate_next_report")
@@ -161,6 +207,9 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         Expect:
             - The command should update the status of the report to completed
         """
+        
+        # Create report
+        self.report = self.create_report()
 
         call_command("generate_next_report")
 
@@ -173,20 +222,12 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         Expect:
             - The command should do nothing (skip all reports)
         """
-
-        # Delete initial reports
-        survey_models.Report.objects.all().delete()
-
-        # Create 2 reports in processing status
-        reports = []
-        for _ in range(2):
-            reports.append(
-                self.create_report(
-                    survey=self.survey,
-                    participant=self.participant,
-                    status="processing",
-                )
-            )
+        
+        # Create 3 reports in completed status
+        for _ in range(3):
+            report = self.create_report()
+            report.status = "completed"
+            report.save()
 
         call_command("generate_next_report")
 
@@ -195,7 +236,7 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
             survey_models.Report.objects.filter(status="pending").count(), 0
         )
         self.assertEqual(
-            survey_models.Report.objects.filter(status="completed").count(), 0
+            survey_models.Report.objects.filter(status="completed").count(), 3
         )
         self.assertEqual(survey_models.Report.objects.filter(status="error").count(), 0)
 
