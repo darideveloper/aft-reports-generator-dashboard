@@ -45,7 +45,6 @@ class Command(BaseCommand):
             report.status = "processing"
             report.logs = ""
             report.pdf_file = None
-            report.total = 0
             report.save()
 
             # get survey calcs

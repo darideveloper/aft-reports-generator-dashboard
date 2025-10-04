@@ -161,7 +161,7 @@ class ResponseSerializer(serializers.Serializer):
         with transaction.atomic():
 
             # Save participant and answers
-            print("Saving participant and answers")
+            print("Saving report and calculating totals")
             participant = models.Participant.objects.create(
                 company=company, **participant_data
             )
@@ -178,7 +178,6 @@ class ResponseSerializer(serializers.Serializer):
             )
 
             # Generate survey calcs
-            print("Generating survey calcs")
             survey_calcs = SurveyCalcs(
                 participant=participant,
                 survey=survey,
@@ -192,7 +191,6 @@ class ResponseSerializer(serializers.Serializer):
             report.save()
 
             # Update company average total
-            print("Updating company average total")
             total_sum = models.Report.objects.filter(
                 participant__company=participant.company
             ).aggregate(total_sum=Sum("total"), total_count=Count("total"))

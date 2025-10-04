@@ -110,7 +110,7 @@ class SurveyCalcs:
         Returns:
             list: List of totals
         """
-        reports = models.Report.objects.filter(status="completed")
+        reports = models.Report.objects.filter()
 
         totals = [report.total for report in reports]
         return totals

@@ -1,5 +1,4 @@
 import os
-import math
 import json
 import random
 from time import sleep
@@ -40,7 +39,7 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
         self.company = self.create_company()
         self.participant = self.create_participant(company=self.company)
         self.survey = survey_models.Survey.objects.get(id=1)
-        
+
         # Login to client with session
         username = "test_user"
         password = "test_pass"
@@ -51,18 +50,65 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
         )
         self.client.login(username=username, password=password)
 
-    def create_report(self, options: list[survey_models.QuestionOption] = []):
+        self.questions, self.options = self.__create_question_and_options()
+        self.question_groups = survey_models.QuestionGroup.objects.all()
+
+    def __create_question_and_options(self) -> tuple:
+        """
+        Create questions and options in each question group
+
+        Returns:
+            tuple: questions and options
+        """
+
+        # Set question gorup scores to same percentage
+        question_groups = survey_models.QuestionGroup.objects.all()
+        for question_group in question_groups:
+            question_group.survey_percentage = 100 / len(question_groups)
+            question_group.save()
+
+        # Create 10 questions in each question group
+        for question_group in question_groups:
+            for _ in range(10):
+                question = self.create_question(question_group=question_group)
+                self.create_question_option(question=question, text="yes", points=1)
+
+        questions = survey_models.Question.objects.all()
+        options = survey_models.QuestionOption.objects.all()
+
+        return questions, options
+    
+    def get_selected_options(self, score: int) -> list[int]:
+        """
+        Get selected options in each question group based on score
+
+        Args:
+            score: Score to get selected options
+
+        Returns:
+            list[int]: Selected options ids
+        """
+        selected_options_ids = []
+        for question_group in self.question_groups:
+            selected_options = self.options.filter(
+                points=1, question__question_group=question_group
+            )
+            selected_options_num = int(score * len(selected_options) / 100)
+            selected_options = selected_options[:selected_options_num]
+            for option in selected_options:
+                selected_options_ids.append(option.id)
+        return selected_options_ids
+
+    def create_report(self, options: list[int] = []):
         """
         Create report calling the api
 
         Args:
-            options: List of QuestionOption objects
-            
+            options: List of QuestionOption ids
+
         Returns:
             survey_models.Report: The created report object
         """
-        
-        options_ids = [option.id for option in options]
 
         endpoint = "/api/response/"
         random_chars = str(uuid.uuid4())
@@ -76,7 +122,7 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
                 "birth_range": "1946-1964",
                 "position": "director",
             },
-            "answers": options_ids,
+            "answers": options,
         }
 
         # Create report
@@ -165,7 +211,7 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
 
         # Update report data
         report.refresh_from_db()
-        
+
         # Validate status
         self.assertEqual(report.status, "completed")
         self.assertIsNotNone(report.pdf_file)
@@ -187,9 +233,7 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         # Create 3 reports
         reports = []
         for _ in range(3):
-            reports.append(
-                self.create_report()
-            )
+            reports.append(self.create_report())
 
         call_command("generate_next_report")
 
@@ -207,7 +251,7 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         Expect:
             - The command should update the status of the report to completed
         """
-        
+
         # Create report
         self.report = self.create_report()
 
@@ -222,7 +266,7 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         Expect:
             - The command should do nothing (skip all reports)
         """
-        
+
         # Create 3 reports in completed status
         for _ in range(3):
             report = self.create_report()
@@ -301,59 +345,15 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
 
         # Delete initial reports
         survey_models.Report.objects.all().delete()
-
-    def __create_report_with_score(self, score: int = 100):
-        """
-        Create questions and options, and set single and correct answer
-        In order to asy generate an specific final score.
-        Example: score = 50, 2 questions created and 1 correct answer.
-        Finally create a report with the score.
-
-        Args:
-            score: Final score to generate
-
-        """
-
-        # Set question gorup scores to same percentage
-        question_groups = survey_models.QuestionGroup.objects.all()
-        for question_group in question_groups:
-            question_group.survey_percentage = 100 / len(question_groups)
-            question_group.save()
-
-        # Create 10 questions in each question group
-        questions = []
-        options = []
-        for question_group in question_groups:
-            for _ in range(10):
-                question = self.create_question(question_group=question_group)
-                questions.append(question)
-                options.append(
-                    self.create_question_option(question=question, text="yes", points=1)
-                )
-
-        # Calculate correct answers
-        correct_answers = math.floor(len(options) * score / 100)
-
-        # Set required correct answers
-        for question_index in range(correct_answers):
-            self.create_answer(
-                participant=self.participant, question_option=options[question_index]
-            )
-
-        self.create_report(survey=self.survey, participant=self.participant)
-
-    def __create_other_100_reports(self):
-        """
-        Create 100 reports with scores from score 0 to 100
-        """
+        
+        # Create 100 reports
         for score in range(0, 100):
-            report = self.create_report(
-                survey=self.survey,
-                participant=self.create_participant(company=self.participant.company),
-            )
+            self.create_report()
+            report = survey_models.Report.objects.all().last()
             report.total = score
+            report.status = "completed"
             report.save()
-
+        
     def __get_pdf_squares(self, pdf_path: str):
         """
         Get squares from pdf
@@ -384,9 +384,10 @@ class GenerateNextReportCheckBoxesTestCase(GenerateNextReportBase):
             score: Score to test
             position: Position of the square
         """
-        # Setup data
-        self.__create_report_with_score(score=score)
-        self.__create_other_100_reports()
+        
+        # Create report with specific score
+        selected_options = self.get_selected_options(score=score)
+        self.create_report(options=selected_options)
 
         # create and get pdf
         pdf_path = self.create_get_pdf()
