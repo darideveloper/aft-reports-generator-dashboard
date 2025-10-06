@@ -176,17 +176,22 @@ class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
     def setUp(self):
         super().setUp()
         self.endpoint = "/admin/survey/report/"
+        
+        # Delete other reports
+        survey_models.Report.objects.all().delete()
 
         # Create required data
         self.survey = self.create_survey()
         self.participant = self.create_participant()
-        self.report = self.create_report(
-            survey=self.survey, participant=self.participant
-        )
-        
+        self.company = self.create_company()
+
         # Load fixtures
         call_command("apps_loaddata")
         call_command("initial_loaddata")
+        
+        # Create report
+        self.create_report()
+        self.report = survey_models.Report.objects.all().last()
 
         # Set question gorup scores to same percentage
         question_groups = survey_models.QuestionGroup.objects.all()
