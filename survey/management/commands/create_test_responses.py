@@ -26,7 +26,11 @@ class Command(BaseCommand):
         # Get number of users to create
         users_num = input("Enter the number of users to create: ")
         users_num = int(users_num)
-        
+        min_score = input("Enter the minimum score: ")
+        min_score = int(min_score)
+        max_score = input("Enter the maximum score: ")
+        max_score = int(max_score)
+
         # Get api key from db (rest_framework.authtoken)
         api_key = Token.objects.order_by("?").first()
 
@@ -54,12 +58,27 @@ class Command(BaseCommand):
 
             # Set random andswers in each question group
             for question_group in models.QuestionGroup.objects.filter(survey=survey):
-                for question in models.Question.objects.filter(
+
+                # Calculate correct options number to match score
+                questions = models.Question.objects.filter(
                     question_group=question_group
-                ):
+                )
+                score = random.randint(min_score, max_score)
+                correct_options_num = int(score * len(questions) / 100)
+
+                # Add correct options to answers
+                for question in questions[:correct_options_num]:
                     options = models.QuestionOption.objects.filter(question=question)
-                    random_option = random.choice(options)
-                    api_data["answers"].append(random_option.id)
+                    correct_options = options.filter(points=1)
+                    for correct_option in correct_options:
+                        api_data["answers"].append(correct_option.id)
+
+                # Add incorrect options to answers
+                for question in questions[correct_options_num:]:
+                    options = models.QuestionOption.objects.filter(question=question)
+                    incorrect_options = options.filter(points=0)
+                    for incorrect_option in incorrect_options:
+                        api_data["answers"].append(incorrect_option.id)
 
             # Call the API
             response = requests.post(
@@ -68,7 +87,7 @@ class Command(BaseCommand):
                 headers={"Authorization": f"Token {api_key.key}"},
             )
             response.raise_for_status()
-            if (response.status_code == 201):
+            if response.status_code == 201:
                 print(response.json())
             else:
                 raise Exception("Error creating test response" + response.json())
