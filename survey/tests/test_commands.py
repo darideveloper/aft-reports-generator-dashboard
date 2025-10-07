@@ -594,3 +594,218 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
                     self.assertIn(question_group["titulo"], page.content())
                     self.assertIn(question_group["descripcion"], page.content())
                     self.assertIn(str(int(question_group["promedio"])), page.content())
+
+
+class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
+    """
+    Test PDF text generation
+    """
+
+    def setUp(self):
+        """Set up test data"""
+
+        # Load initial data
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+        self.questions, self.options = self.__create_question_and_options()
+
+        # Create apo data
+        self.invitation_code = "test"
+        self.data = {
+            "invitation_code": self.invitation_code,
+            "survey_id": 1,
+            "participant": {
+                "email": "test@test.com",
+                "name": "Test User",
+                "gender": "m",
+                "birth_range": "1946-1964",
+                "position": "director",
+            },
+            "answers": [],
+        }
+        self.company = self.create_company(invitation_code=self.invitation_code)
+        self.participant = self.create_participant(company=self.company)
+        self.question_groups = survey_models.QuestionGroup.objects.all()
+        self.endpoint = "/api/response/"
+
+    def __create_question_and_options(self) -> tuple:
+        """
+        Create questions and options in each question group
+
+        Returns:
+            tuple: questions and options
+        """
+
+        # Set question gorup scores to same percentage
+        question_groups = survey_models.QuestionGroup.objects.all()
+        for question_group in question_groups:
+            question_group.survey_percentage = 100 / len(question_groups)
+            question_group.save()
+
+        # Create 10 questions in each question group
+        for question_group in question_groups:
+            for _ in range(10):
+                question = self.create_question(question_group=question_group)
+                self.create_question_option(question=question, text="yes", points=1)
+
+        questions = survey_models.Question.objects.all()
+        options = survey_models.QuestionOption.objects.all()
+
+        return questions, options
+
+    def __get_selected_options(self, score: int) -> list[int]:
+        """
+        Get selected options in each question group based on score
+
+        Args:
+            score: Score to get selected options
+
+        Returns:
+            list[int]: Selected options ids
+        """
+        selected_options_ids = []
+        for question_group in self.question_groups:
+            selected_options = self.options.filter(
+                points=1, question__question_group=question_group
+            )
+            selected_options_num = int(score * len(selected_options) / 100)
+            selected_options = selected_options[:selected_options_num]
+            for option in selected_options:
+                selected_options_ids.append(option.id)
+        return selected_options_ids
+
+    def validate_text_in_pdf(self, pdf_path: str, text: str, page: int):
+        """
+        Validate text is in pdf
+
+        Args:
+            pdf_path: Path to the pdf file
+            text: Text to validate
+            page: Page to validate
+
+        Returns:
+            bool: True if text is in pdf
+        """
+        # Read pdf text content
+        with open(pdf_path, "rb") as f:
+            pdf_reader = PdfReader(f)
+            page_text = pdf_reader.pages[page].extract_text()
+
+        return text in page_text
+
+    def test_generate_pdf_with_question_group_1_50(self):
+        """
+        Test PDF text generation with question group 1 and score 50
+        """
+
+        selected_options = self.get_selected_options(score=50)
+        self.create_report(options=selected_options)
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(pdf_path, "Tu evaluación indica que aún hay áreas de oportunidad en cuanto a tu comprensión y aplicación de conceptos clave relacionados con la alfabetización tecnológica. Aunque reconoces la importancia de la tecnología en el entorno organizacional, es necesario que profundices en aspectos clave que iremos ampliando en este reporte. Te recomiendo que comiences por familiarizarte con las herramientas digitales fundamentales, participando en grupos especializados o accediendo a recursos prácticos que te permitan comprender cómo estos aspectos tecnológicos se aplican en los contextos empresariales actuales. Un enfoque adicional podría ser el desarrollo de tu pensamiento crítico frente a las tecnologías, lo cual te ayudará a tomar decisiones más informadas y a evaluar los riesgos asociados con su implementación. Al avanzar en estos puntos, mejorarás tu capacidad para liderar de manera eficaz en un mundo cada vez más digitalizado.", 7)
+
+        self.assertTrue(text_in_pdf)
+
+
+class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
+    """
+    Test PDF text generation
+    """
+
+    def setUp(self):
+        """Set up test data"""
+        super().setUp(
+            endpoint="/api/response/", restricted_get=True, restricted_post=False
+        )
+
+        # Load initial data
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+        self.questions, self.options = self.__create_question_and_options()
+
+        # Create apo data
+        self.invitation_code = "test"
+        self.data = {
+            "invitation_code": self.invitation_code,
+            "survey_id": 1,
+            "participant": {
+                "email": "test@test.com",
+                "name": "Test User",
+                "gender": "m",
+                "birth_range": "1946-1964",
+                "position": "director",
+            },
+            "answers": [],
+        }
+        self.company = self.create_company(invitation_code=self.invitation_code)
+        self.participant = self.create_participant(company=self.company)
+        self.question_groups = survey_models.QuestionGroup.objects.all()
+        self.endpoint = "/api/response/"
+
+    def __create_question_and_options(self) -> tuple:
+        """
+        Create questions and options in each question group
+
+        Returns:
+            tuple: questions and options
+        """
+
+        # Set question gorup scores to same percentage
+        question_groups = survey_models.QuestionGroup.objects.all()
+        for question_group in question_groups:
+            question_group.survey_percentage = 100 / len(question_groups)
+            question_group.save()
+
+        # Create 10 questions in each question group
+        for question_group in question_groups:
+            for _ in range(10):
+                question = self.create_question(question_group=question_group)
+                self.create_question_option(question=question, text="yes", points=1)
+
+        questions = survey_models.Question.objects.all()
+        options = survey_models.QuestionOption.objects.all()
+
+        return questions, options
+
+    def __get_selected_options(self, score: int) -> list[int]:
+        """
+        Get selected options in each question group based on score
+
+        Args:
+            score: Score to get selected options
+
+        Returns:
+            list[int]: Selected options ids
+        """
+        selected_options_ids = []
+        for question_group in self.question_groups:
+            selected_options = self.options.filter(
+                points=1, question__question_group=question_group
+            )
+            selected_options_num = int(score * len(selected_options) / 100)
+            selected_options = selected_options[:selected_options_num]
+            for option in selected_options:
+                selected_options_ids.append(option.id)
+        return selected_options_ids
+
+    def validate_text_in_pdf(self, pdf_path: str, text: str, page: int):
+        """
+        Validate text is in pdf
+
+        Args:
+            pdf_path: Path to the pdf file
+            text: Text to validate
+            page: Page to validate
+
+        Returns:
+            bool: True if text is in pdf
+        """
+        # Read pdf text content
+        with open(pdf_path, "rb") as f:
+            pdf_reader = PdfReader(f)
+            page_text = pdf_reader.pages[page].extract_text()
+
+        return text in page_text

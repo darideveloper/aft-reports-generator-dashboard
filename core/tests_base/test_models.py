@@ -297,7 +297,7 @@ class TestSurveyModelBase(APITestCase):
         Returns:
             survey_models.Report: The created report object
         """
-        
+
         if not invitation_code:
             invitation_code = self.company.invitation_code
 
