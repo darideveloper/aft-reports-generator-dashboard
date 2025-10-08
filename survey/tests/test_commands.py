@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import random
 from time import sleep
@@ -609,6 +610,16 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
         call_command("initial_loaddata")
         self.questions, self.options = self.__create_question_and_options()
 
+        # Create user and login
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
+
         # Create apo data
         self.invitation_code = "test"
         self.data = {
@@ -691,21 +702,85 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
             pdf_reader = PdfReader(f)
             page_text = pdf_reader.pages[page].extract_text()
 
-        return text in page_text
+        print(page_text)
+
+        # Validate text in pdf
+        # Normalize both texts:
+        def normalize(s):
+            s = s.lower()  # To lowercase
+            s = re.sub(r"\s+", " ", s)  # Replace multiple spaces/line breaks with one
+            s = s.strip()  # Remove leading/trailing spaces
+            return s
+
+        normalized_text = normalize(text)
+        normalized_page = normalize(page_text)
+
+        # Check if text is in pdf
+        return normalized_text in normalized_page
 
     def test_generate_pdf_with_question_group_1_50(self):
         """
         Test PDF text generation with question group 1 and score 50
         """
 
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(options=selected_options)
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
 
         # create and get pdf
         pdf_path = self.create_get_pdf()
 
         # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(pdf_path, "Tu evaluación indica que aún hay áreas de oportunidad en cuanto a tu comprensión y aplicación de conceptos clave relacionados con la alfabetización tecnológica. Aunque reconoces la importancia de la tecnología en el entorno organizacional, es necesario que profundices en aspectos clave que iremos ampliando en este reporte. Te recomiendo que comiences por familiarizarte con las herramientas digitales fundamentales, participando en grupos especializados o accediendo a recursos prácticos que te permitan comprender cómo estos aspectos tecnológicos se aplican en los contextos empresariales actuales. Un enfoque adicional podría ser el desarrollo de tu pensamiento crítico frente a las tecnologías, lo cual te ayudará a tomar decisiones más informadas y a evaluar los riesgos asociados con su implementación. Al avanzar en estos puntos, mejorarás tu capacidad para liderar de manera eficaz en un mundo cada vez más digitalizado.", 7)
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que aún hay áreas de oportunidad en cuanto a tu comprensión y aplicación de conceptos clave relacionados con la alfabetización tecnológica. Aunque reconoces la importancia de la tecnología en el entorno organizacional, es necesario que profundices en aspectos clave que iremos ampliando en este reporte. Te recomiendo que comiences por familiarizarte con las herramientas digitales fundamentales, participando en grupos especializados o accediendo a recursos prácticos que te permitan comprender cómo estos aspectos tecnológicos se aplican en los contextos empresariales actuales. Un enfoque adicional podría ser el desarrollo de tu pensamiento crítico frente a las tecnologías, lo cual te ayudará a tomar decisiones más informadas y a evaluar los riesgos asociados con su implementación. Al avanzar en estos puntos, mejorarás tu capacidad para liderar de manera eficaz en un mundo cada vez más digitalizado.",
+            4,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_1_70(self):
+        """
+        Test PDF text generation with question group 1 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación sugiere que tienes un manejo adecuado de los conceptos fundamentales de la alfabetización tecnológica, aunque aún hay margen para profundizar en aspectos clave. Conoces la importancia de la tecnología y su impacto organizacional, te recomendaría que amplíes tu comprensión sobre cómo implementar herramientas avanzadas, como la inteligencia artificial, para mejorar procesos y tomar decisiones más estratégicas. Además, es importante que refuerces tus conocimientos sobre el cumplimiento de regulaciones y las mejores prácticas para proteger los datos organizacionales. Te sugiero que busques oportunidades para fortalecer tu capacidad de evaluar nuevas tecnologías y sus aplicaciones a nivel estratégico. Continuar aprendiendo sobre las tendencias emergentes te permitirá estar mejor preparado para liderar la innovación y gestionar el cambio dentro de tu organización.",
+            4,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_1_100(self):
+        """
+        Test PDF text generation with question group 1 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja un conocimiento sólido y avanzado sobre los aspectos clave de la alfabetización tecnológica, lo cual es una fortaleza significativa en tu perfil profesional. Comprendes bien las implicaciones y aplicaciones de tecnologías, lo que te permite tomar decisiones informadas y estratégicas en tu organización. No obstante, es recomendable que sigas profundizando en áreas emergentes, como la automatización de procesos y la cadena de bloques, para mantenerte a la vanguardia de las innovaciones tecnológicas. También podrías centrarte en expandir tu capacidad para fomentar una cultura digital dentro de tu equipo, asegurando que todos estén alineados con las nuevas herramientas y tecnologías. Si continúas desarrollando tus habilidades en la gestión de riesgos tecnológicos y el cumplimiento de normativas globales de seguridad, podrás fortalecer aún más tu liderazgo digital y asegurar que tu organización se mantenga competitiva a largo plazo.",
+            4,
+        )
 
         self.assertTrue(text_in_pdf)
 
