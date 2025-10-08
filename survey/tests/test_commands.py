@@ -1394,7 +1394,7 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
         # Validate text in pdf
         text_in_pdf = self.validate_text_in_pdf(
             pdf_path,
-            "Tu evaluación sugiere que aún no has integrado completamente las consideraciones necesarias sobre el uso de las redes sociales. En la era digital, las redes sociales son una herramienta poderosa tanto en lo personal como en lo profesional, y un mal manejo de ellas puede afectar negativamente tanto tu reputación como la de la organización que lideras. El uso de estas puede impactar en la confianza de tus colaboradores, tu influencia como líder y la productividad de tu equipo. Te recomiendo que tomes medidas inmediatas para ajustar tu comportamiento en redes sociales, estableciendo límites claros sobre tu tiempo de uso y mejorando tus configuraciones de privacidad. Además, considera las recomendaciones sobre \"desintoxicación digital\" para equilibrar mejor tu bienestar y productividad. A medida que tomes control de tu presencia digital, serás capaz de modelar un comportamiento positivo para tu equipo y mejorar la imagen de la empresa.",
+            'Tu evaluación sugiere que aún no has integrado completamente las consideraciones necesarias sobre el uso de las redes sociales. En la era digital, las redes sociales son una herramienta poderosa tanto en lo personal como en lo profesional, y un mal manejo de ellas puede afectar negativamente tanto tu reputación como la de la organización que lideras. El uso de estas puede impactar en la confianza de tus colaboradores, tu influencia como líder y la productividad de tu equipo. Te recomiendo que tomes medidas inmediatas para ajustar tu comportamiento en redes sociales, estableciendo límites claros sobre tu tiempo de uso y mejorando tus configuraciones de privacidad. Además, considera las recomendaciones sobre "desintoxicación digital" para equilibrar mejor tu bienestar y productividad. A medida que tomes control de tu presencia digital, serás capaz de modelar un comportamiento positivo para tu equipo y mejorar la imagen de la empresa.',
             14,
         )
 
@@ -1584,14 +1584,21 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
 
     def setUp(self):
         """Set up test data"""
-        super().setUp(
-            endpoint="/api/response/", restricted_get=True, restricted_post=False
-        )
 
         # Load initial data
         call_command("apps_loaddata")
         call_command("initial_loaddata")
         self.questions, self.options = self.__create_question_and_options()
+
+        # Create user and login
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
 
         # Create apo data
         self.invitation_code = "test"
@@ -1675,4 +1682,108 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
             pdf_reader = PdfReader(f)
             page_text = pdf_reader.pages[page].extract_text()
 
-        return text in page_text
+        print(page_text)
+
+        # Validate text in pdf
+        # Normalize both texts:
+        def normalize(s):
+            s = s.lower()  # To lowercase
+            s = re.sub(r"\s+", " ", s)  # Replace multiple spaces/line breaks with one
+            s = s.strip()  # Remove leading/trailing spaces
+            return s
+
+        normalized_text = normalize(text)
+        normalized_page = normalize(page_text)
+
+        # Check if text is in pdf
+        return normalized_text in normalized_page
+
+    def test_generate_pdf_summary_CD_with_100(self):
+        """
+        Test PDF summary text generation with score 100
+        """
+
+        selected_options = self.__get_selected_options(score=100)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder promotor de la cultura digital",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Demuestra seguridad en el uso de herramientas digitales, participa activamente en conversaciones sobre tecnología, integra soluciones innovadoras en su gestión diaria y promueve un entorno digital ético, inclusivo y sostenible. Es percibido como un líder actualizado y abierto al cambio.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_CD_with_80(self):
+        """
+        Test PDF summary text generation with score 80
+        """
+
+        selected_options = self.__get_selected_options(score=79)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en adaptación digital",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Ha comenzado a incorporar herramientas y conceptos digitales en su práctica diaria, aunque aún depende de apoyo para aplicarlos de forma estratégica. Muestra disposición al aprendizaje, pero necesita mayor consistencia para liderar con seguridad en entornos digitales. Podría hacer un mayor esfuerzo para convertirse en un aliado del área de tecnología en esta era digital.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_CD_with_50(self):
+        """
+        Test PDF summary text generation with score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder alejado de la cultura digital",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Evita o delega de forma constante los temas relacionados con tecnología, muestra dificultad para adaptarse a entornos digitales y rara vez incorpora soluciones tecnológicas en su práctica diaria. Su liderazgo no refleja una comprensión clara del entorno digital actual. Podría hacer un mayor esfuerzo para convertirse en un aliado del área de tecnología en esta era digital.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
