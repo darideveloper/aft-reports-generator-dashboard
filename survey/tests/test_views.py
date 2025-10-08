@@ -902,9 +902,7 @@ class ResponseViewTotalsTestCase(TestSurveyViewsBase):
 
         # Select random number of options
         options_to_select = len(self.options) - 1
-        random_options = [
-            random.choice(self.options) for _ in range(options_to_select)
-        ]
+        random_options = [random.choice(self.options) for _ in range(options_to_select)]
         self.data["answers"] = [option.id for option in random_options]
 
         # Submit api data
