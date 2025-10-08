@@ -1787,3 +1787,453 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
         )
 
         self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_TN_with_100(self):
+        """
+        Test PDF summary text generation with score 100
+        """
+
+        selected_options = self.__get_selected_options(score=100)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder digital estratégico",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Se mantiene informado sobre tendencias de conectividad y tecnologías emergentes, comprende su impacto en el negocio y las incorpora en discusiones estratégicas. Sabe identificar cuándo una solución digital puede mejorar procesos, hace preguntas relevantes al área técnica y promueve decisiones basadas en datos y oportunidades tecnológicas.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_TN_with_80(self):
+        """
+        Test PDF summary text generation with score 80
+        """
+
+        selected_options = self.__get_selected_options(score=79)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en evolución tecnológica",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tiene una comprensión general de conceptos como conectividad, nube o tecnologías emergentes, y comienza a reconocer su impacto en el negocio. Participa en conversaciones digitales, aunque aún necesita apoyo para aplicarlos estratégicamente o impulsar iniciativas tecnológicas.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_TN_with_50(self):
+        """
+        Test PDF summary text generation with score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder desconectado del entorno digital",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Muestra desconocimiento sobre el funcionamiento o el potencial de tecnologías clave, como la nube, la conectividad o la inteligencia artificial. Tiene dificultad para relacionar estos temas con la estrategia del negocio, lo que limita su participación en decisiones digitales o su capacidad para identificar oportunidades de mejora.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_CS_with_100(self):
+        """
+        Test PDF summary text generation with score 100
+        """
+
+        selected_options = self.__get_selected_options(score=100)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder digital confiable",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Se mantiene al día en temas de ciberseguridad y aplica buenas prácticas digitales en su liderazgo. Modela el uso ético de la tecnología, cuida la privacidad de la información, y fomenta un entorno digital seguro, inclusivo y libre de riesgos. Es visto como una figura confiable y comprometida, que fortalece la cultura de responsabilidad digital.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_CS_with_80(self):
+        """
+        Test PDF summary text generation with score 80
+        """
+
+        selected_options = self.__get_selected_options(score=79)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en desarrollo digital responsable",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Reconoce la importancia de la ciberseguridad y busca informarse, aunque aún no aplica de forma consistente las buenas prácticas digitales. Muestra disposición a mejorar, participa en iniciativas de concientización y empieza a promover comportamientos responsables en su equipo, aunque requiere acompañamiento para reforzar su rol como referente en este ámbito.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_CS_with_50(self):
+        """
+        Test PDF summary text generation with score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en riesgo digital",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Evita involucrarse en temas de ciberseguridad y no muestra conciencia sobre su rol en la protección de la información o el uso ético de la tecnología. Puede ignorar buenas prácticas, subestimar riesgos digitales o compartir información sin precaución, debilitando la confianza y exponiendo al equipo o a la organización a posibles vulnerabilidades.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_IP_with_100(self):
+        """
+        Test PDF summary text generation with score 100
+        """
+
+        selected_options = self.__get_selected_options(score=100)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder con presencia digital estratégica",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Gestiona su presencia digital con conciencia y coherencia. Utiliza las redes sociales de forma estratégica para comunicar valor, cuida su lenguaje en entornos digitales, respeta la privacidad y actúa como modelo de etiqueta digital. Su comportamiento refuerza la confianza, la reputación y la cultura profesional dentro y fuera de la organización.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_IP_with_80(self):
+        """
+        Test PDF summary text generation with score 80
+        """
+
+        selected_options = self.__get_selected_options(score=79)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en desarrollo de su imagen digital",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Es consciente del impacto de su comportamiento en línea y ha comenzado a ajustar sus prácticas, aunque de forma todavía inconsistente. Participa en redes sociales, pero puede tener dificultades para proyectar un mensaje alineado con su rol y valores organizacionales. Requiere fortalecer el criterio y la intención estratégica en su presencia digital.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_IP_with_50(self):
+        """
+        Test PDF summary text generation with score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder con riesgo de exposición digital",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Su comportamiento en entornos digitales es poco cuidadoso o reactivo. Publica o comenta sin considerar el impacto, comparte información de forma imprudente o desatiende las normas básicas de etiqueta digital. Esto puede generar desconfianza, afectar su imagen profesional y debilitar el entorno cultural de la organización.",
+            19,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_TMA_with_100(self):
+        """
+        Test PDF summary text generation with score 100
+        """
+
+        selected_options = self.__get_selected_options(score=100)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder digital sustentable",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Integra prácticas tecnológicas sostenibles en su gestión, como el reciclaje electrónico y el ahorro de energía, y promueve el uso de tecnología de asistencia para incluir a personas con distintas capacidades. Toma decisiones considerando el impacto ambiental y la accesibilidad en entornos digitales.",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_TMA_with_80(self):
+        """
+        Test PDF summary text generation with score 80
+        """
+
+        selected_options = self.__get_selected_options(score=79)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en transición hacia la sostenibilidad digital",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Implementa algunas prácticas sostenibles y comienza a considerar herramientas de asistencia en su entorno laboral. Sin embargo, lo hace de forma aislada o sin una intención clara de integrarlas en su rutina o en la toma de decisiones. Requiere mayor consistencia para alinear sus acciones con una visión digital más integral y una determinación proactiva.",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_TMA_with_50(self):
+        """
+        Test PDF summary text generation with score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en riesgo de sostenibilidad e inclusión digital",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Implementa algunas acciones aisladas para reducir el impacto ambiental o facilitar la inclusión, como apagar equipos o compartir archivos digitales, pero lo hace sin consistencia ni enfoque estratégico. Aún no identifica claramente cómo la sostenibilidad y la inclusión pueden fortalecer su liderazgo o el desempeño organizacional.",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_EDC_with_100(self):
+        """
+        Test PDF summary text generation with score 100
+        """
+
+        selected_options = self.__get_selected_options(score=100)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder colaborativo digital",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Utiliza con fluidez dispositivos digitales y herramientas colaborativas para coordinar equipos, compartir información y gestionar proyectos en tiempo real. Integra plataformas en la nube, automatiza tareas y promueve una cultura de trabajo ágil, conectada y eficiente. Su ejemplo ayuda a otros a actualizarse y a mantener un ritmo activo.",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_EDC_with_80(self):
+        """
+        Test PDF summary text generation with score 80
+        """
+
+        selected_options = self.__get_selected_options(score=79)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder en desarrollo de habilidades colaborativas digitales",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Muestra disposición para usar herramientas digitales de colaboración y aprovecha funciones básicas para comunicarse o compartir información. Sin embargo, aún depende de otros para tareas más avanzadas, como automatización, integración de plataformas o gestión autónoma de proyectos virtuales.",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_summary_EDC_with_50(self):
+        """
+        Test PDF summary text generation with score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Líder con brechas digitales de colaboración",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Presenta dificultades para utilizar dispositivos y herramientas de colaboración digital en su trabajo cotidiano. Suele evitar plataformas colaborativas, lo que afecta la agilidad del equipo, dificulta la comunicación y limita su efectividad en entornos híbridos o distribuidos. Es importante que se actualice en su visión digital para potencializar su desempeño.",
+            20,
+        )
+
+        self.assertTrue(text_in_pdf)
