@@ -1246,6 +1246,336 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
 
         self.assertTrue(text_in_pdf)
 
+    def test_generate_pdf_with_question_group_9_50(self):
+        """
+        Test PDF text generation with question group 9 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que aún necesitas fortalecer tu comprensión sobre las tecnologías emergentes como la inteligencia artificial (IA), Realidad Virtual (RV), la cadena de bloques entre otros, que están transformando industrias y modelos de negocio. El hecho de no entender los aspectos clave de estas tecnologías podría limitar tu capacidad para liderar en un entorno digital en constante cambio. Te sugiero que empieces a familiarizarte con los diferentes tipos de IA, y cómo estas herramientas pueden aplicarse a tu área de trabajo. Asimismo, la comprensión de la cadena de bloques y sus aplicaciones prácticas, como la seguridad en las transacciones y los contratos inteligentes, te permitirá tomar decisiones más informadas. La falta de conocimiento en estas áreas también puede generar una desconexión con el equipo de TI y poner a la organización en desventaja frente a la competencia. ",
+            12,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_9_70(self):
+        """
+        Test PDF text generation with question group 9 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes una comprensión adecuada de las tecnologías emergentes, como la inteligencia artificial, Realidad Virtual (RV) y la cadena de bloques, pero aún hay áreas donde puedes mejorar para estar completamente al día con los avances en estas áreas. Tienes una base sólida, pero para optimizar el rendimiento de tu equipo y tomar decisiones más informadas, sería beneficioso profundizar más en la aplicación práctica de la IA en tu industria. Además, sería útil que profundices en la cadena de bloques y sus aplicaciones más allá de las criptomonedas, como los contratos inteligentes y la gestión de la cadena de suministro. Te sugiero que te centres en cómo estas tecnologías pueden integrarse mejor con los sistemas existentes en tu empresa y cómo su adopción puede mejorar la eficiencia operativa. Con un mayor enfoque en estas áreas, estarás mejor preparado para tomar decisiones estratégicas en un panorama tecnológico dinámico.",
+            12,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_9_100(self):
+        """
+        Test PDF text generation with question group 9 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja un sólido conocimiento y comprensión de las tecnologías emergentes, como la inteligencia artificial, Realidad Virtual (RV) y la cadena de bloques, lo que te coloca en una posición destacada, podrías ser líder digital fuera del área de tecnología. Dominas los conceptos clave y estás bien informado sobre cómo estas tecnologías pueden impactar tu industria y mejorar las operaciones. Para seguir avanzando, te sugiero que te enfoques en implementar la IA de manera más estratégica dentro de tu organización, para mejorar la productividad y la toma de decisiones. Además, dado tu conocimiento sobre la cadena de bloques, podrías explorar formas de integrar contratos inteligentes y otras aplicaciones descentralizadas para optimizar los procesos y aumentar la transparencia en las operaciones de la empresa. También sería valioso que lideres iniciativas educativas ayudando a tu equipo a comprender cómo estas tecnologías pueden mejorar su trabajo. ",
+            12,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_10_50(self):
+        """
+        Test PDF text generation with question group 10 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que aún hay áreas importantes en las que necesitas mejorar tu comprensión sobre las tecnologías de asistencia y su impacto en la inclusión y accesibilidad. Es fundamental que entiendas cómo estas tecnologías no solo mejoran la calidad de vida de las personas con capacidades diferentes, sino que también contribuyen a crear un entorno más equitativo. Te recomiendo que te enfoques en estudiar ejemplos clave, como los asistentes de voz, los lectores de pantalla y los dispositivos domésticos inteligentes, para comprender cómo funcionan y cómo pueden facilitar la vida cotidiana de las personas con diversas discapacidades. Además, es esencial que te mantengas informado sobre las últimas innovaciones en este campo, ya que la tecnología de asistencia está en constante evolución. La falta de conocimiento en esta área podría limitar tu capacidad para liderar iniciativas inclusivas en tu organización. ",
+            13,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_10_70(self):
+        """
+        Test PDF text generation with question group 10 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes una comprensión adecuada de las tecnologías de asistencia, pero aún puedes profundizar en su aplicación práctica y en su impacto directo en las personas con discapacidades. Estás al tanto de algunas de las herramientas clave, como los asistentes de voz y los lectores de pantalla, pero sería beneficioso si impulsas estos dispositivos dentro la organización. Te sugiero que te enfoques en comprender más a fondo los beneficios específicos de cada tecnología y cómo se pueden personalizar para satisfacer las necesidades individuales de las personas con capacidades diferentes. Además, explorar las implicaciones legales y sociales de estas tecnologías, como las normativas de accesibilidad digital y las políticas de inclusión, te permitirá comprender el panorama completo. Mejorar tu comprensión en estas áreas te permitirá ser un defensor más eficaz de la inclusión en tu organización y contribuir a un entorno más accesible y equitativo.",
+            13,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_10_100(self):
+        """
+        Test PDF text generation with question group 10 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja un conocimiento avanzado de las tecnologías de asistencia y su papel en la creación de una sociedad más inclusiva. Tienes una comprensión sólida de cómo estas herramientas, como los asistentes de voz, los lectores de pantalla y los dispositivos domésticos inteligentes, benefician a las personas con capacidades diferentes, facilitando su independencia y participación en la sociedad. Para seguir avanzando, te sugiero que tomes un enfoque proactivo en la implementación de estas tecnologías dentro de tu organización, garantizando que todos los empleados, independientemente de sus capacidades, tengan acceso a herramientas que mejoren su productividad y bienestar. Además, sería beneficioso que lideres iniciativas para aumentar la conciencia sobre la importancia de la accesibilidad digital y cómo se pueden integrar soluciones de tecnología de asistencia en la vida cotidiana de manera efectiva. ",
+            13,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_11_50(self):
+        """
+        Test PDF text generation with question group 11 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación sugiere que aún no has integrado completamente las consideraciones necesarias sobre el uso de las redes sociales. En la era digital, las redes sociales son una herramienta poderosa tanto en lo personal como en lo profesional, y un mal manejo de ellas puede afectar negativamente tanto tu reputación como la de la organización que lideras. El uso de estas puede impactar en la confianza de tus colaboradores, tu influencia como líder y la productividad de tu equipo. Te recomiendo que tomes medidas inmediatas para ajustar tu comportamiento en redes sociales, estableciendo límites claros sobre tu tiempo de uso y mejorando tus configuraciones de privacidad. Además, considera las recomendaciones sobre \"desintoxicación digital\" para equilibrar mejor tu bienestar y productividad. A medida que tomes control de tu presencia digital, serás capaz de modelar un comportamiento positivo para tu equipo y mejorar la imagen de la empresa.",
+            14,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_11_70(self):
+        """
+        Test PDF text generation with question group 11 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes una comprensión razonable sobre el impacto que el uso de redes sociales puede tener en tu liderazgo y en los resultados de negocio. Eres consciente de la importancia de la reputación personal y profesional, así como de la influencia que ejerces en tu equipo y en las relaciones con clientes. Sin embargo, para optimizar tu presencia digital y mejorar el bienestar en línea, te sugiero que implementes cambios prácticos como el establecimiento de límites de tiempo para el uso de redes sociales. Además, sería beneficioso que reflexionaras más sobre las implicaciones a largo plazo de lo que compartes y cómo esto puede afectar la percepción pública de tu marca personal y la empresa. Practicar descansos periódicos de las redes sociales y educarte más sobre la gestión del acoso cibernético te permitirá fomentar un entorno de trabajo más saludable, a la vez que proteges tu bienestar y el de tu equipo. ",
+            14,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_11_100(self):
+        """
+        Test PDF text generation with question group 11 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja una comprensión avanzada de los desafíos y oportunidades que presentan las redes sociales para los líderes en la era digital. Tus respuestas sugieren que manejas bien tu presencia en línea, lo que te permite influir positivamente en tu equipo, mejorar la percepción pública de la empresa y generar relaciones de confianza con clientes y socios. No obstante, te recomiendo que sigas perfeccionando tu enfoque al establecer límites aún más rigurosos en el tiempo que dedicas a las redes sociales, para que puedas concentrarte en las prioridades profesionales y reducir la presión psicológica de la conectividad constante. Además, dado tu conocimiento, sería valioso que lideres iniciativas dentro de tu organización para educar a tu equipo sobre el uso responsable de las plataformas digitales, promoviendo una cultura de bienestar y respeto en línea. Siguiendo estas prácticas, fortalecerás tu influencia como un líder responsable y equilibrado.",
+            14,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_12_50(self):
+        """
+        Test PDF text generation with question group 12 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que aún necesitas mejorar tu comprensión sobre cómo la tecnología puede impactar el medio ambiente y cómo las prácticas sostenibles pueden mitigar estos efectos. Te recomiendo que empieces a estudiar las prácticas recomendadas para reducir el impacto ambiental, como el uso de dispositivos de bajo consumo de energía y el reciclaje de aparatos electrónicos. Además, es fundamental que aprendas cómo la adopción de energías renovables y la optimización del consumo de recursos tecnológicos pueden ayudar a minimizar la huella de carbono de tu organización. La falta de conocimiento sobre estos temas podría resultar en decisiones poco informadas que afecten tanto a la sostenibilidad ambiental como a los resultados comerciales. Invierte tiempo en investigar tecnologías ecológicas y cómo éstas pueden ser implementadas de manera efectiva en tu empresa. Plantéate la necesidad de ser un aliado para quien lidera la tecnología en la organización.",
+            15,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_12_70(self):
+        """
+        Test PDF text generation with question group 12 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes un conocimiento adecuado sobre la relación entre la tecnología y el medio ambiente, pero aún hay áreas donde podrías profundizar para estar completamente alineado con las mejores prácticas sostenibles. Eres consciente de la importancia de adoptar hábitos como la reducción del uso de papel y el reciclaje de aparatos electrónicos, pero te sugeriría que explores más ejemplos de tecnologías ecológicas y cómo estas pueden contribuir a la sostenibilidad a nivel organizacional. Considera implementar prácticas adicionales, como la adopción de energías renovables en tus operaciones o la promoción de dispositivos de bajo consumo de energía dentro de tu empresa. Además, sería valioso que educaras a tu equipo sobre la importancia de la gestión de desechos electrónicos y las implicaciones de no adoptar políticas de sostenibilidad. Al fortalecer estos aspectos, fomentarás una cultura organizacional consciente del medio ambiente.",
+            15,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_12_100(self):
+        """
+        Test PDF text generation with question group 12 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja un excelente dominio de las prácticas sostenibles relacionadas con la tecnología y el medio ambiente. Tienes una comprensión profunda de cómo la adopción de tecnologías ecológicas, como el uso de energías renovables y el reciclaje de equipos electrónicos, pueden beneficiar tanto al medio ambiente como a la sostenibilidad de la empresa. Te sugiero que tomes la iniciativa para liderar dentro de tu organización, implementando políticas más rigurosas que promuevan la eficiencia energética y la reducción de la huella de carbono. Además, puedes considerar la creación de una estrategia de sostenibilidad más robusta que incluya la optimización de recursos tecnológicos y la integración de soluciones más verdes en todos los aspectos de la operación empresarial. Sigue explorando nuevas tecnologías ecológicas y asegúrate de que tu empresa esté a la vanguardia en cuanto a sostenibilidad digital.",
+            15,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_13_50(self):
+        """
+        Test PDF text generation with question group 13 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación sugiere que es necesario mejorar en varios aspectos clave relacionados con la etiqueta digital. El respeto y la claridad en la comunicación en línea son esenciales para un liderazgo efectivo en el entorno digital, y parece que aún no has integrado completamente estos principios en tus interacciones. Te recomiendo que trabajes en desarrollar una comunicación respetuosa y profesional en todas las plataformas digitales, ya sea en correos electrónicos, chats o videollamadas. También es importante que establezcas expectativas claras sobre los tiempos de respuesta y seas consciente del tono que utilizas, evitando el sarcasmo y la ambigüedad. Además, es fundamental que consideres las diferencias generacionales en la forma de comunicarte. Comprender y aplicar estos principios no solo fortalecerá tu liderazgo, sino que también contribuirá a crear un ambiente más productivo y respetuoso para tu equipo. ",
+            16,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_13_70(self):
+        """
+        Test PDF text generation with question group 13 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes una comprensión razonable de la etiqueta digital, pero hay oportunidades para profundizar y mejorar aún más. Sabes la importancia de mantener una comunicación respetuosa y de responder de manera clara y oportuna; sin embargo, en algunas ocasiones podría ser útil que ajustes tu enfoque según la plataforma o la generación con la que estés interactuando. Te recomiendo que refuerces tu capacidad para gestionar la comunicación multicanal, adaptándola al contexto y a la audiencia. Además, es crucial que seas más consciente del impacto de tu lenguaje en la interacción, priorizando un tono respetuoso e inclusivo, independientemente de si estás interactuando con compañeros más jóvenes o mayores. Otro aspecto que podrías mejorar es el respeto por los límites digitales, especialmente en un entorno remoto, asegurándote de no sobrecargar a tu equipo fuera del horario laboral.",
+            16,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_13_100(self):
+        """
+        Test PDF text generation with question group 13 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja un nivel sobresaliente en cuanto a etiqueta digital, lo que indica que tienes una gran capacidad para comunicarte de manera respetuosa y profesional en plataformas digitales. Sabes manejar diferentes tipos de comunicación y eres consciente de la importancia de la rapidez y la claridad en las respuestas. Además, muestras una excelente habilidad para adaptarte a las expectativas de las diversas generaciones, lo que te permite gestionar equipos de manera efectiva en un entorno digital. Sin embargo, es importante que continúes perfeccionando tu capacidad para respetar los límites digitales, tanto para ti como para tu equipo, especialmente en un entorno remoto donde el trabajo puede fácilmente invadir el tiempo personal. Te sugiero que sigas promoviendo un uso responsable de las tecnologías y sigas modelando un comportamiento digital positivo para tu equipo. No olvides que liderar con el ejemplo es una ventaja única. ",
+            16,
+        )
+
+        self.assertTrue(text_in_pdf)
+
 
 class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
     """
