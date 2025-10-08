@@ -784,6 +784,468 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
 
         self.assertTrue(text_in_pdf)
 
+    def test_generate_pdf_with_question_group_2_50(self):
+        """
+        Test PDF text generation with question group 2 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que aún hay áreas importantes en las que necesitas mejorar tu comprensión de la evolución tecnológica y su impacto en la vida humana. Aunque comprendes algunos de los desarrollos clave, te falta una conexión más profunda sobre cómo estas tecnologías han transformado los diferentes sectores de la sociedad. Te sugiero que te enfoques en estudiar más detalladamente los desarrollos tecnológicos recientes, como la inteligencia artificial y sobre todo cómo éstos han cambiado las industrias y la vida cotidiana. Para mejorar tu nivel de conocimiento, te recomiendo buscar recursos que te ayuden a comprender las implicaciones de estas tecnologías en términos de eficiencia y sostenibilidad en los negocios. Incrementar tu conocimiento sobre estos desarrollos te permitirá participar más activamente en discusiones estratégicas sobre cómo estas tecnologías pueden influir en tu organización.",
+            5,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_2_70(self):
+        """
+        Test PDF text generation with question group 2 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra un conocimiento básico de la línea de tiempo en la evolución tecnológica, pero hay espacio para mejorar tu comprensión y la conexión de los desarrollos científicos y de su impacto en los diferentes sectores. Identificas algunos de los avances clave; sin embargo, es importante que profundices más en cómo éstos han impactado en nuestras formas de trabajar, comunicarnos y consumir. Te sugiero que dediques tiempo a estudiar las aplicaciones actuales de la IA en diferentes industrias como logística, manufactura, de servicios entre otras, para visualizar cómo la tecnología redefine los modelos de negocio y las competencias necesarias. Y cómo las empresas están adoptando estas tecnologías para mejorar la toma de decisiones y optimizar los flujos de trabajo. Al ampliar tu comprensión sobre la automatización y el futuro del trabajo, podrás tener una visión más integral de la revolución digital y estar mejor preparado para tomar decisiones informadas y estratégicas.",
+            5,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_2_100(self):
+        """
+        Test PDF text generation with question group 2 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja un sólido conocimiento de la línea de tiempo en la evolución tecnológica y su impacto en la vida humana, lo que te posiciona bien para tomar decisiones estratégicas en un entorno altamente digitalizado. Para seguir avanzando, te sugiero que profundices en el impacto de la inteligencia artificial y la automatización en sectores específicos, como la atención médica, servicios y la manufactura o los que podrían aplicarse a tu organización. Estar al tanto de las últimas tendencias en IA te permitirá liderar la integración de estas tecnologías en tu organización para mejorar la productividad y la innovación. Además, sería beneficioso que investigaras más sobre las implicaciones éticas y sociales de la IA, especialmente en relación con la automatización del trabajo. De esta forma, podrás guiar a tu equipo y a tu organización hacia una adopción tecnológica sostenible, anticipando los desafíos del futuro del trabajo.",
+            5,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_3_50(self):
+        """
+        Test PDF text generation with question group 3 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que aún hay áreas importantes por desarrollar en cuanto a la comprensión de la diferencia entre Internet y la World Wide Web (WWW). Si bien es posible que tengas una noción general de ambas, es fundamental que profundices en cómo estas diferencias impactan directamente las decisiones estratégicas y la transformación digital. Los líderes que entienden que Internet no se limita solo a la WWW, sino que abarca una infraestructura más amplia, como la computación en la nube y la IoT (internet de las cosas), pueden identificar oportunidades más allá de las plataformas web para mejorar sus operaciones. Te recomiendo que inviertas tiempo en estudiar cómo la WWW se conecta con las interacciones con los clientes y cómo estas interacciones pueden mejorar a través de estrategias de marketing y comercio electrónico. Esto te permitirá desarrollar una perspectiva más completa sobre cómo aprovechar las tecnologías disponibles.",
+            6,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_3_70(self):
+        """
+        Test PDF text generation with question group 3 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes un buen entendimiento de la distinción entre Internet y la World Wide Web (WWW), pero hay oportunidades para mejorar en tu comprensión más detallada sobre cómo esta diferencia afecta la toma de decisiones estratégicas en el negocio. Reconoces que Internet es una infraestructura más amplia que permite la computación en la nube y la IoT (internet de las cosas), sin embargo, es importante que profundices más en cómo estos elementos impactan la transformación digital de los negocios, así podrás ser un aliado de los que lideran la tecnología en tú organización. Al integrar esta información con tu conocimiento sobre la WWW, podrás tomar decisiones más informadas sobre la seguridad cibernética y las inversiones tecnológicas. Considera también estudiar cómo estas distinciones influyen en la optimización de procesos internos y en la relación con los clientes para maximizar la eficiencia y la competitividad a largo plazo.",
+            6,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_3_100(self):
+        """
+        Test PDF text generation with question group 3 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja una sólida comprensión de la diferencia entre Internet y la World Wide Web (WWW), lo que te permite adoptar un enfoque estratégico más integral en la transformación digital y en las inversiones tecnológicas, súmate a los líderes que promueven este progreso. Tienes claro que la infraestructura de Internet va más allá de la WWW e incluye tecnologías como la computación en la nube, la IoT (internet de las cosas) y la cadena de bloques. Para seguir avanzando, te sugiero que continúes profundizando en el impacto de estas tecnologías emergentes, como la computación perimetral (edge computing) y la Internet industrial de las cosas (IIoT), que están remodelando el panorama digital. Al seguir desarrollando tu visión holística de cómo estas tecnologías interrelacionadas afectan la competitividad empresarial, podrás liderar de manera más efectiva la innovación, la protección de datos y las estrategias de crecimiento sostenible dentro de tu organización. ",
+            6,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_4_50(self):
+        """
+        Test PDF text generation with question group 4 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que aún necesitas mejorar significativamente en el uso y comprensión de los dispositivos digitales para maximizar tu productividad. En la actualidad, los líderes deben ser competentes en el uso de herramientas tecnológicas como teléfonos inteligentes, computadoras portátiles y tabletas para acceder a información clave en tiempo real, colaborar con equipos y gestionar tareas de manera eficiente. Si te resulta difícil conectar dispositivos en reuniones o manejar herramientas básicas como aplicaciones de análisis de datos o comunicación en la nube, es urgente que inviertas tiempo en familiarizarte con estas plataformas. Te recomiendo tomar cursos en línea o buscar mentoría para mejorar tu destreza en el uso de herramientas. También es importante que te acerques a la tecnología de automatización, como asistentes virtuales o aplicaciones de gestión de tareas, para optimizar tu tiempo y aumentar la eficiencia operativa. ",
+            7,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_4_70(self):
+        """
+        Test PDF text generation with question group 4 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes un conocimiento adecuado de cómo utilizar dispositivos digitales y sus aplicaciones para apoyar tu trabajo, pero hay áreas donde puedes mejorar para ser más eficiente y estratégico. Aunque eres capaz de manejar herramientas comunes para comunicarte, almacenar información o asistentes de IA básicos, es importante que profundices en cómo estas plataformas pueden integrarse más eficientemente en tu flujo de trabajo diario. Un área en la que podrías avanzar es en el uso de herramientas de análisis de datos, que te permitirán tomar decisiones informadas basadas en datos en tiempo real. Te sugiero que empieces a explorar este tipo de plataformas y que te enfoques en cómo pueden ayudarte a monitorear el desempeño y a realizar ajustes rápidos en las estrategias. Además, sería beneficioso que mejorases tus habilidades en la automatización de tareas repetitivas, utilizando aplicaciones de IA o sistemas de gestión de proyectos y equipos.",
+            7,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_4_100(self):
+        """
+        Test PDF text generation with question group 4 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja una sólida comprensión de los dispositivos digitales y sus aplicaciones, lo cual es una fortaleza clave en tu desempeño como líder. Seguramente utilizas herramientas de análisis de datos, colaboración en la nube y automatización de tareas de manera efectiva para optimizar tu tiempo y mejorar la productividad. Sin embargo, para continuar avanzando, te sugiero profundizar en el uso de aplicaciones avanzadas de IA, como asistentes virtuales personalizados o herramientas de análisis predictivo, que pueden ofrecerte nuevas formas de anticipar problemas y tomar decisiones más estratégicas. También es importante que compartas tus conocimientos con tu equipo, fomentando una cultura de adopción tecnológica y asegurándote de que todos estén alineados en el uso de estas herramientas. Esto fortalecerá aún más tu capacidad de liderazgo y tu impacto en la organización.",
+            7,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_5_50(self):
+        """
+        Test PDF text generation with question group 5 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación sugiere que necesitas fortalecer tu comprensión de los aspectos clave de la ciberseguridad. Esta es un componente esencial en la vida empresarial, y es vital que comprendas los riesgos que enfrenta tu organización, como los ciberataques y las violaciones de datos. Asegúrate de familiarizarte y entender lo que tienes que hacer tú respecto a la protección de datos y la gestión de riesgos cibernéticos, ya que son fundamentales para proteger los activos digitales de la empresa. Te recomiendo invertir tiempo en formarte sobre las mejores prácticas de seguridad, incluyendo el cifrado de datos y la autenticación multifactor, y en mantenerte al tanto de las regulaciones de privacidad como el RGPD. Es crucial que trabajes en la integración de la ciberseguridad en todos los niveles de tu organización, ya que la falta de preparación en esta área puede llevar a consecuencias devastadoras, como pérdidas financieras y daños a la reputación.",
+            8,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_5_70(self):
+        """
+        Test PDF text generation with question group 5 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja que tienes una comprensión sólida de los principios básicos de ciberseguridad, pero aún hay espacio para mejorar en algunas áreas clave. Sabes cómo gestionar los riesgos y proteger los datos. Es recomendable que amplíes tu conocimiento en técnicas de defensa avanzadas, como el uso de la ingeniería social y el phishing, para entender cómo los atacantes provienen de explotar las debilidades humanas. Además, te sugiero que te enfoques en la creación de planes de respuesta a incidentes efectivos, de modo que tu organización pueda reaccionar rápidamente a cualquier brecha de seguridad. La educación continua en ciberseguridad es esencial, así que sería útil que participes en seminarios o cursos adicionales sobre los estándares de la industria, como el cumplimiento normativo con el RGPD. Con un esfuerzo adicional en estas áreas, podrás mejorar la capacidad de tu organización para responder a amenazas cibernéticas a tiempo.",
+            8,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_5_100(self):
+        """
+        Test PDF text generation with question group 5 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que tienes una comprensión avanzada de la ciberseguridad y de su impacto en la estrategia organizacional, lo que te posiciona como un líder capaz de tomar decisiones clave para proteger los activos digitales de la empresa. Dominas conceptos clave como la gestión de riesgos, la protección de datos y el cumplimiento normativo, y has integrado estas prácticas en las operaciones de la organización. Para seguir avanzando, te recomendaría que lideres iniciativas de concientización sobre ciberseguridad dentro de tu equipo y entorno laboral, asegurándote de que todos, desde los empleados hasta los altos ejecutivos, comprendan la importancia de una cultura de seguridad. También sería valioso que continúes evaluando y mejorando los planes de respuesta a incidentes de la empresa, apoya a los que lideran las áreas de tecnología en todo lo que soliciten, e impulsa las simulaciones regulares para asegurar una respuesta rápida ante cualquier brecha.",
+            8,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_6_50(self):
+        """
+        Test PDF text generation with question group 6 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que aún hay áreas críticas en las que es necesario mejorar tu comprensión y manejo de la huella digital. Como líder, debes entender que la huella digital que dejas a través de tus actividades en línea puede exponer a tu organización a riesgos de ciberseguridad significativos. Es urgente que empieces a adoptar prácticas básicas de protección, como usar contraseñas seguras, activar la autenticación multifactor y manejar de manera adecuada los datos confidenciales en la nube. Además, es fundamental que te familiarices con las políticas de privacidad de los servicios que utilizas y aprendas a reconocer los riesgos asociados con la ingeniería social y el phishing. Te sugiero que te capacites más en estas áreas mediante cursos y seminarios para evitar que tu huella digital quede desprotegida, lo que podría afectar tanto tu reputación como la seguridad de la organización.",
+            9,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_6_70(self):
+        """
+        Test PDF text generation with question group 6 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes una comprensión razonable de los conceptos básicos relacionados con la huella digital. Sin embargo, hay margen para profundizar y mejorar en áreas clave para fortalecer la protección de los activos digitales de la empresa. Si bien estás al tanto de la importancia de usar herramientas como VPNs y la autenticación multifactor, sería beneficioso que expandas tu conocimiento sobre la gestión de la huella digital en el uso de aplicaciones móviles y redes sociales. Es recomendable que ajustes regularmente las configuraciones de privacidad y accesos a archivos en la nube, y que empieces a realizar auditorías periódicas de tus cuentas en línea. Te sugiero también que refuerces tu educación en el uso de plataformas cifradas para proteger la información confidencial. Con una mayor atención a estos detalles, tu capacidad para gestionar los riesgos y proteger la organización será aún más sólida.",
+            9,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_6_100(self):
+        """
+        Test PDF text generation with question group 6 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja una comprensión avanzada sobre la huella digital, lo que te coloca en una posición fuerte como líder en la protección de los activos digitales de la organización. Dominas las estrategias clave, como el uso de contraseñas seguras, la encriptación de datos y la implementación de políticas de acceso controlado, lo cual es esencial para minimizar los riesgos. Para seguir avanzando, te sugiero que continúes investigando las últimas tendencias en ciberseguridad. Además, lidera iniciativas educativas dentro de la organización, capacitando a tu equipo sobre los riesgos de la huella digital y las mejores prácticas de seguridad. Fomentar una cultura de ciberseguridad contribuirá a fortalecer aún más la protección de la organización y minimizará las vulnerabilidades humanas. Mantente también al tanto de las regulaciones de privacidad y seguridad, asegurando que tu empresa cumpla con los estándares internacionales.",
+            9,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_7_50(self):
+        """
+        Test PDF text generation with question group 7 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que necesitas mejorar en varias áreas clave relacionadas con el uso responsable de la tecnología. Es esencial que empieces a comprender la importancia de ser un líder digital responsable, especialmente cuando se trata de proteger la privacidad, evitar el acoso cibernético y respetar la propiedad intelectual. Te recomiendo que comiences a reflexionar sobre cómo tu comportamiento digital puede influir en la cultura organizacional, desde las comunicaciones por correo electrónico hasta tu presencia en redes sociales. Es crucial que implementes prácticas éticas en tu uso de la tecnología, como ser transparente con tus interacciones digitales y garantizar que siempre das el crédito correspondiente a las ideas ajenas. Desarrollar estas competencias no solo te ayudará a liderar de manera más efectiva, sino que también contribuirá a un entorno digital más respetuoso y seguro dentro de la organización.",
+            10,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_7_70(self):
+        """
+        Test PDF text generation with question group 7 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que tienes una comprensión adecuada de los principios del uso responsable de la tecnología, pero aún hay áreas en las que podrías profundizar para mejorar tu liderazgo digital. Sabes la importancia de evitar el plagio y proteger la privacidad, pero sería beneficioso que sigas desarrollando tu conocimiento sobre cómo crear un entorno digital respetuoso y ético. Te sugiero que te concentres en implementar prácticas más concretas para fomentar la ciudadanía digital dentro de tu equipo, como liderar talleres sobre los riesgos del acoso cibernético. Además, aunque eres consciente de la importancia de ser transparente en tu uso de la tecnología, es recomendable que sigas trabajando en tu capacidad para gestionar y comunicar las implicaciones éticas de nuevas tecnologías, como la inteligencia artificial, dentro de tu organización. Con una mayor concentración en estos temas, podrás fortalecer tu capacidad para guiar a tu equipo de manera responsable.",
+            10,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_7_100(self):
+        """
+        Test PDF text generation with question group 7 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja una comprensión avanzada y un enfoque ejemplar sobre el uso responsable de la tecnología. Estás bien posicionado para liderar con ética en el ámbito digital, lo que es fundamental para fomentar una cultura de integridad y respeto en tu organización. Has demostrado un compromiso con la transparencia, la privacidad y la creación de un ambiente digital seguro, lo cual es crucial para generar confianza tanto interna como externamente. Para seguir avanzando, te sugiero que sigas promoviendo la educación continua sobre el comportamiento ético en el uso de la tecnología dentro de tu equipo, asegurándote de que todos comprendan su responsabilidad digital. Además, sería valioso que lideres más iniciativas sobre los beneficios y riesgos de las tecnologías emergentes, como la IA y el análisis de datos, y cómo estas pueden implementarse de manera ética en la organización. ",
+            10,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_8_50(self):
+        """
+        Test PDF text generation with question group 8 and score 50
+        """
+
+        selected_options = self.__get_selected_options(score=49)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación muestra que hay áreas clave en las que necesitas mejorar para ser más efectivo en el uso de herramientas de colaboración en línea. Es fundamental que te familiarices con las funciones básicas de plataformas más comunes que ahora están usando las organizaciones, ya que son herramientas esenciales para la comunicación y colaboración en equipos distribuidos. Sin una comprensión sólida de estas herramientas, podrías enfrentar dificultades al intentar gestionar equipos remotos o híbridos, lo que resultará en ineficiencias y decisiones más lentas. Te recomiendo que inviertas tiempo en capacitarte sobre las funcionalidades clave de estas plataformas, especialmente en áreas como el almacenamiento de archivos compartidos, la integración con otras aplicaciones y las capacidades de videoconferencia. A medida que te actualices en estas herramientas, mejorarás tanto la productividad como la eficiencia de tus equipos.",
+            11,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_8_70(self):
+        """
+        Test PDF text generation with question group 8 and score 70
+        """
+
+        selected_options = self.__get_selected_options(score=69)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación indica que tienes un manejo adecuado de las herramientas de colaboración en línea, pero aún hay espacio para mejorar y profundizar en su utilización estratégica. Conoces las funciones básicas de herramientas más comunes que están usando las organizaciones, pero te sugiero que vayas más allá y explores las integraciones que pueden optimizar los flujos de trabajo dentro de tu organización. Integrar estas plataformas con otros sistemas, como CRM o herramientas de gestión de proyectos, te permitirá automatizar tareas repetitivas y mejorar la eficiencia operativa. También es importante que te familiarices con las capacidades de análisis de estas plataformas, que pueden brindarte información valiosa sobre el rendimiento del equipo y el progreso de los proyectos. Mejorar tus conocimientos en estas áreas no solo facilitará la gestión de equipos distribuidos, sino que también permitirá una mayor innovación y adaptabilidad a los modelos de trabajo híbridos.",
+            11,
+        )
+
+        self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_8_100(self):
+        """
+        Test PDF text generation with question group 8 and score 100
+        """
+
+        selected_options = self.__get_selected_options(score=99)
+        self.create_report(
+            options=selected_options, invitation_code=self.invitation_code
+        )
+
+        # create and get pdf
+        pdf_path = self.create_get_pdf()
+
+        # Validate text in pdf
+        text_in_pdf = self.validate_text_in_pdf(
+            pdf_path,
+            "Tu evaluación refleja una comprensión avanzada de las herramientas de colaboración en línea y su aplicación en un entorno de trabajo híbrido o remoto. Ya dominas las características clave de plataformas más comunes y eres capaz de utilizarlas para mejorar la eficiencia operativa y el rendimiento de tu equipo. Sin embargo, te sugiero que sigas explorando nuevas formas de integrar estas plataformas con otros sistemas de la organización, como CRM y ERP, para optimizar aún más los flujos de trabajo y automatizar tareas repetitivas. Te recomiendo que lideres la implementación de una estrategia de datos en tu organización. También sería beneficioso que continúes desarrollando tus habilidades en la gestión de equipos distribuidos, asegurando que el trabajo remoto e híbrido se gestione de manera eficiente y cohesionada. Siguiendo estos pasos, continuarás destacándote como un líder adaptado a las tendencias digitales y preparado para afrontar los retos futuros.",
+            11,
+        )
+
+        self.assertTrue(text_in_pdf)
+
 
 class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
     """
