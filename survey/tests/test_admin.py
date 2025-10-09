@@ -338,3 +338,15 @@ class TextPDFSummaryAdminTestCase(TestAdminBase, TestSurveyModelBase):
     def test_search_bar(self):
         """Validate search bar working"""
         self.submit_search_bar(self.endpoint)
+        
+        
+class CompanyDesiredScoreAdminTestCase(TestAdminBase, TestSurveyModelBase):
+    """Testing company desired score admin"""
+
+    def setUp(self):
+        super().setUp()
+        self.endpoint = "/admin/survey/companydesiredscore/"
+
+    def test_search_bar(self):
+        """Validate search bar working"""
+        self.submit_search_bar(self.endpoint)

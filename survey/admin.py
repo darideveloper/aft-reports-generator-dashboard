@@ -279,3 +279,13 @@ class TextPDFSummaryAdmin(admin.ModelAdmin):
     
     text_summary.short_description = "Texto"
     text_summary.admin_order_field = "text"
+
+
+@admin.register(models.CompanyDesiredScore)
+class CompanyDesiredScoreAdmin(admin.ModelAdmin):
+    list_display = ("company", "question_group", "desired_score", "created_at")
+    list_filter = ("company", "question_group", "created_at", "updated_at")
+    search_fields = ("company__name", "question_group__name")
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("company", "question_group")
+    list_per_page = 30

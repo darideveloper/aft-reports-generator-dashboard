@@ -53,6 +53,23 @@ class Company(models.Model):
         verbose_name = "Empresa"
         verbose_name_plural = "Empresas"
 
+    def save(self, *args, **kwargs):
+
+        # Create CompanyDesiredScore for each question group
+        if not self.use_average:
+            for survey in Survey.objects.all():
+                for question_group in QuestionGroup.objects.filter(survey=survey):
+                    if not CompanyDesiredScore.objects.filter(
+                        company=self, question_group=question_group
+                    ).exists():
+                        CompanyDesiredScore.objects.create(
+                            company=self,
+                            question_group=question_group,
+                            desired_score=0,
+                        )
+
+        super().save(*args, **kwargs)
+
 
 class Survey(models.Model):
     id = models.AutoField(primary_key=True)
@@ -432,3 +449,30 @@ class TextPDFSummary(models.Model):
     class Meta:
         verbose_name = "PDF Resumen"
         verbose_name_plural = "PDF Resumen"
+
+
+class CompanyDesiredScore(models.Model):
+    id = models.AutoField(primary_key=True)
+    company = models.ForeignKey(
+        Company, on_delete=models.CASCADE, verbose_name="Empresa"
+    )
+    question_group = models.ForeignKey(
+        QuestionGroup, on_delete=models.CASCADE, verbose_name="Grupo de Preguntas"
+    )
+    desired_score = models.FloatField(
+        verbose_name="Puntaje Deseado",
+        default=0,
+        help_text="Puntaje deseado de 0 a 100",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return (
+            f"{self.company.name} - {self.question_group.name} - {self.desired_score}"
+        )
+
+    class Meta:
+        verbose_name = "Puntaje Deseado de Grupo de Preguntas"
+        verbose_name_plural = "Puntajes Deseados de Grupos de Preguntas"
+        unique_together = ("company", "question_group")
