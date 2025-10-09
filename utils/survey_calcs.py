@@ -253,6 +253,10 @@ class SurveyCalcs:
         question_groups = models.QuestionGroup.objects.filter(
             survey=self.survey
         ).order_by("survey_index")
+    
+        company_desired_scores = models.CompanyDesiredScore.objects.filter(
+            company=self.company
+        )
 
         # Get title and description from question groups
         data = []
@@ -286,7 +290,10 @@ class SurveyCalcs:
                 item["promedio"] = avg
             else:
                 # Get fixed value from question_group
-                item["promedio"] = question_group.goal_rate
+                company_desired_score = company_desired_scores.filter(
+                    question_group=question_group
+                ).first()
+                item["promedio"] = company_desired_score.desired_score
 
             # Set value (user group score)
             totals = models.ReportQuestionGroupTotal.objects.filter(

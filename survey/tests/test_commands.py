@@ -542,8 +542,11 @@ class GenerateNextReportBarChartTestCase(GenerateNextReportBase):
                 )
             else:
                 # Validate reference line as fixed
+                company_desired_score = survey_models.CompanyDesiredScore.objects.get(
+                    company=self.company, question_group=question_group
+                )
                 self.assertEqual(
-                    question_group_json["promedio"], question_group.goal_rate
+                    question_group_json["promedio"], company_desired_score.desired_score
                 )
 
     def test_get_bar_chart_data_use_average_true(self):

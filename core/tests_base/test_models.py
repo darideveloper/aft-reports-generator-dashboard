@@ -119,7 +119,6 @@ class TestSurveyModelBase(APITestCase):
         survey_index: int = 0,
         survey_percentage: float = 0,
         modifiers: list[survey_models.QuestionGroupModifier] = [],
-        goal_rate: float = 0,
     ) -> survey_models.QuestionGroup:
         """Create a question group object
 
@@ -132,7 +131,6 @@ class TestSurveyModelBase(APITestCase):
             survey_percentage (float): The percentage of the question group in the survey
             modifiers (list[survey_models.QuestionGroupModifier]): Modifiers of the
                 question group.
-            goal_rate (float): The goal rate of the question group
 
         Returns:
             survey_models.QuestionGroup: The created question group object
@@ -150,7 +148,6 @@ class TestSurveyModelBase(APITestCase):
             survey_percentage=survey_percentage,
             details=details,
             details_bar_chart=details_bar_chart,
-            goal_rate=goal_rate,
         )
 
         for modifier in modifiers:
