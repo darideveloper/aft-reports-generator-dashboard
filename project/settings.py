@@ -266,6 +266,8 @@ JAZZMIN_SETTINGS = {
         "survey.Report": "fas fa-file-pdf",
         "survey.QuestionGroupModifier": "fas fa-sliders",
         "survey.ReportQuestionGroupTotal": "fas fa-chart-bar",
+        "survey.TextPDFQuestionGroup": "fas fa-paragraph",
+        "survey.TextPDFSummary": "fas fa-heading",
     },
     # Icons that are used when one is not manually specified
     "default_icon_parents": "fas fa-chevron-circle-right",
