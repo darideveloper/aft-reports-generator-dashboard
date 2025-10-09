@@ -283,6 +283,23 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
             survey_models.Report.objects.filter(status="completed").count(), 3
         )
         self.assertEqual(survey_models.Report.objects.filter(status="error").count(), 0)
+        
+    def test_percentages_2_decimal_places(self):
+        """
+        Test percentages are 2 decimal places
+        """
+        self.company.use_average = False
+        self.company.save()
+        
+        options_100 = self.get_selected_options(score=100)
+        self.create_report(options=options_100)
+        pdf_path = self.create_get_pdf()
+        self.validate_text_in_pdf(pdf_path, "100.00%")
+        
+        options_0 = self.get_selected_options(score=0)
+        self.create_report(options=options_0)
+        pdf_path = self.create_get_pdf()
+        self.validate_text_in_pdf(pdf_path, "0.00%")
 
 
 class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
