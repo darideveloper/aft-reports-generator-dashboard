@@ -48,21 +48,21 @@ def generate_bell_curve_plot(
         color="#ff9900",
         linestyle="--",
         linewidth=2,
-        label=f"Media de grupo ({company_average_total})",
+        label=f"Media de grupo ({company_average_total:.2f})",
     )
     plt.axvline(
         x=grade,
         color="#cc0000",
         linestyle="--",
         linewidth=2,
-        label=f"Participante ({grade})",
+        label=f"Participante ({grade:.2f})",
     )
     plt.axvline(
         x=mean_grades,
         color="#7465BF",
         linestyle="--",
         linewidth=2,
-        label=f"Media Global ({mean_grades})",
+        label=f"Media Global ({mean_grades:.2f})",
     )
 
     # Fill area under the curve

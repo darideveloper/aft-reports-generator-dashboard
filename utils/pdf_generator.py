@@ -275,8 +275,12 @@ def generate_report(
     # Pages 7 - 19
     for i in range(13):
         score = resulting_paragraphs[i]["score"]
+        
+        # Convert score to 2 decimal places
+        score = round(score, 2)
+        
         c.setFont("arialbd", 12)
-        c.drawString(69, 660, f" Calificación {score}%")
+        c.drawString(69, 660, f" Calificación {score:.2f}%")
 
         text = resulting_paragraphs[i]["text"]
         justify_text(c, text, x=72, y=520)
