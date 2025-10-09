@@ -314,3 +314,27 @@ class ReportQuestionGroupTotalAdminTestCase(TestAdminBase, TestSurveyModelBase):
     def test_search_bar(self):
         """Validate search bar working"""
         self.submit_search_bar(self.endpoint)
+
+
+class TextPDFQuestionGroupAdminTestCase(TestAdminBase, TestSurveyModelBase):
+    """Testing text pdf question group admin"""
+
+    def setUp(self):
+        super().setUp()
+        self.endpoint = "/admin/survey/textpdfquestiongroup/"
+
+    def test_search_bar(self):
+        """Validate search bar working"""
+        self.submit_search_bar(self.endpoint)
+
+
+class TextPDFSummaryAdminTestCase(TestAdminBase, TestSurveyModelBase):
+    """Testing text pdf summary admin"""
+
+    def setUp(self):
+        super().setUp()
+        self.endpoint = "/admin/survey/textpdfsummary/"
+
+    def test_search_bar(self):
+        """Validate search bar working"""
+        self.submit_search_bar(self.endpoint)

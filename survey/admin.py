@@ -253,17 +253,29 @@ class ReportQuestionGroupTotalAdmin(admin.ModelAdmin):
 
 @admin.register(models.TextPDFQuestionGroup)
 class TextPDFQuestionGroupAdmin(admin.ModelAdmin):
-    list_display = ("text", "question_group", "created_at")
+    list_display = ("text_summary", "question_group", "min_score", "created_at")
     list_filter = ("question_group", "created_at", "updated_at")
     search_fields = ("text", "question_group__name")
     readonly_fields = ("created_at", "updated_at")
-    ordering = ("question_group", "text")
+    ordering = ("question_group", "-min_score")
+    
+    def text_summary(self, obj):
+        return obj.text[:100] + "..."
+    
+    text_summary.short_description = "Texto"
+    text_summary.admin_order_field = "text"
 
 
 @admin.register(models.TextPDFSummary)
 class TextPDFSummaryAdmin(admin.ModelAdmin):
-    list_display = ("text", "created_at")
+    list_display = ("text_summary", "paragraph_type", "min_score", "created_at")
     list_filter = ("created_at", "updated_at")
     search_fields = ("text",)
     readonly_fields = ("created_at", "updated_at")
-    ordering = ("text",)
+    ordering = ("paragraph_type", "-min_score")
+    
+    def text_summary(self, obj):
+        return obj.text[:100] + "..."
+    
+    text_summary.short_description = "Texto"
+    text_summary.admin_order_field = "text"
