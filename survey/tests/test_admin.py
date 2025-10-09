@@ -302,6 +302,22 @@ class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
         self.assertIn("btn-primary", link["class"])
         self.assertEqual(link.get("href"), pdf_url)
         self.assertIsNone(link.get("disabled"))
+        
+    def test_action_set_to_pending(self):
+        """Validate action set to pending working"""
+        
+        # Update report status
+        self.report.status = "completed"
+        self.report.save()
+
+        # Simulate action
+        self.client.post(f"{self.endpoint}", {
+            "action": "set_to_pending",
+            "_selected_action": [self.report.id]
+        })
+        
+        self.report.refresh_from_db()
+        self.assertEqual(self.report.status, "pending")
 
 
 class ReportQuestionGroupTotalAdminTestCase(TestAdminBase, TestSurveyModelBase):

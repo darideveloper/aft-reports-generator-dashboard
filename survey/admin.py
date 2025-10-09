@@ -179,6 +179,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(models.Report)
 class ReportAdmin(admin.ModelAdmin):
+    actions = ("set_to_pending",)
     list_display = (
         "participant",
         "survey",
@@ -203,19 +204,27 @@ class ReportAdmin(admin.ModelAdmin):
 
         pdf_url = ""
         if obj.status == "completed":
-            pdf_url = get_media_url(obj.pdf_file)
+            try:
+                pdf_url = get_media_url(obj.pdf_file)
+            except Exception:
+                pass
 
         return format_html(
             '<a class="btn my-1 {}" target="_blank" {} {}>Ver Reporte</a>',
             (
                 # styles
                 "btn-primary"
-                if obj.status == "completed"
+                if obj.status == "completed" and pdf_url
                 else "btn-secondary disabled"
             ),
             f"href={pdf_url}" if pdf_url else "",  # href
             "disabled" if obj.status != "completed" else "",  # disabled
         )
+        
+    def set_to_pending(self, request, queryset):
+        queryset.update(status="pending")
+        
+    set_to_pending.short_description = "Establecer a pendiente"
 
 
 @admin.register(models.Answer)
