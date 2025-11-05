@@ -912,3 +912,93 @@ class ResponseViewTotalsTestCase(TestSurveyViewsBase):
 
         report_decimals = str(report.total).split(".")[1]
         self.assertEqual(len(report_decimals), 2)
+
+
+class ResponseViewDynamicPointsTestCase(TestSurveyViewsBase):
+    """
+    Test report totals are generated correctly (question group totals)
+    with dynamic points (0 points, 1 point and 2 points in each question option)
+    """
+    
+    def setUp(self):
+        """Set up test data"""
+        super().setUp(
+            endpoint="/api/response/", restricted_get=True, restricted_post=False
+        )
+
+        # Load initial data
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+        
+        # Create apo data
+        self.invitation_code = "test"
+        self.data = {
+            "invitation_code": self.invitation_code,
+            "survey_id": 1,
+            "participant": {
+                "email": "test@test.com",
+                "name": "Test User",
+                "gender": "m",
+                "birth_range": "1946-1964",
+                "position": "director",
+            },
+            "answers": [],
+        }
+        self.company = self.create_company(invitation_code=self.invitation_code)
+        self.participant = self.create_participant(company=self.company)
+        self.question_groups = survey_models.QuestionGroup.objects.all()
+        self.endpoint = "/api/response/"
+        
+        # Delete other question groups
+        survey_models.QuestionGroup.objects.all().delete()
+
+        # Create 2 questions, each one with 3 options (0 points, 1 point and 2 points)
+        survey = survey_models.Survey.objects.all().first()
+        question_group = self.create_question_group(survey, survey_percentage=100)
+        # [q0 point0, q0 point1, q0 point2, q1 point0, q1 point1, q1 point2]
+        self.options_ids = []
+        for _ in range(2):
+            question = self.create_question(question_group=question_group)
+            for points in [0, 1, 2]:
+                option = self.create_question_option(question=question, points=points)
+                self.options_ids.append(option.id)
+                
+    def __validate_score(self, options_id: int, score: int):
+        """Validate score is calculated correctly based on options ids and expected score
+        
+        Args:
+            options_id: selected option id
+            score: Expected score
+        """
+    
+        # Select only option 0 from list (2 points)
+        self.data["answers"] = [options_id]
+
+        # Select the option with 2 points and validate the total
+        response = self.client.post(self.endpoint, self.data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Validate excpected total: 50%
+        report = survey_models.Report.objects.all().last()
+        self.assertEqual(report.total, score)
+        
+    def test_option_points_2_points_selected(self):
+        """ Select option with 2 points and validate the total
+        Excpected total: 50% (2 points / 4 points (counting only max points per question))
+        """
+        self.__validate_score(self.options_ids[2], 50)
+        
+    def test_option_points_1_point_selected(self):
+        """ Select option with 1 point and validate the total
+        Excpected total: 25% (1 point / 4 points (counting only max points per question))
+        """
+        self.__validate_score(self.options_ids[1], 25)
+        
+    def test_option_points_0_points_selected(self):
+        """ Select option with 0 points and validate the total
+        Excpected total: 0% (0 point / 4 points (counting only max points per question))
+        """
+        self.__validate_score(self.options_ids[0], 0)
+
+
+  

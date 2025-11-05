@@ -1,4 +1,4 @@
-from django.db.models import Avg
+from django.db.models import Avg, Max
 
 
 from survey import models
@@ -33,19 +33,22 @@ class SurveyCalcs:
         """
 
         # Local import to avoid circular import
-        from survey.models import Answer, QuestionOption
+        from survey.models import Answer, Question, QuestionOption
 
-        # Return points of answers
-        options = QuestionOption.objects.filter(
-            question__question_group=question_group,
-        )
+        # Calculate user points
         answers = Answer.objects.filter(
             question_option__question__question_group=question_group,
             participant=participant,
         )
-
         user_points = sum(answer.question_option.points for answer in answers)
-        total_points = sum(option.points for option in options)
+        
+        # Calculate totail points: get the max points answer per question, and sum them
+        questions = Question.objects.filter(question_group=question_group)
+        total_points = 0
+        for question in questions:
+            options = QuestionOption.objects.filter(question=question)
+            max_points = options.aggregate(max_points=Max("points"))["max_points"]
+            total_points += max_points
         if total_points == 0:
             return 0
 
@@ -63,11 +66,9 @@ class SurveyCalcs:
         question_groups = QuestionGroup.objects.filter(survey=self.survey).order_by(
             "survey_index"
         )
-
         # Calculate totals for each question group
         for question_group in question_groups:
             total = self.__get_question_group_total(question_group, self.participant)
-
             report_question_group_total, _ = (
                 ReportQuestionGroupTotal.objects.get_or_create(
                     report=self.report,
