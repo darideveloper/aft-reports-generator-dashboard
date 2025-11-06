@@ -2,8 +2,18 @@
   border: 1px solid red;
 }
 
+body {
+  width: 100vw;
+  overflow-x: hidden;
+}
+
 .debug {
   border: 1px solid red;
+}
+
+body {
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 h1 img {
@@ -89,6 +99,10 @@ h1 img {
 
 .select2.select2-container {
   width: 100% !important;
+}
+
+.form-group {
+  max-width: 100% !important;
 }
 
 .rendered-media {
