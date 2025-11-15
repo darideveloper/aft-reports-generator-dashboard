@@ -63,8 +63,8 @@ class Command(BaseCommand):
         json_payload = self.get_json_responses(df, invitation_code)
 
         self.stdout.write(self.style.SUCCESS("JSON payload created successfully"))
-        for entry in json_payload:
-            print(entry)
+        """ for entry in json_payload:
+            print(entry) """
 
     # --------------------------------------------------------------------------
 
@@ -109,11 +109,45 @@ class Command(BaseCommand):
 
         return None
 
+    def get_best_matching_option(self, question, option_text: str, threshold: int = 65):
+        """
+        Returns the best matching QuestionOption for a given Question
+        based on fuzzy similarity.
+        """
+
+        if option_text is None or pd.isna(option_text):
+            return None
+
+        option_text = str(option_text).strip()
+
+        # Get all option texts for this question
+        all_options = list(
+            QuestionOption.objects.filter(question=question).values_list(
+                "text", flat=True
+            )
+        )
+
+        all_options = [str(opt) for opt in all_options]
+
+        # Find best match
+        result = process.extractOne(option_text, all_options, scorer=fuzz.ratio)
+
+        if result is None:
+            return None
+
+        best_match, score = result
+
+        if score >= threshold:
+            return QuestionOption.objects.get(question=question, text=best_match)
+
+        return None
+
     # --------------------------------------------------------------------------
 
     def extract_question_option_ids(self, row) -> list[int]:
 
         option_ids = []
+        special_k_values = []  # Collect values for question K
 
         for column_name, cell_value in row.items():
 
@@ -121,7 +155,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-
+                # --- Manual normalization rules ---
                 target = "Opta por dispositivos de bajo"
                 if target in column_name:
                     column_name = "Opta por dispositivos de bajo consumo de energía"
@@ -132,7 +166,9 @@ class Command(BaseCommand):
 
                 target = "Usa el almacenamiento en la"
                 if target in column_name:
-                    column_name = "Usa el almacenamiento en la nube de manera responsable"
+                    column_name = (
+                        "Usa el almacenamiento en la nube de manera responsable"
+                    )
 
                 target = "Recicle los aparatos electrón"
                 if target in column_name:
@@ -146,10 +182,15 @@ class Command(BaseCommand):
                 if target in column_name:
                     column_name = "Repare, no sustituya"
 
-                target = "Apoya a las marcas sostenibles"
+                target = "Reduzca el uso de papel"
+                if target in column_name:
+                    column_name = "Reduzca el uso de papel"
+
+                target = "Apoya a las marcas sostenible"
                 if target in column_name:
                     column_name = "Apoya a las marcas sostenibles"
 
+                # Find the best matching question
                 question = self.get_best_matching_question(str(column_name))
 
                 if question is None:
@@ -160,22 +201,26 @@ class Command(BaseCommand):
                     )
                     continue
 
+                # --- SPECIAL CASE: question K has two columns ---
                 question_k = "k) Los líderes pueden tomar mejores decisiones de inversión al distinguir entre la infraestructura (\_\_\_\_\_\_\_) que respalda las funciones organizacionales a largo plazo y la presencia en línea más visible (\_\_\_\_\_\_) que influye en la marca y la participación del cliente."
-                if question.text == question_k:
-                    print("Found it")
 
                 cell_value = str(cell_value).strip()
                 if cell_value == "False":
                     cell_value = "Falso"
                 elif cell_value == "True":
                     cell_value = "Verdadero"
-                print(cell_value)
 
+                if question.text == question_k:
+                    # Store the values to combine later
+                    special_k_values.append(cell_value)
+                    question_k_id = question.id
+                    continue  # Don't process yet
+
+                # Normal case: look up the option directly
                 option = QuestionOption.objects.get(
                     question=question,
                     text=cell_value,
                 )
-
                 option_ids.append(option.id)
 
             except Question.DoesNotExist:
@@ -187,6 +232,23 @@ class Command(BaseCommand):
                 warning += f" with option='{cell_value}'"
                 self.stdout.write(self.style.WARNING(warning))
 
+        # --- After the loop: process special K question ---
+        if special_k_values:
+            combined_value = ", ".join(special_k_values)
+            result = self.get_best_matching_option(
+                question_k_id, combined_value
+            )
+
+            try:
+                option = QuestionOption.objects.get(
+                    question__text=question_k, text=result.text
+                )
+                option_ids.append(option.id)
+
+            except QuestionOption.DoesNotExist:
+                warning = "No QuestionOption found for special question K"
+                warning += f" with value='{combined_value}'"
+                self.stdout.write(self.style.WARNING(warning))
         print(len(option_ids))
         return option_ids
 
