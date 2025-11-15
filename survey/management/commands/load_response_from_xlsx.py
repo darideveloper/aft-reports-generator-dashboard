@@ -81,7 +81,7 @@ class Command(BaseCommand):
 
     # --------------------------------------------------------------------------
 
-    def get_best_matching_question(self, column_name: str, threshold: int = 85):
+    def get_best_matching_question(self, column_name: str, threshold: int = 65):
         """
         Returns the best matching Question based on fuzzy string similarity.
         """
@@ -121,6 +121,35 @@ class Command(BaseCommand):
                 continue
 
             try:
+
+                target = "Opta por dispositivos de bajo"
+                if target in column_name:
+                    column_name = "Opta por dispositivos de bajo consumo de energía"
+
+                target = "Apaga los dispositivos cuando"
+                if target in column_name:
+                    column_name = "Apaga los dispositivos cuando no los uses"
+
+                target = "Usa el almacenamiento en la"
+                if target in column_name:
+                    column_name = "Usa el almacenamiento en la nube de manera responsable"
+
+                target = "Recicle los aparatos electrón"
+                if target in column_name:
+                    column_name = "Recicle los aparatos electrónicos"
+
+                target = "Elija energías renovables"
+                if target in column_name:
+                    column_name = "Elija energías renovables"
+
+                target = "Repare, no sustituya"
+                if target in column_name:
+                    column_name = "Repare, no sustituya"
+
+                target = "Apoya a las marcas sostenibles"
+                if target in column_name:
+                    column_name = "Apoya a las marcas sostenibles"
+
                 question = self.get_best_matching_question(str(column_name))
 
                 if question is None:
@@ -130,6 +159,10 @@ class Command(BaseCommand):
                         )
                     )
                     continue
+
+                question_k = "k) Los líderes pueden tomar mejores decisiones de inversión al distinguir entre la infraestructura (\_\_\_\_\_\_\_) que respalda las funciones organizacionales a largo plazo y la presencia en línea más visible (\_\_\_\_\_\_) que influye en la marca y la participación del cliente."
+                if question.text == question_k:
+                    print("Found it")
 
                 cell_value = str(cell_value).strip()
                 if cell_value == "False":
