@@ -1,7 +1,10 @@
+from email import message
 import os
-import pandas as pd
+import json
+import requests
 import random
 import string
+import pandas as pd
 from thefuzz import fuzz, process
 
 from django.core.management.base import BaseCommand, CommandError
@@ -16,6 +19,12 @@ POSITION_CHOICES = {
     "Otro": "other",
 }
 
+GENDER_CHOICES = {
+    "hombre": "m",
+    "mujer": "f",
+    "otro": "o",
+}
+
 
 class Command(BaseCommand):
     help = (
@@ -28,6 +37,12 @@ class Command(BaseCommand):
             type=str,
             required=True,
             help="Invitation code for all responses",
+        )
+        parser.add_argument(
+            "--token",
+            type=str,
+            required=True,
+            help="Token for authentication",
         )
         parser.add_argument(
             "--excel",
@@ -47,6 +62,7 @@ class Command(BaseCommand):
         invitation_code = options["invitation"]
         excel_filename = options["excel"]
         sheet_name = options["sheet"]
+        token = options["token"]
 
         # Build path to /data/<file>
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,8 +79,9 @@ class Command(BaseCommand):
         json_payload = self.get_json_responses(df, invitation_code)
 
         self.stdout.write(self.style.SUCCESS("JSON payload created successfully"))
-        """ for entry in json_payload:
-            print(entry) """
+
+        self.stdout.write(self.style.SUCCESS("Sending data to API..."))
+        self.send_responses_to_api(json_payload, token)
 
     # --------------------------------------------------------------------------
 
@@ -235,9 +252,7 @@ class Command(BaseCommand):
         # --- After the loop: process special K question ---
         if special_k_values:
             combined_value = ", ".join(special_k_values)
-            result = self.get_best_matching_option(
-                question_k_id, combined_value
-            )
+            result = self.get_best_matching_option(question_k_id, combined_value)
 
             try:
                 option = QuestionOption.objects.get(
@@ -262,7 +277,7 @@ class Command(BaseCommand):
             print(f"\nProcessing row {index}")
 
             name = row["Primer nombre y primer apellido"]
-            gender = row["Género"].lower()[0]
+            gender = GENDER_CHOICES[row["Género"].lower()]
             birth_date = row["Año de nacimiento"]
             position = POSITION_CHOICES[row["Posición"]]
             email = row["Dirección de correo electrónico"]
@@ -273,7 +288,7 @@ class Command(BaseCommand):
             participant = {
                 "name": name,
                 "gender": gender,
-                "birth_date": birth_date,
+                "birth_range": birth_date,
                 "position": position,
                 "email": email,
             }
@@ -290,3 +305,60 @@ class Command(BaseCommand):
             )
 
         return json_list
+
+    # --------------------------------------------------------------------------
+
+    def send_responses_to_api(self, payload: list[dict], token: str) -> list:
+        """
+        Sends a list of survey response dictionaries to the API endpoint.
+
+        Args:
+            payload (list[dict]): The JSON-ready list of responses you generated.
+            token (str): The authentication token for the API.
+
+        Returns:
+            list: A list of results containing status and server replies.
+        """
+
+        url = "http://127.0.0.1:8000/api/response/"
+
+        headers = {
+            "Authorization": f"Token {token}",
+            "Content-Type": "application/json",
+        }
+
+        results = []
+
+        for entry in payload:
+            try:
+                print(entry)
+                response = requests.post(
+                    url,
+                    headers=headers,
+                    data=json.dumps(entry),
+                    timeout=10,
+                )
+
+                results.append(
+                    {
+                        "sent": entry,
+                        "status_code": response.status_code,
+                        "response": response.json() if response.content else None,
+                    }
+                )
+
+                if response.status_code == 201:
+                    response_message = f"Data for {entry['participant']['email']}"
+                    self.stdout.write(self.style.SUCCESS(response_message + " sent successfully"))
+                else:
+                    response_message = f"Data for {entry['participant']['email']}"
+                    self.stdout.write(self.style.ERROR(response_message + " failed to send with status code: " + str(response.status_code)))
+            except Exception as e:
+                results.append(
+                    {
+                        "sent": entry,
+                        "error": str(e),
+                    }
+                )
+
+        return results
