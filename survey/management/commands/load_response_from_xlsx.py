@@ -206,9 +206,9 @@ class Command(BaseCommand):
                 # --- SPECIAL CASE: question K has two columns ---
                 question_k = (
                     "k) Los líderes pueden tomar mejores decisiones de inversión al distinguir "
-                    + "entre la infraestructura (__________) "
+                    + r"entre la infraestructura (\_\_\_\_\_\_\_) "
                     + "que respalda las funciones organizacionales a largo plazo "
-                    + "y la presencia en línea más visible (__________) "
+                    + r"y la presencia en línea más visible (\_\_\_\_\_\_) "
                     + "que influye en la marca "
                     + "y la participación del cliente."
                 )
