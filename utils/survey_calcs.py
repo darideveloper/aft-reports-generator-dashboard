@@ -41,7 +41,7 @@ class SurveyCalcs:
             participant=participant,
         )
         user_points = sum(answer.question_option.points for answer in answers)
-        
+
         # Calculate totail points: get the max points answer per question, and sum them
         questions = Question.objects.filter(question_group=question_group)
         total_points = 0
@@ -154,7 +154,9 @@ class SurveyCalcs:
         result = []
 
         # Get all group totals
-        group_totals = models.ReportQuestionGroupTotal.objects.filter(report=report)
+        group_totals = models.ReportQuestionGroupTotal.objects.filter(
+            report=report
+        ).order_by("question_group__survey_index")
 
         for group_total in group_totals:
             score = group_total.total
@@ -254,7 +256,7 @@ class SurveyCalcs:
         question_groups = models.QuestionGroup.objects.filter(
             survey=self.survey
         ).order_by("survey_index")
-    
+
         company_desired_scores = models.CompanyDesiredScore.objects.filter(
             company=self.company
         )
@@ -316,7 +318,7 @@ class SurveyCalcs:
         all_totals = self.get_all_participants_totals()
         totals_sorted = sorted(all_totals)
         total_count = len(all_totals)
-        
+
         # Return MEP if no totals
         if total_count < 5:
             return "MEP"
