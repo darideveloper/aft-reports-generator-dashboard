@@ -1,4 +1,3 @@
-from email import message
 import os
 import json
 import requests
@@ -6,6 +5,9 @@ import random
 import string
 import pandas as pd
 from thefuzz import fuzz, process
+
+from survey import models
+from rest_framework.authtoken.models import Token
 
 from django.core.management.base import BaseCommand, CommandError
 from survey.models import Question, QuestionOption
@@ -31,38 +33,21 @@ class Command(BaseCommand):
         "Imports survey responses from Excel and converts them into JSON-like objects."
     )
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--invitation",
-            type=str,
-            required=True,
-            help="Invitation code for all responses",
-        )
-        parser.add_argument(
-            "--token",
-            type=str,
-            required=True,
-            help="Token for authentication",
-        )
-        parser.add_argument(
-            "--excel",
-            type=str,
-            default="respuestas.xlsx",
-            help="Excel filename inside the 'data' folder",
-        )
-        parser.add_argument(
-            "--sheet",
-            type=str,
-            default="Respuestas de formulario 1",
-            help="Sheet name to load from Excel",
-        )
+    # Esxcel path
+    EXCEL_PATH = os.path.join(os.path.dirname(__file__), "files", "responses.xlsx")
+    SHEET_NAME = "Respuestas de formulario 1"
+
+    # Get invitation code of "Prueba Beta" from db
+    INVITATION_CODE = models.Company.objects.get(name="Prueba Beta").invitation_code
+
+    # Get DRF token from db
+    TOKEN = Token.objects.order_by("?").first().key
+
+    # Raise error if file does not exist
+    if not os.path.exists(EXCEL_PATH):
+        raise FileNotFoundError(f"Excel file not found at: {EXCEL_PATH}")
 
     def handle(self, *args, **options):
-
-        invitation_code = options["invitation"]
-        excel_filename = options["excel"]
-        sheet_name = options["sheet"]
-        token = options["token"]
 
         # Build path to /data/<file>
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -70,18 +55,18 @@ class Command(BaseCommand):
         management_dir = os.path.join(app_dir, "management")
         commands_dir = os.path.join(management_dir, "commands")
         data_dir = os.path.join(commands_dir, "data")
-        file_path = os.path.join(data_dir, excel_filename)
+        file_path = os.path.join(data_dir, self.EXCEL_PATH)
 
         if not os.path.exists(file_path):
             raise CommandError(f"Excel file not found at: {file_path}")
 
-        df = self.process_excel(file_path, sheet_name)
-        json_payload = self.get_json_responses(df, invitation_code)
+        df = self.process_excel(file_path, self.SHEET_NAME)
+        json_payload = self.get_json_responses(df, self.INVITATION_CODE)
 
         self.stdout.write(self.style.SUCCESS("JSON payload created successfully"))
 
         self.stdout.write(self.style.SUCCESS("Sending data to API..."))
-        self.send_responses_to_api(json_payload, token)
+        self.send_responses_to_api(json_payload, self.TOKEN)
 
     # --------------------------------------------------------------------------
 
@@ -219,8 +204,14 @@ class Command(BaseCommand):
                     continue
 
                 # --- SPECIAL CASE: question K has two columns ---
-                question_k = "k) Los líderes pueden tomar mejores decisiones de inversión al distinguir entre la infraestructura (\_\_\_\_\_\_\_) que respalda las funciones organizacionales a largo plazo y la presencia en línea más visible (\_\_\_\_\_\_) que influye en la marca y la participación del cliente."
-
+                question_k = (
+                    "k) Los líderes pueden tomar mejores decisiones de inversión al distinguir "
+                    + "entre la infraestructura (__________) "
+                    + "que respalda las funciones organizacionales a largo plazo "
+                    + "y la presencia en línea más visible (__________) "
+                    + "que influye en la marca "
+                    + "y la participación del cliente."
+                )
                 cell_value = str(cell_value).strip()
                 if cell_value == "False":
                     cell_value = "Falso"
@@ -349,10 +340,18 @@ class Command(BaseCommand):
 
                 if response.status_code == 201:
                     response_message = f"Data for {entry['participant']['email']}"
-                    self.stdout.write(self.style.SUCCESS(response_message + " sent successfully"))
+                    self.stdout.write(
+                        self.style.SUCCESS(response_message + " sent successfully")
+                    )
                 else:
                     response_message = f"Data for {entry['participant']['email']}"
-                    self.stdout.write(self.style.ERROR(response_message + " failed to send with status code: " + str(response.status_code)))
+                    self.stdout.write(
+                        self.style.ERROR(
+                            response_message
+                            + " failed to send with status code: "
+                            + str(response.status_code)
+                        )
+                    )
             except Exception as e:
                 results.append(
                     {
