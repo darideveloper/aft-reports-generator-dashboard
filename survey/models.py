@@ -274,10 +274,24 @@ class Participant(models.Model):
     ]
 
     POSITION_CHOICES = [
+        ("analista", "Analista"),
+        ("asesor", "Asesor"),
+        ("auxiliar", "Auxiliar"),
+        ("contralor", "Contralor"),
+        ("coordinador", "Coordinador"),
         ("director", "Director"),
+        ("director_general", "Director General"),
+        ("director_general_adjunto", "Director General Adjunto"),
+        ("enlace_informacion", "Enlace de Información"),
         ("manager", "Gerente"),
-        ("supervisor", "Supervisor"),
+        ("inspector", "Inspector"),
+        ("investigador", "Investigador"),
+        ("jefe_departamento", "Jefe de Departamento"),
         ("operator", "Operador"),
+        ("secretario_ejecutivo", "Secretario Ejecutivo"),
+        ("subdirector", "Subdirector"),
+        ("subsecretario", "Subsecretario"),
+        ("supervisor", "Supervisor"),
         ("other", "Otro"),
     ]
 
