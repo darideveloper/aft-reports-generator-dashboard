@@ -124,9 +124,9 @@ class SurveyCalcs:
         Returns:
             int: min score value to recover text
         """
-        if score < 50:
+        if score <= 50:
             return 50
-        elif score < 70:
+        elif score <= 70:
             return 70
         else:
             return 100
