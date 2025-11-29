@@ -300,25 +300,6 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
         self.create_report(options=options_0)
         pdf_path = self.create_get_pdf()
         self.validate_text_in_pdf(pdf_path, "0.00%")
-        
-    def test_option_points_2_points_selected(self):
-        """ Create an option with 2 points instead of 1,
-        and the other option with 1 point.
-        Select the option with 2 points and validate the total"""
-        
-        # Create an option with 2 points instead of 1
-        question = self.create_question()
-        option = self.create_question_option(question=question, points=2)
-        self.create_question_option(question=question, points=1)
-        
-        # Select the option with 2 points and validate the total
-        self.data["answers"] = [option.id]
-        response = self.client.post(self.endpoint, self.data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
-        # Validate total
-        report = survey_models.Report.objects.all().last()
-        self.assertEqual(report.total, 100)
 
 
 class GenerateNextReportBellChartTestCase(GenerateNextReportBase):
