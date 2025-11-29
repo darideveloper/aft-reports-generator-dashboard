@@ -283,19 +283,19 @@ class GenerateNextReportCreationTestCase(GenerateNextReportBase):
             survey_models.Report.objects.filter(status="completed").count(), 3
         )
         self.assertEqual(survey_models.Report.objects.filter(status="error").count(), 0)
-        
+
     def test_percentages_2_decimal_places(self):
         """
         Test percentages are 2 decimal places
         """
         self.company.use_average = False
         self.company.save()
-        
+
         options_100 = self.get_selected_options(score=100)
         self.create_report(options=options_100)
         pdf_path = self.create_get_pdf()
         self.validate_text_in_pdf(pdf_path, "100.00%")
-        
+
         options_0 = self.get_selected_options(score=0)
         self.create_report(options=options_0)
         pdf_path = self.create_get_pdf()
@@ -680,12 +680,23 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
         # Create company with invitation code
         self.company = self.create_company(invitation_code=self.invitation_code)
 
-    def test_generate_pdf_with_question_group_1_0(self):
+    def _test_pdf_text_generation(self, question_group_index: int, score: int):
         """
-        Test PDF text generation with question group 1 and score 0
-        """
+        Helper method to test PDF text generation for a question group and score.
 
-        selected_options = self.get_selected_options(score=0)
+        Args:
+            question_group_index: Index of the question group (0-12)
+            score: Score value to test (0, 49, 50, 51, 69, 70, 71, 99, 100)
+        """
+        # Determine expected min_score based on score
+        if score <= 50:
+            expected_min_score = 50
+        elif score <= 70:
+            expected_min_score = 70
+        else:
+            expected_min_score = 100
+
+        selected_options = self.get_selected_options(score=score)
         self.create_report(
             options=selected_options, invitation_code=self.invitation_code
         )
@@ -697,2081 +708,714 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
         text_in_pdf = self.validate_text_in_pdf(
             pdf_path,
             survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[0], min_score=50
+                question_group=self.question_groups[question_group_index],
+                min_score=expected_min_score,
             ).text,
         )
 
         self.assertTrue(text_in_pdf)
+
+    def test_generate_pdf_with_question_group_1_0(self):
+        """
+        Test PDF text generation with question group 1 and score 0
+        """
+        self._test_pdf_text_generation(question_group_index=0, score=0)
 
     def test_generate_pdf_with_question_group_2_0(self):
         """
         Test PDF text generation with question group 2 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[1], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=1, score=0)
 
     def test_generate_pdf_with_question_group_3_0(self):
         """
         Test PDF text generation with question group 3 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[2], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=2, score=0)
 
     def test_generate_pdf_with_question_group_4_0(self):
         """
         Test PDF text generation with question group 4 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[3], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=3, score=0)
 
     def test_generate_pdf_with_question_group_5_0(self):
         """
         Test PDF text generation with question group 5 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[4], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=4, score=0)
 
     def test_generate_pdf_with_question_group_6_0(self):
         """
         Test PDF text generation with question group 6 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[5], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=5, score=0)
 
     def test_generate_pdf_with_question_group_7_0(self):
         """
         Test PDF text generation with question group 7 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[6], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=6, score=0)
 
     def test_generate_pdf_with_question_group_8_0(self):
         """
         Test PDF text generation with question group 8 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[7], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=7, score=0)
 
     def test_generate_pdf_with_question_group_9_0(self):
         """
         Test PDF text generation with question group 9 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[8], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=8, score=0)
 
     def test_generate_pdf_with_question_group_10_0(self):
         """
         Test PDF text generation with question group 10 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[9], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=9, score=0)
 
     def test_generate_pdf_with_question_group_11_0(self):
         """
         Test PDF text generation with question group 11 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[10], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=10, score=0)
 
     def test_generate_pdf_with_question_group_12_0(self):
         """
         Test PDF text generation with question group 12 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[11], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=11, score=0)
 
     def test_generate_pdf_with_question_group_13_0(self):
         """
         Test PDF text generation with question group 13 and score 0
         """
-
-        selected_options = self.get_selected_options(score=0)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[12], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=12, score=0)
 
     def test_generate_pdf_with_question_group_1_49(self):
         """
         Test PDF text generation with question group 1 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[0], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=0, score=49)
 
     def test_generate_pdf_with_question_group_2_49(self):
         """
         Test PDF text generation with question group 2 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[1], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=1, score=49)
 
     def test_generate_pdf_with_question_group_3_49(self):
         """
         Test PDF text generation with question group 3 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[2], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=2, score=49)
 
     def test_generate_pdf_with_question_group_4_49(self):
         """
         Test PDF text generation with question group 4 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[3], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=3, score=49)
 
     def test_generate_pdf_with_question_group_5_49(self):
         """
         Test PDF text generation with question group 5 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[4], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=4, score=49)
 
     def test_generate_pdf_with_question_group_6_49(self):
         """
         Test PDF text generation with question group 6 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[5], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=5, score=49)
 
     def test_generate_pdf_with_question_group_7_49(self):
         """
         Test PDF text generation with question group 7 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[6], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=6, score=49)
 
     def test_generate_pdf_with_question_group_8_49(self):
         """
         Test PDF text generation with question group 8 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[7], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=7, score=49)
 
     def test_generate_pdf_with_question_group_9_49(self):
         """
         Test PDF text generation with question group 9 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[8], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=8, score=49)
 
     def test_generate_pdf_with_question_group_10_49(self):
         """
         Test PDF text generation with question group 10 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[9], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=9, score=49)
 
     def test_generate_pdf_with_question_group_11_49(self):
         """
         Test PDF text generation with question group 11 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[10], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=10, score=49)
 
     def test_generate_pdf_with_question_group_12_49(self):
         """
         Test PDF text generation with question group 12 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[11], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=11, score=49)
 
     def test_generate_pdf_with_question_group_13_49(self):
         """
         Test PDF text generation with question group 13 and score 49
         """
-
-        selected_options = self.get_selected_options(score=49)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[12], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=12, score=49)
 
     def test_generate_pdf_with_question_group_1_50(self):
         """
         Test PDF text generation with question group 1 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[0], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=0, score=50)
 
     def test_generate_pdf_with_question_group_2_50(self):
         """
         Test PDF text generation with question group 2 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[1], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=1, score=50)
 
     def test_generate_pdf_with_question_group_3_50(self):
         """
         Test PDF text generation with question group 3 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[2], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=2, score=50)
 
     def test_generate_pdf_with_question_group_4_50(self):
         """
         Test PDF text generation with question group 4 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[3], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=3, score=50)
 
     def test_generate_pdf_with_question_group_5_50(self):
         """
         Test PDF text generation with question group 5 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[4], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=4, score=50)
 
     def test_generate_pdf_with_question_group_6_50(self):
         """
         Test PDF text generation with question group 6 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[5], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=5, score=50)
 
     def test_generate_pdf_with_question_group_7_50(self):
         """
         Test PDF text generation with question group 7 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[6], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=6, score=50)
 
     def test_generate_pdf_with_question_group_8_50(self):
         """
         Test PDF text generation with question group 8 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[7], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=7, score=50)
 
     def test_generate_pdf_with_question_group_9_50(self):
         """
         Test PDF text generation with question group 9 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[8], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=8, score=50)
 
     def test_generate_pdf_with_question_group_10_50(self):
         """
         Test PDF text generation with question group 10 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[9], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=9, score=50)
 
     def test_generate_pdf_with_question_group_11_50(self):
         """
         Test PDF text generation with question group 11 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[10], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=10, score=50)
 
     def test_generate_pdf_with_question_group_12_50(self):
         """
         Test PDF text generation with question group 12 and score 50
         """
-
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[11], min_score=50
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=11, score=50)
 
     def test_generate_pdf_with_question_group_13_50(self):
         """
         Test PDF text generation with question group 13 and score 50
         """
+        self._test_pdf_text_generation(question_group_index=12, score=50)
 
-        selected_options = self.get_selected_options(score=50)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
+    def test_generate_pdf_with_question_group_1_51(self):
+        """
+        Test PDF text generation with question group 1 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=0, score=51)
 
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
+    def test_generate_pdf_with_question_group_2_51(self):
+        """
+        Test PDF text generation with question group 2 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=1, score=51)
 
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[12], min_score=50
-            ).text,
-        )
+    def test_generate_pdf_with_question_group_3_51(self):
+        """
+        Test PDF text generation with question group 3 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=2, score=51)
 
-        self.assertTrue(text_in_pdf)
+    def test_generate_pdf_with_question_group_4_51(self):
+        """
+        Test PDF text generation with question group 4 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=3, score=51)
+
+    def test_generate_pdf_with_question_group_5_51(self):
+        """
+        Test PDF text generation with question group 5 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=4, score=51)
+
+    def test_generate_pdf_with_question_group_6_51(self):
+        """
+        Test PDF text generation with question group 6 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=5, score=51)
+
+    def test_generate_pdf_with_question_group_7_51(self):
+        """
+        Test PDF text generation with question group 7 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=6, score=51)
+
+    def test_generate_pdf_with_question_group_8_51(self):
+        """
+        Test PDF text generation with question group 8 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=7, score=51)
+
+    def test_generate_pdf_with_question_group_9_51(self):
+        """
+        Test PDF text generation with question group 9 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=8, score=51)
+
+    def test_generate_pdf_with_question_group_10_51(self):
+        """
+        Test PDF text generation with question group 10 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=9, score=51)
+
+    def test_generate_pdf_with_question_group_11_51(self):
+        """
+        Test PDF text generation with question group 11 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=10, score=51)
+
+    def test_generate_pdf_with_question_group_12_51(self):
+        """
+        Test PDF text generation with question group 12 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=11, score=51)
+
+    def test_generate_pdf_with_question_group_13_51(self):
+        """
+        Test PDF text generation with question group 13 and score 51
+        """
+        self._test_pdf_text_generation(question_group_index=12, score=51)
 
     def test_generate_pdf_with_question_group_1_69(self):
         """
         Test PDF text generation with question group 1 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[0], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=0, score=69)
 
     def test_generate_pdf_with_question_group_2_69(self):
         """
         Test PDF text generation with question group 2 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[1], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=1, score=69)
 
     def test_generate_pdf_with_question_group_3_69(self):
         """
         Test PDF text generation with question group 3 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[2], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=2, score=69)
 
     def test_generate_pdf_with_question_group_4_69(self):
         """
         Test PDF text generation with question group 4 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[3], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=3, score=69)
 
     def test_generate_pdf_with_question_group_5_69(self):
         """
         Test PDF text generation with question group 5 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[4], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=4, score=69)
 
     def test_generate_pdf_with_question_group_6_69(self):
         """
         Test PDF text generation with question group 6 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[5], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=5, score=69)
 
     def test_generate_pdf_with_question_group_7_69(self):
         """
         Test PDF text generation with question group 7 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[6], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=6, score=69)
 
     def test_generate_pdf_with_question_group_8_69(self):
         """
         Test PDF text generation with question group 8 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[7], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=7, score=69)
 
     def test_generate_pdf_with_question_group_9_69(self):
         """
         Test PDF text generation with question group 9 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[8], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=8, score=69)
 
     def test_generate_pdf_with_question_group_10_69(self):
         """
         Test PDF text generation with question group 10 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[9], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=9, score=69)
 
     def test_generate_pdf_with_question_group_11_69(self):
         """
         Test PDF text generation with question group 11 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[10], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=10, score=69)
 
     def test_generate_pdf_with_question_group_12_69(self):
         """
         Test PDF text generation with question group 12 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[11], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=11, score=69)
 
     def test_generate_pdf_with_question_group_13_69(self):
         """
         Test PDF text generation with question group 13 and score 69
         """
-
-        selected_options = self.get_selected_options(score=69)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[12], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=12, score=69)
 
     def test_generate_pdf_with_question_group_1_70(self):
         """
         Test PDF text generation with question group 1 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[0], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=0, score=70)
 
     def test_generate_pdf_with_question_group_2_70(self):
         """
         Test PDF text generation with question group 2 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[1], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=1, score=70)
 
     def test_generate_pdf_with_question_group_3_70(self):
         """
         Test PDF text generation with question group 3 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[2], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=2, score=70)
 
     def test_generate_pdf_with_question_group_4_70(self):
         """
         Test PDF text generation with question group 4 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[3], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=3, score=70)
 
     def test_generate_pdf_with_question_group_5_70(self):
         """
         Test PDF text generation with question group 5 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[4], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=4, score=70)
 
     def test_generate_pdf_with_question_group_6_70(self):
         """
         Test PDF text generation with question group 6 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[5], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=5, score=70)
 
     def test_generate_pdf_with_question_group_7_70(self):
         """
         Test PDF text generation with question group 7 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[6], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=6, score=70)
 
     def test_generate_pdf_with_question_group_8_70(self):
         """
         Test PDF text generation with question group 8 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[7], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=7, score=70)
 
     def test_generate_pdf_with_question_group_9_70(self):
         """
         Test PDF text generation with question group 9 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[8], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=8, score=70)
 
     def test_generate_pdf_with_question_group_10_70(self):
         """
         Test PDF text generation with question group 10 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[9], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=9, score=70)
 
     def test_generate_pdf_with_question_group_11_70(self):
         """
         Test PDF text generation with question group 11 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[10], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=10, score=70)
 
     def test_generate_pdf_with_question_group_12_70(self):
         """
         Test PDF text generation with question group 12 and score 70
         """
-
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[11], min_score=70
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=11, score=70)
 
     def test_generate_pdf_with_question_group_13_70(self):
         """
         Test PDF text generation with question group 13 and score 70
         """
+        self._test_pdf_text_generation(question_group_index=12, score=70)
 
-        selected_options = self.get_selected_options(score=70)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
+    def test_generate_pdf_with_question_group_1_71(self):
+        """
+        Test PDF text generation with question group 1 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=0, score=71)
 
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
+    def test_generate_pdf_with_question_group_2_71(self):
+        """
+        Test PDF text generation with question group 2 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=1, score=71)
 
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[12], min_score=70
-            ).text,
-        )
+    def test_generate_pdf_with_question_group_3_71(self):
+        """
+        Test PDF text generation with question group 3 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=2, score=71)
 
-        self.assertTrue(text_in_pdf)
+    def test_generate_pdf_with_question_group_4_71(self):
+        """
+        Test PDF text generation with question group 4 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=3, score=71)
+
+    def test_generate_pdf_with_question_group_5_71(self):
+        """
+        Test PDF text generation with question group 5 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=4, score=71)
+
+    def test_generate_pdf_with_question_group_6_71(self):
+        """
+        Test PDF text generation with question group 6 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=5, score=71)
+
+    def test_generate_pdf_with_question_group_7_71(self):
+        """
+        Test PDF text generation with question group 7 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=6, score=71)
+
+    def test_generate_pdf_with_question_group_8_71(self):
+        """
+        Test PDF text generation with question group 8 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=7, score=71)
+
+    def test_generate_pdf_with_question_group_9_71(self):
+        """
+        Test PDF text generation with question group 9 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=8, score=71)
+
+    def test_generate_pdf_with_question_group_10_71(self):
+        """
+        Test PDF text generation with question group 10 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=9, score=71)
+
+    def test_generate_pdf_with_question_group_11_71(self):
+        """
+        Test PDF text generation with question group 11 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=10, score=71)
+
+    def test_generate_pdf_with_question_group_12_71(self):
+        """
+        Test PDF text generation with question group 12 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=11, score=71)
+
+    def test_generate_pdf_with_question_group_13_71(self):
+        """
+        Test PDF text generation with question group 13 and score 71
+        """
+        self._test_pdf_text_generation(question_group_index=12, score=71)
 
     def test_generate_pdf_with_question_group_1_99(self):
         """
         Test PDF text generation with question group 1 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[0], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=0, score=99)
 
     def test_generate_pdf_with_question_group_2_99(self):
         """
         Test PDF text generation with question group 2 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[1], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=1, score=99)
 
     def test_generate_pdf_with_question_group_3_99(self):
         """
         Test PDF text generation with question group 3 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[2], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=2, score=99)
 
     def test_generate_pdf_with_question_group_4_99(self):
         """
         Test PDF text generation with question group 4 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[3], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=3, score=99)
 
     def test_generate_pdf_with_question_group_5_99(self):
         """
         Test PDF text generation with question group 5 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[4], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=4, score=99)
 
     def test_generate_pdf_with_question_group_6_99(self):
         """
         Test PDF text generation with question group 6 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[5], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=5, score=99)
 
     def test_generate_pdf_with_question_group_7_99(self):
         """
         Test PDF text generation with question group 7 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[6], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=6, score=99)
 
     def test_generate_pdf_with_question_group_8_99(self):
         """
         Test PDF text generation with question group 8 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[7], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=7, score=99)
 
     def test_generate_pdf_with_question_group_9_99(self):
         """
         Test PDF text generation with question group 9 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[8], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=8, score=99)
 
     def test_generate_pdf_with_question_group_10_99(self):
         """
         Test PDF text generation with question group 10 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[9], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=9, score=99)
 
     def test_generate_pdf_with_question_group_11_99(self):
         """
         Test PDF text generation with question group 11 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[10], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=10, score=99)
 
     def test_generate_pdf_with_question_group_12_99(self):
         """
         Test PDF text generation with question group 12 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[11], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=11, score=99)
 
     def test_generate_pdf_with_question_group_13_99(self):
         """
         Test PDF text generation with question group 13 and score 99
         """
-
-        selected_options = self.get_selected_options(score=99)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[12], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=12, score=99)
 
     def test_generate_pdf_with_question_group_1_100(self):
         """
         Test PDF text generation with question group 1 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[0], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=0, score=100)
 
     def test_generate_pdf_with_question_group_2_100(self):
         """
         Test PDF text generation with question group 2 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[1], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=1, score=100)
 
     def test_generate_pdf_with_question_group_3_100(self):
         """
         Test PDF text generation with question group 3 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[2], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=2, score=100)
 
     def test_generate_pdf_with_question_group_4_100(self):
         """
         Test PDF text generation with question group 4 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[3], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=3, score=100)
 
     def test_generate_pdf_with_question_group_5_100(self):
         """
         Test PDF text generation with question group 5 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[4], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=4, score=100)
 
     def test_generate_pdf_with_question_group_6_100(self):
         """
         Test PDF text generation with question group 6 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[5], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=5, score=100)
 
     def test_generate_pdf_with_question_group_7_100(self):
         """
         Test PDF text generation with question group 7 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[6], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=6, score=100)
 
     def test_generate_pdf_with_question_group_8_100(self):
         """
         Test PDF text generation with question group 8 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[7], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=7, score=100)
 
     def test_generate_pdf_with_question_group_9_100(self):
         """
         Test PDF text generation with question group 9 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[8], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=8, score=100)
 
     def test_generate_pdf_with_question_group_10_100(self):
         """
         Test PDF text generation with question group 10 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[9], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=9, score=100)
 
     def test_generate_pdf_with_question_group_11_100(self):
         """
         Test PDF text generation with question group 11 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[10], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=10, score=100)
 
     def test_generate_pdf_with_question_group_12_100(self):
         """
         Test PDF text generation with question group 12 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[11], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=11, score=100)
 
     def test_generate_pdf_with_question_group_13_100(self):
         """
         Test PDF text generation with question group 13 and score 100
         """
-
-        selected_options = self.get_selected_options(score=100)
-        self.create_report(
-            options=selected_options, invitation_code=self.invitation_code
-        )
-
-        # create and get pdf
-        pdf_path = self.create_get_pdf()
-
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(
-            pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[12], min_score=100
-            ).text,
-        )
-
-        self.assertTrue(text_in_pdf)
+        self._test_pdf_text_generation(question_group_index=12, score=100)
 
 
 class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
