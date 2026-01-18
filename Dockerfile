@@ -35,6 +35,9 @@ ARG DB_PASSWORD
 ARG DB_HOST
 ARG DB_PORT
 
+# Integrations
+ARG N8N_BASE_WEBHOOKS
+
 # Django core settings
 ENV SECRET_KEY=${SECRET_KEY}
 ENV DEBUG=${DEBUG}
@@ -60,6 +63,9 @@ ENV DB_USER=${DB_USER}
 ENV DB_PASSWORD=${DB_PASSWORD}
 ENV DB_HOST=${DB_HOST}
 ENV DB_PORT=${DB_PORT}
+
+# Integrations
+ENV N8N_BASE_WEBHOOKS=${N8N_BASE_WEBHOOKS}
 
 # Set the working directory in the container
 WORKDIR /app

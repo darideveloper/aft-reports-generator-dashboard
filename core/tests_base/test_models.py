@@ -349,3 +349,25 @@ class TestSurveyModelBase(APITestCase):
         return survey_models.ReportQuestionGroupTotal.objects.create(
             report=report, question_group=question_group, total=total
         )
+
+    def create_reports_download(
+        self,
+        reports: list[survey_models.Report] = [],
+        status: str = "pending",
+    ) -> survey_models.ReportsDownload:
+        """Create a reports download object
+
+        Args:
+            reports (list[survey_models.Report]): The reports of the reports download
+            status (str): The status of the reports download
+
+        Returns:
+            survey_models.ReportsDownload: The created reports download object
+        """
+
+        reports_download = survey_models.ReportsDownload.objects.create(status=status)
+
+        if reports:
+            reports_download.reports.set(reports)
+
+        return reports_download

@@ -26,6 +26,7 @@ HOST = os.getenv("HOST")
 TEST_HEADLESS = os.getenv("TEST_HEADLESS", "False") == "True"
 PAGE_SIZE = int(os.getenv("PAGE_SIZE", 10))
 BAR_CHART_ENDPOINT = os.getenv("BAR_CHART_ENDPOINT")
+N8N_BASE_WEBHOOKS = os.getenv("N8N_BASE_WEBHOOKS")
 
 # Testing env variables
 TEST_BAR_CHART_ENDPOINT = os.getenv("TEST_BAR_CHART_ENDPOINT")

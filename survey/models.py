@@ -1,9 +1,11 @@
-from django.template.defaultfilters import default
 from django.db import models
-from django.contrib import admin, messages
+from django.contrib import admin
+from django.conf import settings
 
 from utils.text_generation import get_uuid
 from core.choices import STATUS_CHOICES
+
+import requests
 
 
 class Company(models.Model):
@@ -506,6 +508,27 @@ class ReportsDownload(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        # Generate zip file (api call to n8n) if it doesn't exist
+        if not self.id:
+            print("Generating zip file with n8n webhook")
+            self.status = "pending"
+
+            res = requests.get(
+                f"{settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file",
+            )
+            print(
+                f"Webhook URL: {settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file"
+            )
+            print(f"Response from n8n webhook: {res.json()}")
+
+            if res.status_code == 200:
+                self.status = "processing"
+            else:
+                self.status = "error"
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"ZIP file ({self.reports})"
