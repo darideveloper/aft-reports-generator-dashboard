@@ -39,7 +39,7 @@ class Command(BaseCommand):
             )
             if not next_reports_download:
                 message = "No reports to download"
-                logs += message
+                logs += message + "\n"
                 self.stdout.write(self.style.SUCCESS(message))
                 return
 
@@ -52,17 +52,17 @@ class Command(BaseCommand):
             for report in next_reports_download.reports.all():
                 if not report.pdf_file:
                     message = f"Report {report.id} has no pdf file"
-                    logs += message
+                    logs += message + "\n"
                     self.stdout.write(self.style.WARNING(message))
                     continue
                 pdf_url = get_media_url(report.pdf_file)
                 message = f"Downloading pdf file {pdf_url}"
-                logs += message
+                logs += message + "\n"
                 self.stdout.write(message)
                 res = requests.get(pdf_url)
                 if res.status_code != 200:
                     message = f"Failed to download pdf file {pdf_url}"
-                    logs += message
+                    logs += message + "\n"
                     self.stdout.write(self.style.ERROR(message))
                     continue
                 pdf_path = os.path.join(temp_dir, f"{str(report)}.pdf")
@@ -72,7 +72,7 @@ class Command(BaseCommand):
 
             # Generate zip file with all pdfs
             message = "Generating zip file with all pdfs"
-            logs += message
+            logs += message + "\n"
             self.stdout.write(message)
             zip_path = os.path.join(
                 temp_dir, f"reports_download_{next_reports_download.id}.zip"
@@ -83,14 +83,14 @@ class Command(BaseCommand):
 
             # Delete temp pdf files
             message = "Deleting temp pdf files"
-            logs += message
+            logs += message + "\n"
             self.stdout.write(message)
             for pdf_path in pdf_downloaded_paths:
                 os.remove(pdf_path)
 
             # Add file to model
             message = "Adding file to model"
-            logs += message
+            logs += message + "\n"
             self.stdout.write(message)
             next_reports_download.zip_file = SimpleUploadedFile(
                 name=os.path.basename(zip_path),
@@ -101,13 +101,13 @@ class Command(BaseCommand):
 
             # Delete temp zip file
             message = "Deleting temp zip file"
-            logs += message
+            logs += message + "\n"
             self.stdout.write(message)
             os.remove(zip_path)
 
             # Update status
             message = "Updating status to completed"
-            logs += message
+            logs += message + "\n"
             self.stdout.write(self.style.SUCCESS(message))
             next_reports_download.status = "completed"
             next_reports_download.save()
@@ -115,7 +115,7 @@ class Command(BaseCommand):
         except Exception as e:
             # Catch and save error in logs
             message = "Error: " + str(e)
-            logs += message
+            logs += message + "\n"
             self.stdout.write(self.style.ERROR(message))
             if next_reports_download:
                 next_reports_download.status = "error"
