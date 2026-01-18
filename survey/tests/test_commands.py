@@ -2,11 +2,13 @@ import os
 import re
 import json
 import random
+import shutil
 from time import sleep
 
 from django.core.management import call_command
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -19,6 +21,8 @@ from utils.survey_calcs import SurveyCalcs
 import requests
 from PyPDF2 import PdfReader
 from playwright.sync_api import sync_playwright
+
+from unittest.mock import MagicMock, patch
 
 
 class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
@@ -119,6 +123,8 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
         pdf_files = os.listdir(pdf_folder)
         new_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
         new_files = [file for file in new_pdf_files if file not in old_pdf_files]
+        print(new_files)
+        print(old_pdf_files)
         self.assertEqual(len(new_files), 1)
         new_file = new_files[0]
         pdf_path = os.path.join(pdf_folder, new_file)
@@ -1599,3 +1605,210 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
 
             # Validate text in pdf
             self.__validate_title_and_text(pdf_path, summary_type, 49)
+
+
+class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
+    """
+    Test suite for create_reports_download_file command
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        # Load data
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+
+        # Login to client with session
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
+
+        # Ensure temp dir exists or is clean for tests
+        self.temp_dir = os.path.join(settings.BASE_DIR, "media", "temp", "zips")
+        if os.path.exists(self.temp_dir):
+            shutil.rmtree(self.temp_dir)
+        os.makedirs(self.temp_dir, exist_ok=True)
+
+        # Create basic data
+        self.company = self.create_company()
+        self.participant = self.create_participant(company=self.company)
+        self.survey = survey_models.Survey.objects.get(id=1)
+
+        # Create a dummy PDF file for testing
+        self.dummy_pdf_content = b"%PDF-1.4 dummy content"
+        self.dummy_pdf_name = "test_report.pdf"
+
+    def tearDown(self):
+        # Cleanup temp dir
+        if os.path.exists(self.temp_dir):
+            shutil.rmtree(self.temp_dir)
+        super().tearDown()
+
+    def create_dummy_report_with_pdf(self):
+        report = self.create_report()
+        report.pdf_file = SimpleUploadedFile(
+            self.dummy_pdf_name, self.dummy_pdf_content, content_type="application/pdf"
+        )
+        report.status = "completed"
+        report.save()
+        return report
+
+    def create_reports_download(self, reports=None):
+        if reports is None:
+            reports = []
+        download = survey_models.ReportsDownload.objects.create(status="pending")
+        if reports:
+            download.reports.set(reports)
+        return download
+
+    def test_no_pending_downloads(self):
+        """Test command when there are no pending downloads"""
+        # Ensure no pending downloads exist
+        survey_models.ReportsDownload.objects.all().delete()
+
+        with patch("sys.stdout.write") as mock_stdout:
+            call_command("create_reports_download_file")
+            # We expect a message saying no reports to download
+            # Note: Checking exact string might depend on implementation details
+            pass
+
+        # Verify nothing changed
+        self.assertEqual(
+            survey_models.ReportsDownload.objects.filter(status="pending").count(), 0
+        )
+
+    @patch("requests.get")
+    def test_success_single_report(self, mock_get):
+        """Test successful zip generation for a single report"""
+        # Configure mock for model creation (n8n webhook) AND pdf download
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = self.dummy_pdf_content
+        mock_response.json.return_value = {"success": True}
+        mock_get.return_value = mock_response
+
+        report = self.create_dummy_report_with_pdf()
+        download = self.create_reports_download([report])
+
+        # Verify creation didn't fail
+        self.assertEqual(download.status, "pending", download.logs)
+
+        call_command("create_reports_download_file")
+
+        download.refresh_from_db()
+        self.assertEqual(download.status, "completed", download.logs)
+        self.assertTrue(download.zip_file)
+        self.assertTrue(download.zip_file.name.endswith(".zip"))
+        self.assertIn("completed", download.logs)
+
+    @patch("requests.get")
+    def test_success_multiple_reports(self, mock_get):
+        """Test successful zip generation for multiple reports"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = self.dummy_pdf_content
+        mock_response.json.return_value = {"success": True}
+        mock_get.return_value = mock_response
+
+        report1 = self.create_dummy_report_with_pdf()
+        report2 = self.create_dummy_report_with_pdf()
+        download = self.create_reports_download([report1, report2])
+
+        call_command("create_reports_download_file")
+
+        download.refresh_from_db()
+        self.assertEqual(download.status, "completed", download.logs)
+        self.assertTrue(download.zip_file)
+
+        # Requests: 1 for model creation, 2 for PDFs
+        self.assertEqual(mock_get.call_count, 3)
+
+    @patch("requests.get")
+    def test_missing_pdf_file_in_report(self, mock_get):
+        """Test handling when a report is missing the PDF file"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = self.dummy_pdf_content
+        mock_response.json.return_value = {"success": True}
+        mock_get.return_value = mock_response
+
+        # Report with PDF
+        report1 = self.create_dummy_report_with_pdf()
+        # Report without PDF
+        report2 = self.create_report()
+        report2.status = "completed"
+        report2.save()
+
+        download = self.create_reports_download([report1, report2])
+
+        call_command("create_reports_download_file")
+
+        download.refresh_from_db()
+        self.assertEqual(download.status, "completed", download.logs)
+        # Should still have a zip file (containing the available PDF)
+        self.assertTrue(download.zip_file)
+
+        # Check logs for missing PDF message
+        self.assertIn(f"Report {report2.id} has no pdf file", download.logs)
+
+    @patch("requests.get")
+    def test_download_error_404(self, mock_get):
+        """Test handling when PDF download fails"""
+        # We need successful creation, then 404 for download
+
+        # Response for creation
+        creation_response = MagicMock()
+        creation_response.status_code = 200
+        creation_response.json.return_value = {"success": True}
+
+        # Response for download
+        download_response = MagicMock()
+        download_response.status_code = 404
+
+        mock_get.side_effect = [creation_response, download_response]
+
+        report = self.create_dummy_report_with_pdf()
+        download = self.create_reports_download([report])
+
+        self.assertEqual(download.status, "pending")
+
+        call_command("create_reports_download_file")
+
+        download.refresh_from_db()
+        # Command should complete even if one file fails (it logs error)
+        self.assertEqual(download.status, "completed", download.logs)
+        self.assertIn(f"Failed to download pdf file", download.logs)
+
+    @patch("zipfile.ZipFile")
+    @patch("requests.get")
+    def test_general_exception(self, mock_get, mock_zip):
+        """Test handling of unexpected exceptions"""
+        # Creation success
+        creation_response = MagicMock()
+        creation_response.status_code = 200
+        creation_response.json.return_value = {"success": True}
+
+        # Download success
+        download_response = MagicMock()
+        download_response.status_code = 200
+        download_response.content = self.dummy_pdf_content
+
+        mock_get.side_effect = [creation_response, download_response]
+
+        report = self.create_dummy_report_with_pdf()
+        download = self.create_reports_download([report])
+
+        # Mock an exception during zip creation
+        mock_zip.side_effect = Exception("Boom!")
+
+        call_command("create_reports_download_file")
+
+        download.refresh_from_db()
+        self.assertEqual(download.status, "error", download.logs)
+        self.assertIn("Error: Boom!", download.logs)

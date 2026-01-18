@@ -506,6 +506,12 @@ class ReportsDownload(models.Model):
         verbose_name="Estado",
         help_text="Estado del archivo ZIP",
     )
+    logs = models.TextField(
+        verbose_name="Logs",
+        help_text="Logs de la generación del archivo ZIP",
+        blank=True,
+        null=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -515,18 +521,19 @@ class ReportsDownload(models.Model):
             print("Generating zip file with n8n webhook")
             self.status = "pending"
 
-            res = requests.get(
-                f"{settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file",
+            webhook_url = (
+                f"{settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file"
             )
-            print(
-                f"Webhook URL: {settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file"
-            )
+            res = requests.get(webhook_url)
+            print(f"Webhook URL: {webhook_url}")
             print(f"Response from n8n webhook: {res.json()}")
 
-            if res.status_code == 200:
-                self.status = "processing"
-            else:
+            if res.status_code != 200:
                 self.status = "error"
+                logs = f"Failed to generate zip file with n8n webhook.\n"
+                logs += f"Webhook URL: {webhook_url}\n"
+                logs += f"Response: {res.json()}\n"
+                self.logs = logs
 
         super().save(*args, **kwargs)
 

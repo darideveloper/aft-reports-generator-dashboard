@@ -35,7 +35,6 @@ print(f"DEBUG: {DEBUG}")
 print(f"STORAGE_AWS: {STORAGE_AWS}")
 print(f"HOST: {HOST}")
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")

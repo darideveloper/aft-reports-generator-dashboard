@@ -22,7 +22,7 @@ class ReportsDownloadModelTestCase(TestSurveyModelBase):
         mock_get.assert_called_once_with(expected_url)
 
         # Verify status update based on response
-        self.assertEqual(download.status, "processing")
+        self.assertEqual(download.status, "pending")
 
     @mock.patch("survey.models.requests.get")
     def test_save_api_call_failure(self, mock_get):
