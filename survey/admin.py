@@ -221,6 +221,8 @@ class ReportAdmin(admin.ModelAdmin):
             "disabled" if obj.status != "completed" else "",  # disabled
         )
 
+    custom_links.short_description = "Acciones"
+
     def set_to_pending(self, request, queryset):
         queryset.update(status="pending")
 
@@ -316,13 +318,37 @@ class CompanyDesiredScoreAdmin(admin.ModelAdmin):
 
 @admin.register(models.ReportsDownload)
 class ReportsDownloadAdmin(admin.ModelAdmin):
-    list_display = ("id", "status", "reports_num", "created_at", "zip_file")
+    list_display = ("id", "status", "reports_num", "created_at", "custom_links")
     list_filter = ("status", "created_at", "updated_at")
     readonly_fields = ("created_at", "updated_at")
     ordering = ("-created_at",)
     list_per_page = 30
 
+    # CUSTOM FIELDS
     def reports_num(self, obj):
         return obj.reports.count()
 
+    def custom_links(self, obj):
+        """Create custom Imprimir and Ver buttons"""
+
+        zip_url = ""
+        if obj.status == "completed":
+            try:
+                zip_url = get_media_url(obj.zip_file)
+            except Exception:
+                pass
+
+        return format_html(
+            '<a class="btn my-1 {}" target="_blank" {} {}>Descargar Reportes</a>',
+            (
+                # styles
+                "btn-primary"
+                if obj.status == "completed" and zip_url
+                else "btn-secondary disabled"
+            ),
+            f"href={zip_url}" if zip_url else "",  # href
+            "disabled" if obj.status != "completed" else "",  # disabled
+        )
+
     reports_num.short_description = "Número de reportes"
+    custom_links.short_description = "Acciones"

@@ -1,8 +1,10 @@
 import math
+from unittest import mock
 
 from django.http import HttpResponse
 from django.core.management import call_command
 from django.contrib import messages
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from bs4 import BeautifulSoup
 
@@ -425,3 +427,84 @@ class ReportsDownloadAdminTestCase(TestAdminBase, TestSurveyModelBase):
         reports_num_cell = soup.select_one(".field-reports_num")
         self.assertIsNotNone(reports_num_cell)
         self.assertEqual(reports_num_cell.get_text(strip=True), "2")
+
+    def __validate_download_reports_btn(self, response: HttpResponse):
+        """Validate disabled see report button
+
+        Args:
+            response (HttpResponse): Response of the request
+        """
+
+        # Validate http status
+        self.assertEqual(response.status_code, 200)
+
+        # Validate link "Ver Reporte" disabled
+        soup = BeautifulSoup(response.content, "html.parser")
+        link = soup.select_one(".field-custom_links > a")
+        self.assertIsNotNone(link)
+        self.assertIn("disabled", link["class"])
+        self.assertIn("btn-secondary", link["class"])
+        self.assertIsNone(link.get("href"))
+        self.assertEqual(link.get("disabled"), "")
+
+    def test_custom_links_download_reports_pending(self):
+        """Validate custom link "Descargar Reportes" working for pending download"""
+
+        # Create ReportsDownload
+        with mock.patch("requests.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            reports_download = survey_models.ReportsDownload.objects.create(
+                status="pending"
+            )
+
+        # Validate response
+        response = self.client.get(f"{self.endpoint}")
+
+        self.__validate_download_reports_btn(response)
+
+    def test_custom_links_download_reports_error(self):
+        """Validate custom link "Descargar Reportes" working for error download"""
+
+        # Create ReportsDownload
+        with mock.patch("requests.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            reports_download = survey_models.ReportsDownload.objects.create(
+                status="error"
+            )
+
+        # Validate response
+        response = self.client.get(f"{self.endpoint}")
+
+        self.__validate_download_reports_btn(response)
+
+    def test_custom_links_download_reports_completed(self):
+        """Validate custom link "Descargar Reportes" working for completed download"""
+
+        file = SimpleUploadedFile(
+            "test.zip", b"content", content_type="application/zip"
+        )
+
+        # Create ReportsDownload
+        with mock.patch("requests.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            reports_download = survey_models.ReportsDownload.objects.create(
+                zip_file=file
+            )
+
+        # Force status to completed (bypass save logic which sets to pending on creation)
+        reports_download.status = "completed"
+        reports_download.save()
+
+        # Validate response
+        response = self.client.get(f"{self.endpoint}")
+
+        self.assertEqual(response.status_code, 200)
+
+        # Validate link "Descargar Reportes" enabled
+        soup = BeautifulSoup(response.content, "html.parser")
+        link = soup.select_one(".field-custom_links > a")
+        self.assertIsNotNone(link)
+        self.assertNotIn("disabled", link["class"])
+        self.assertIn("btn-primary", link["class"])
+        self.assertIn("reports_downloads/zip_files/test", link.get("href"))
+        self.assertIsNone(link.get("disabled"))
