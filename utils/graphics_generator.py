@@ -34,6 +34,9 @@ def generate_bell_curve_plot(
     mu = np.mean(grades)
     sigma = np.std(grades)
 
+    if sigma == 0:
+        sigma = 1e-6
+
     # Create adjusted normal distribution
     x = np.linspace(mu - 4 * sigma, mu + 4 * sigma, 1000)
     y = norm.pdf(x, mu, sigma)

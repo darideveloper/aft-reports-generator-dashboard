@@ -123,8 +123,6 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
         pdf_files = os.listdir(pdf_folder)
         new_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
         new_files = [file for file in new_pdf_files if file not in old_pdf_files]
-        print(new_files)
-        print(old_pdf_files)
         self.assertEqual(len(new_files), 1)
         new_file = new_files[0]
         pdf_path = os.path.join(pdf_folder, new_file)
@@ -695,9 +693,13 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
             score: Score value to test (0, 49, 50, 51, 69, 70, 71, 99, 100)
         """
         # Determine expected min_score based on score
-        if score <= 50:
+        # Determine expected min_score based on score
+        # Since we have 10 questions, the score will be a multiple of 10
+        effective_score = int(score / 10) * 10
+
+        if effective_score <= 50:
             expected_min_score = 50
-        elif score <= 70:
+        elif effective_score <= 70:
             expected_min_score = 70
         else:
             expected_min_score = 100
