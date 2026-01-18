@@ -65,7 +65,9 @@ class Command(BaseCommand):
                     logs += message + "\n"
                     self.stdout.write(self.style.ERROR(message))
                     continue
-                pdf_path = os.path.join(temp_dir, f"{str(report)}.pdf")
+                pdf_path = os.path.join(
+                    temp_dir, f"{str(report.participant)}_{report.id}.pdf"
+                )
                 with open(pdf_path, "wb") as f:
                     f.write(res.content)
                 pdf_downloaded_paths.append(pdf_path)
@@ -88,7 +90,7 @@ class Command(BaseCommand):
             for pdf_path in pdf_downloaded_paths:
                 os.remove(pdf_path)
 
-            # Add file to model
+            # Add zip file to model
             message = "Adding file to model"
             logs += message + "\n"
             self.stdout.write(message)

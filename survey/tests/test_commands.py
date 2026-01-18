@@ -1814,3 +1814,39 @@ class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
         download.refresh_from_db()
         self.assertEqual(download.status, "error", download.logs)
         self.assertIn("Error: Boom!", download.logs)
+
+    @patch("requests.get")
+    def test_duplicate_participant_names_reproduce_crash(self, mock_get):
+        """
+        Test that duplicate participant names currently cause a crash
+        """
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = self.dummy_pdf_content
+        mock_response.json.return_value = {"success": True}
+        mock_get.return_value = mock_response
+
+        # Create 2 reports
+        report1 = self.create_dummy_report_with_pdf()
+        report2 = self.create_dummy_report_with_pdf()
+
+        # Ensure they have the same participant name
+        p1 = report1.participant
+        p2 = report2.participant
+        p2.name = p1.name
+        p2.save()
+
+        download = self.create_reports_download([report1, report2])
+
+        # This should currently fail (status error) or crash the command
+        call_command("create_reports_download_file")
+
+        download.refresh_from_db()
+
+        # If bug exists, this will fail assertion as status will be 'error'
+        # with logs containing 'No such file or directory'
+        self.assertEqual(
+            download.status,
+            "completed",
+            f"Expected completed, got {download.status}. Logs: {download.logs}",
+        )
