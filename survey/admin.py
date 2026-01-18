@@ -179,7 +179,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(models.Report)
 class ReportAdmin(admin.ModelAdmin):
-    actions = ("set_to_pending",)
+    actions = ("set_to_pending", "")
     list_display = (
         "participant",
         "survey",
@@ -220,10 +220,10 @@ class ReportAdmin(admin.ModelAdmin):
             f"href={pdf_url}" if pdf_url else "",  # href
             "disabled" if obj.status != "completed" else "",  # disabled
         )
-        
+
     def set_to_pending(self, request, queryset):
         queryset.update(status="pending")
-        
+
     set_to_pending.short_description = "Establecer a pendiente"
 
 
@@ -267,10 +267,10 @@ class TextPDFQuestionGroupAdmin(admin.ModelAdmin):
     search_fields = ("text", "question_group__name")
     readonly_fields = ("created_at", "updated_at")
     ordering = ("question_group", "-min_score")
-    
+
     def text_summary(self, obj):
         return obj.text[:100] + "..."
-    
+
     text_summary.short_description = "Texto"
     text_summary.admin_order_field = "text"
 
@@ -282,10 +282,10 @@ class TextPDFSummaryAdmin(admin.ModelAdmin):
     search_fields = ("text",)
     readonly_fields = ("created_at", "updated_at")
     ordering = ("paragraph_type", "-min_score")
-    
+
     def text_summary(self, obj):
         return obj.text[:100] + "..."
-    
+
     text_summary.short_description = "Texto"
     text_summary.admin_order_field = "text"
 
@@ -297,4 +297,13 @@ class CompanyDesiredScoreAdmin(admin.ModelAdmin):
     search_fields = ("company__name", "question_group__name")
     readonly_fields = ("created_at", "updated_at")
     ordering = ("company", "question_group")
+    list_per_page = 30
+
+
+@admin.register(models.ReportsDownload)
+class ReportsDownloadAdmin(admin.ModelAdmin):
+    list_display = ("zip_file", "status", "created_at")
+    list_filter = ("status", "created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("-created_at",)
     list_per_page = 30
