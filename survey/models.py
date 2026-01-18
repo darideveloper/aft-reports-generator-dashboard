@@ -1,5 +1,6 @@
+from django.template.defaultfilters import default
 from django.db import models
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from utils.text_generation import get_uuid
 from core.choices import STATUS_CHOICES
@@ -491,8 +492,10 @@ class ReportsDownload(models.Model):
     )
     zip_file = models.FileField(
         upload_to="reports_downloads/zip_files/",
-        verbose_name="Archivo ZIP (reportes)",
+        verbose_name="Archivo ZIP",
         help_text="Archivo ZIP con los reportes seleccionados",
+        blank=True,
+        null=True,
     )
     status = models.CharField(
         max_length=255,
@@ -505,8 +508,7 @@ class ReportsDownload(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        reports_ids = ", ".join([str(report.id) for report in self.reports.all()])
-        return f"ZIP file ({reports_ids})"
+        return f"ZIP file ({self.reports})"
 
     class Meta:
         verbose_name = "Descarga de Reportes"

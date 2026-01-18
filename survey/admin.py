@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.html import format_html
 
 from survey import models
@@ -179,7 +179,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(models.Report)
 class ReportAdmin(admin.ModelAdmin):
-    actions = ("set_to_pending", "")
+    actions = ("set_to_pending", "create_reports_download")
     list_display = (
         "participant",
         "survey",
@@ -224,7 +224,21 @@ class ReportAdmin(admin.ModelAdmin):
     def set_to_pending(self, request, queryset):
         queryset.update(status="pending")
 
+    def create_reports_download(self, request, queryset):
+        reports_download = models.ReportsDownload.objects.create(
+            status="pending",
+        )
+        reports_download.reports.set(queryset)
+        reports_download.save()
+
+        self.message_user(
+            request,
+            "Descarga creada correctamente. Consulta tabla de descargas para ver el estado.",
+            messages.SUCCESS,
+        )
+
     set_to_pending.short_description = "Establecer a pendiente"
+    create_reports_download.short_description = "Descargar reportes"
 
 
 @admin.register(models.Answer)
@@ -302,8 +316,13 @@ class CompanyDesiredScoreAdmin(admin.ModelAdmin):
 
 @admin.register(models.ReportsDownload)
 class ReportsDownloadAdmin(admin.ModelAdmin):
-    list_display = ("zip_file", "status", "created_at")
+    list_display = ("id", "status", "reports_num", "created_at", "zip_file")
     list_filter = ("status", "created_at", "updated_at")
     readonly_fields = ("created_at", "updated_at")
     ordering = ("-created_at",)
     list_per_page = 30
+
+    def reports_num(self, obj):
+        return obj.reports.count()
+
+    reports_num.short_description = "Número de reportes"

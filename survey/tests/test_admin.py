@@ -2,6 +2,7 @@ import math
 
 from django.http import HttpResponse
 from django.core.management import call_command
+from django.contrib import messages
 
 from bs4 import BeautifulSoup
 
@@ -176,7 +177,7 @@ class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
     def setUp(self):
         super().setUp()
         self.endpoint = "/admin/survey/report/"
-        
+
         # Delete other reports
         survey_models.Report.objects.all().delete()
 
@@ -188,7 +189,7 @@ class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
         # Load fixtures
         call_command("apps_loaddata")
         call_command("initial_loaddata")
-        
+
         # Create report
         self.create_report()
         self.report = survey_models.Report.objects.all().last()
@@ -302,22 +303,43 @@ class ReportAdminTestCase(TestAdminBase, TestSurveyModelBase):
         self.assertIn("btn-primary", link["class"])
         self.assertEqual(link.get("href"), pdf_url)
         self.assertIsNone(link.get("disabled"))
-        
+
     def test_action_set_to_pending(self):
         """Validate action set to pending working"""
-        
+
         # Update report status
         self.report.status = "completed"
         self.report.save()
 
         # Simulate action
-        self.client.post(f"{self.endpoint}", {
-            "action": "set_to_pending",
-            "_selected_action": [self.report.id]
-        })
-        
+        self.client.post(
+            f"{self.endpoint}",
+            {"action": "set_to_pending", "_selected_action": [self.report.id]},
+        )
+
         self.report.refresh_from_db()
         self.assertEqual(self.report.status, "pending")
+
+    def test_action_create_reports_download(self):
+        """Validate action create reports download working"""
+
+        # Simulate action
+        response = self.client.post(
+            f"{self.endpoint}",
+            {"action": "create_reports_download", "_selected_action": [self.report.id]},
+            follow=True,
+        )
+
+        # Validate download created in table
+        self.assertEqual(survey_models.ReportsDownload.objects.count(), 1)
+
+        # Validate message
+        messages = list(response.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            "Descarga creada correctamente. Consulta tabla de descargas para ver el estado.",
+        )
 
 
 class ReportQuestionGroupTotalAdminTestCase(TestAdminBase, TestSurveyModelBase):
@@ -354,8 +376,8 @@ class TextPDFSummaryAdminTestCase(TestAdminBase, TestSurveyModelBase):
     def test_search_bar(self):
         """Validate search bar working"""
         self.submit_search_bar(self.endpoint)
-        
-        
+
+
 class CompanyDesiredScoreAdminTestCase(TestAdminBase, TestSurveyModelBase):
     """Testing company desired score admin"""
 
@@ -366,3 +388,40 @@ class CompanyDesiredScoreAdminTestCase(TestAdminBase, TestSurveyModelBase):
     def test_search_bar(self):
         """Validate search bar working"""
         self.submit_search_bar(self.endpoint)
+
+
+class ReportsDownloadAdminTestCase(TestAdminBase, TestSurveyModelBase):
+    """Testing reports download admin"""
+
+    def setUp(self):
+        super().setUp()
+        self.endpoint = "/admin/survey/reportsdownload/"
+        self.company = self.create_company()
+        self.survey = self.create_survey()
+
+    def test_search_bar(self):
+        """Validate search bar working"""
+        self.submit_search_bar(self.endpoint)
+
+    def test_reports_num_column(self):
+        """Validate reports_num calculated field in list display"""
+
+        # Create reports
+        report_1 = self.create_report()
+        report_2 = self.create_report()
+
+        # Create ReportsDownload
+        reports_download = survey_models.ReportsDownload.objects.create(
+            status="pending"
+        )
+        reports_download.reports.set([report_1, report_2])
+
+        # Get admin page
+        response = self.client.get(self.endpoint)
+        self.assertEqual(response.status_code, 200)
+
+        # Validate column value
+        soup = BeautifulSoup(response.content, "html.parser")
+        reports_num_cell = soup.select_one(".field-reports_num")
+        self.assertIsNotNone(reports_num_cell)
+        self.assertEqual(reports_num_cell.get_text(strip=True), "2")
