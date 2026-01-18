@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import admin
 
 from utils.text_generation import get_uuid
+from core.choices import STATUS_CHOICES
 
 
 class Company(models.Model):
@@ -326,13 +327,6 @@ class Participant(models.Model):
 
 class Report(models.Model):
 
-    STATUS_CHOICES = [
-        ("pending", "⏳ Pendiente"),
-        ("processing", "⚡ Procesando"),
-        ("completed", "✔ Completado"),
-        ("error", "✖ Error"),
-    ]
-
     id = models.AutoField(primary_key=True)
     survey = models.ForeignKey(
         Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
@@ -485,3 +479,35 @@ class CompanyDesiredScore(models.Model):
         verbose_name = "Puntaje Deseado de Grupo de Preguntas"
         verbose_name_plural = "Puntajes Deseados de Grupos de Preguntas"
         unique_together = ("company", "question_group")
+
+
+class ReportsDownload(models.Model):
+    id = models.AutoField(primary_key=True)
+    reports = models.ManyToManyField(
+        Report,
+        verbose_name="Reportes",
+        related_name="reports_downloads",
+        help_text="Reportes seleccionados para descargar",
+    )
+    zip_file = models.FileField(
+        upload_to="reports_downloads/zip_files/",
+        verbose_name="Archivo ZIP (reportes)",
+        help_text="Archivo ZIP con los reportes seleccionados",
+    )
+    status = models.CharField(
+        max_length=255,
+        choices=STATUS_CHOICES,
+        default="pending",
+        verbose_name="Estado",
+        help_text="Estado del archivo ZIP",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        reports_ids = ", ".join([str(report.id) for report in self.reports.all()])
+        return f"ZIP file ({reports_ids})"
+
+    class Meta:
+        verbose_name = "Descarga de Reportes"
+        verbose_name_plural = "Descargas de Reportes"
