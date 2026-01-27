@@ -352,3 +352,18 @@ class ReportsDownloadAdmin(admin.ModelAdmin):
 
     reports_num.short_description = "Número de reportes"
     custom_links.short_description = "Acciones"
+
+
+@admin.register(models.FormProgress)
+class FormProgressAdmin(admin.ModelAdmin):
+    list_display = (
+        "email",
+        "survey",
+        "company",
+        "current_screen",
+        "expires_at",
+        "updated_at",
+    )
+    list_filter = ("survey", "company", "created_at", "expires_at")
+    search_fields = ("email", "company__name", "survey__name")
+    readonly_fields = ("created_at", "updated_at")

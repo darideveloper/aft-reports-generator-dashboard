@@ -1850,3 +1850,39 @@ class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
             "completed",
             f"Expected completed, got {download.status}. Logs: {download.logs}",
         )
+
+from datetime import timedelta
+from django.utils import timezone
+from django.test import TestCase
+from survey.models import FormProgress, Survey
+
+class DeleteExpiredProgressCommandTestCase(TestCase):
+    def setUp(self):
+        self.survey = Survey.objects.create(name="Test Survey")
+        self.email = "test@example.com"
+        
+        # Create expired record
+        self.expired = FormProgress.objects.create(
+            email="expired@example.com",
+            survey=self.survey,
+            current_screen=1,
+            data={}
+        )
+        self.expired.expires_at = timezone.now() - timedelta(days=1)
+        self.expired.save()
+        
+        # Create active record
+        self.active = FormProgress.objects.create(
+            email="active@example.com",
+            survey=self.survey,
+            current_screen=1,
+            data={}
+        )
+        # Default expiration is in future, so it should stay
+
+    def test_delete_expired(self):
+        """Test that expired records are deleted and active ones remain"""
+        call_command("delete_expired_progress")
+        
+        self.assertFalse(FormProgress.objects.filter(pk=self.expired.pk).exists())
+        self.assertTrue(FormProgress.objects.filter(pk=self.active.pk).exists())

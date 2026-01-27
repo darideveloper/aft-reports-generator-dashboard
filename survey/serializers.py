@@ -208,3 +208,26 @@ class ResponseSerializer(serializers.Serializer):
             participant.company.save()
 
         return participant, selected_options, report
+
+
+class FormProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FormProgress
+        fields = ["email", "survey", "current_screen", "data", "expires_at"]
+        read_only_fields = ["expires_at"]
+
+    def validate(self, data):
+        email = data.get("email")
+        survey = data.get("survey")
+
+        if email and survey:
+            if models.Answer.objects.filter(
+                participant__email=email,
+                question_option__question__question_group__survey=survey,
+            ).exists():
+                raise serializers.ValidationError(
+                    "ALREADY_SUBMITTED",
+                    code="ALREADY_SUBMITTED",
+                )
+
+        return data

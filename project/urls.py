@@ -36,6 +36,7 @@ urlpatterns = [
         survey_views.HasAnswerView.as_view(),
         name="participant-has-answer",
     ),
+    path("api/progress/", survey_views.FormProgressView.as_view(), name="progress"),
 ]
 
 if not settings.STORAGE_AWS:

@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib import admin
 from django.conf import settings
 
@@ -543,3 +545,37 @@ class ReportsDownload(models.Model):
     class Meta:
         verbose_name = "Descarga de Reportes"
         verbose_name_plural = "Descargas de Reportes"
+
+
+def get_default_expires_at():
+    return timezone.now() + timedelta(days=30)
+
+
+class FormProgress(models.Model):
+    id = models.AutoField(primary_key=True)
+    email = models.EmailField(verbose_name="Correo electrónico")
+    survey = models.ForeignKey(
+        Survey, on_delete=models.CASCADE, verbose_name="Encuesta"
+    )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.SET_NULL,
+        verbose_name="Empresa",
+        null=True,
+        blank=True,
+    )
+    current_screen = models.IntegerField(default=1, verbose_name="Pantalla actual")
+    data = models.JSONField(verbose_name="Datos del formulario")
+    expires_at = models.DateTimeField(
+        default=get_default_expires_at, verbose_name="Fecha de expiración"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.email} - {self.survey.name}"
+
+    class Meta:
+        verbose_name = "Progreso de Formulario"
+        verbose_name_plural = "Progresos de Formularios"
+        unique_together = ("email", "survey")

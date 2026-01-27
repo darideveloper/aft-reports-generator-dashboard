@@ -131,6 +131,11 @@ class ResponseView(APIView):
 
         participant, options, report = serializer.save()
 
+        # Delete progress after successful submission
+        models.FormProgress.objects.filter(
+            email=participant.email, survey=report.survey
+        ).delete()
+
         return Response(
             {
                 "status": "ok",
@@ -143,3 +148,75 @@ class ResponseView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+class FormProgressView(APIView):
+    def get(self, request):
+        email = request.query_params.get("email")
+        survey_id = request.query_params.get("survey")
+
+        if not email or not survey_id:
+            return Response(
+                {"detail": "email and survey parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            progress = models.FormProgress.objects.get(email=email, survey_id=survey_id)
+            serializer = serializers.FormProgressSerializer(progress)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except models.FormProgress.DoesNotExist:
+            return Response(
+                {"detail": "Progress not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+    def post(self, request):
+        email = request.data.get("email")
+        survey_id = request.data.get("survey")
+
+        if not email or not survey_id:
+            return Response(
+                {"detail": "email and survey are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Handle Upsert logic
+        try:
+            progress = models.FormProgress.objects.get(email=email, survey_id=survey_id)
+            serializer = serializers.FormProgressSerializer(
+                progress, data=request.data, partial=True
+            )
+        except models.FormProgress.DoesNotExist:
+            serializer = serializers.FormProgressSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Extract guestCode for company linking
+            data_blob = request.data.get("data", {})
+            guest_code = data_blob.get("guestCodeResponse", {}).get("guestCode")
+            company = None
+            if guest_code:
+                company = models.Company.objects.filter(
+                    invitation_code=guest_code, is_active=True
+                ).first()
+
+            progress = serializer.save(company=company)
+            # Update expires_at on every save to extend validity
+            progress.expires_at = models.get_default_expires_at()
+            progress.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        email = request.query_params.get("email")
+        survey_id = request.query_params.get("survey")
+
+        if not email or not survey_id:
+            return Response(
+                {"detail": "email and survey parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        models.FormProgress.objects.filter(email=email, survey_id=survey_id).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

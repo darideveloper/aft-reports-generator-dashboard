@@ -919,7 +919,7 @@ class ResponseViewDynamicPointsTestCase(TestSurveyViewsBase):
     Test report totals are generated correctly (question group totals)
     with dynamic points (0 points, 1 point and 2 points in each question option)
     """
-    
+
     def setUp(self):
         """Set up test data"""
         super().setUp(
@@ -929,7 +929,7 @@ class ResponseViewDynamicPointsTestCase(TestSurveyViewsBase):
         # Load initial data
         call_command("apps_loaddata")
         call_command("initial_loaddata")
-        
+
         # Create apo data
         self.invitation_code = "test"
         self.data = {
@@ -948,7 +948,7 @@ class ResponseViewDynamicPointsTestCase(TestSurveyViewsBase):
         self.participant = self.create_participant(company=self.company)
         self.question_groups = survey_models.QuestionGroup.objects.all()
         self.endpoint = "/api/response/"
-        
+
         # Delete other question groups
         survey_models.QuestionGroup.objects.all().delete()
 
@@ -962,15 +962,15 @@ class ResponseViewDynamicPointsTestCase(TestSurveyViewsBase):
             for points in [0, 1, 2]:
                 option = self.create_question_option(question=question, points=points)
                 self.options_ids.append(option.id)
-                
+
     def __validate_score(self, options_id: int, score: int):
         """Validate score is calculated correctly based on options ids and expected score
-        
+
         Args:
             options_id: selected option id
             score: Expected score
         """
-    
+
         # Select only option 0 from list (2 points)
         self.data["answers"] = [options_id]
 
@@ -981,24 +981,120 @@ class ResponseViewDynamicPointsTestCase(TestSurveyViewsBase):
         # Validate excpected total: 50%
         report = survey_models.Report.objects.all().last()
         self.assertEqual(report.total, score)
-        
+
     def test_option_points_2_points_selected(self):
-        """ Select option with 2 points and validate the total
+        """Select option with 2 points and validate the total
         Excpected total: 50% (2 points / 4 points (counting only max points per question))
         """
         self.__validate_score(self.options_ids[2], 50)
-        
+
     def test_option_points_1_point_selected(self):
-        """ Select option with 1 point and validate the total
+        """Select option with 1 point and validate the total
         Excpected total: 25% (1 point / 4 points (counting only max points per question))
         """
         self.__validate_score(self.options_ids[1], 25)
-        
+
     def test_option_points_0_points_selected(self):
-        """ Select option with 0 points and validate the total
+        """Select option with 0 points and validate the total
         Excpected total: 0% (0 point / 4 points (counting only max points per question))
         """
         self.__validate_score(self.options_ids[0], 0)
 
 
-  
+class FormProgressViewTestCase(TestSurveyViewsBase):
+    def setUp(self):
+        super().setUp(
+            endpoint="/api/progress/",
+            restricted_get=False,
+            restricted_post=False,
+        )
+        self.restricted_delete = False
+        self.survey = self.create_survey()
+        self.company = self.create_company(invitation_code="TEST-CODE")
+        self.email = "test@example.com"
+        self.progress_data = {
+            "email": self.email,
+            "survey": self.survey.id,
+            "current_screen": 2,
+            "data": {
+                "guestCodeResponse": {"guestCode": "TEST-CODE"},
+                "responses": [{"questionId": 1, "optionId": 2}],
+            },
+        }
+
+    def test_post_create_progress(self):
+        """Test creating a new progress record"""
+        response = self.client.post(self.endpoint, self.progress_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify database
+        progress = survey_models.FormProgress.objects.get(
+            email=self.email, survey=self.survey
+        )
+        self.assertEqual(progress.current_screen, 2)
+        self.assertEqual(progress.company, self.company)
+        self.assertEqual(progress.data["guestCodeResponse"]["guestCode"], "TEST-CODE")
+
+    def test_post_update_progress(self):
+        """Test updating (upsert) existing progress record"""
+        # Create initial
+        self.client.post(self.endpoint, self.progress_data, format="json")
+
+        # Update
+        update_data = self.progress_data.copy()
+        update_data["current_screen"] = 5
+        response = self.client.post(self.endpoint, update_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        progress = survey_models.FormProgress.objects.get(
+            email=self.email, survey=self.survey
+        )
+        self.assertEqual(progress.current_screen, 5)
+
+    def test_get_progress(self):
+        """Test retrieving existing progress"""
+        self.client.post(self.endpoint, self.progress_data, format="json")
+
+        response = self.client.get(
+            self.endpoint, {"email": self.email, "survey": self.survey.id}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["current_screen"], 2)
+
+    def test_get_progress_not_found(self):
+        """Test retrieving non-existent progress"""
+        response = self.client.get(
+            self.endpoint, {"email": "none@example.com", "survey": self.survey.id}
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_progress(self):
+        """Test deleting progress"""
+        self.client.post(self.endpoint, self.progress_data, format="json")
+        self.assertTrue(
+            survey_models.FormProgress.objects.filter(email=self.email).exists()
+        )
+
+        response = self.client.delete(
+            self.endpoint + f"?email={self.email}&survey={self.survey.id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(
+            survey_models.FormProgress.objects.filter(email=self.email).exists()
+        )
+
+    def test_post_already_submitted(self):
+        """Test that saving progress is blocked if survey is already submitted"""
+        # Create a participant and answer for this survey
+        participant = self.create_participant(email=self.email)
+        question_group = self.create_question_group(survey=self.survey)
+        question = self.create_question(question_group=question_group)
+        option = self.create_question_option(question=question)
+        self.create_answer(participant=participant, question_option=option)
+
+        # Attempt to save progress
+        response = self.client.post(self.endpoint, self.progress_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        # Check for ALREADY_SUBMITTED code in errors
+        self.assertIn("ALREADY_SUBMITTED", str(response.data))
