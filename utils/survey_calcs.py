@@ -116,21 +116,6 @@ class SurveyCalcs:
         totals = [report.total for report in reports]
         return totals
 
-    def get_target_threshold(self, score):
-        """
-        Get the min score value to recover a text
-        Args:
-            score: Participant Score on a given Question Group
-        Returns:
-            int: min score value to recover text
-        """
-        if score <= 50:
-            return 50
-        elif score <= 70:
-            return 70
-        else:
-            return 100
-
     def get_resulting_paragraphs(self) -> list[dict]:
         """
         Get the resulting paragraphs for a participant in a survey.
@@ -162,13 +147,25 @@ class SurveyCalcs:
             score = group_total.total
             question_group = group_total.question_group
 
-            # Pick threshold
-            threshold = self.get_target_threshold(score)
-
             # Get corresponding text
-            text_entry = models.TextPDFQuestionGroup.objects.filter(
-                question_group=question_group, min_score=threshold
-            ).first()
+            # Find the text with the highest min_score that is less than or equal to the score
+            text_entry = (
+                models.TextPDFQuestionGroup.objects.filter(
+                    question_group=question_group, min_score__lte=score
+                )
+                .order_by("-min_score")
+                .first()
+            )
+
+            # Fallback: if no text found (e.g. score below all thresholds), use the lowest implementation
+            if not text_entry:
+                text_entry = (
+                    models.TextPDFQuestionGroup.objects.filter(
+                        question_group=question_group
+                    )
+                    .order_by("min_score")
+                    .first()
+                )
 
             if text_entry:
                 result.append(
@@ -200,31 +197,44 @@ class SurveyCalcs:
 
         total = models.Report.objects.filter(participant=self.participant)[0].total
 
-        # Decide which threshold applies
-        if total < 50:
-            target_score = 49
-        elif total < 80:
-            target_score = 79
-        else:
-            target_score = 100
-
-        # Query texts with that min_score
-        queryset = models.TextPDFSummary.objects.filter(min_score=target_score).values(
-            "paragraph_type", "text"
-        )
-
         result = {}
 
-        for item in queryset:
-            paragraph_type = item[
-                "paragraph_type"
-            ].lower()  # e.g. "Cultura" → "cultura"
+        # Get all distinct paragraph types available
+        types = models.TextPDFSummary.objects.values_list(
+            "paragraph_type", flat=True
+        ).distinct()
+
+        best_matches = {}
+
+        for p_type in types:
+            # Find best match for this type: highest min_score <= total
+            match = (
+                models.TextPDFSummary.objects.filter(
+                    paragraph_type=p_type, min_score__lte=total
+                )
+                .order_by("-min_score")
+                .first()
+            )
+
+            if not match:
+                # Fallback: lowest min_score available for this type
+                match = (
+                    models.TextPDFSummary.objects.filter(paragraph_type=p_type)
+                    .order_by("min_score")
+                    .first()
+                )
+
+            if match:
+                best_matches[p_type] = match.text
+
+        for paragraph_type_code, text in best_matches.items():
+            paragraph_type = paragraph_type_code.lower()  # e.g. "Cultura" → "cultura"
 
             # Split into subtitle + paragraph
-            if "|" in item["text"]:
-                subtitle, paragraph = item["text"].split("|", 1)
+            if "|" in text:
+                subtitle, paragraph = text.split("|", 1)
             else:
-                subtitle, paragraph = "", item["text"]
+                subtitle, paragraph = "", text
 
             result[paragraph_type] = {
                 "subtitle": subtitle.strip(),

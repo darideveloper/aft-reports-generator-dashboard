@@ -1459,154 +1459,162 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
         # tests data
         self.summary_types = ["CD", "TN", "CS", "IP", "TMA", "EDC"]
 
-    def __validate_title_and_text(
-        self, pdf_path: str, summary_type: str, min_score: int
-    ):
+    def __validate_title_and_text(self, pdf_path: str, summary_type: str, score: int):
         """
         Validate title and text in PDF
 
         Args:
             pdf_path(str): Path to the pdf file
             summary_type(str): Type of summary
-            min_score(int): Minimum score
+            score(int): Participant score
         """
-        text_summary = survey_models.TextPDFSummary.objects.get(
-            paragraph_type=summary_type, min_score=min_score
-        ).text
+
+        text_entry_all = survey_models.TextPDFSummary.objects.filter(
+            paragraph_type=summary_type, min_score__lte=score
+        ).order_by("min_score")
+
+        for text_entry in text_entry_all:
+            print(
+                f"DEBUG: TextPDFSummary for type={summary_type}, score={text_entry.min_score}: {text_entry.text}"
+            )
+
+        # Find the text with the highest min_score that is less than or equal to the score
+        text_entry = (
+            survey_models.TextPDFSummary.objects.filter(
+                paragraph_type=summary_type, min_score__lte=score
+            )
+            .order_by("min_score")
+            .last()
+        )
+
+        # Set min score
+        if not text_entry:
+            text_entry = (
+                survey_models.TextPDFSummary.objects.filter(paragraph_type=summary_type)
+                .order_by("min_score")
+                .first()
+            )
+
+        text_summary = text_entry.text
         title, text = text_summary.split("|")
+        title = title.strip()
+        text = text.strip()
 
-        # Validate text in pdf
-        text_in_pdf = self.validate_text_in_pdf(pdf_path, title)
-        self.assertTrue(text_in_pdf)
+        # Validate title in pdf
+        title_in_pdf = self.validate_text_in_pdf(pdf_path, title)
+        if not title_in_pdf:
+            print(f"DEBUG: Title '{title}' not found in PDF for score {score}")
+            # Debug PDF content
+            with open(pdf_path, "rb") as f:
+                reader = PdfReader(f)
+                pdf_text = ""
+                for page in reader.pages:
+                    pdf_text += page.extract_text()
 
-        text_in_pdf = self.validate_text_in_pdf(pdf_path, text)
-        self.assertTrue(text_in_pdf)
+            def normalize(s):
+                s = s.lower()
+                s = re.sub(r"\s+", " ", s)
+                return s.strip()
+
+            norm_pdf = normalize(pdf_text)
+            norm_title = normalize(title)
+            print(f"DEBUG: Normalized Title: '{norm_title}'")
+            print(f"DEBUG: Normalized PDF Content (subset): '{norm_pdf[:200]}...'")
+            if norm_title in norm_pdf:
+                print(
+                    "DEBUG: Title IS in normalized PDF! validation_text_in_pdf might be creating a new instance or normalized differently?"
+                )
+            else:
+                print("DEBUG: Title really NOT in normalized PDF.")
+
+        self.assertTrue(
+            title_in_pdf, f"Title '{title}' not found in PDF for score {score}"
+        )
+
+        # Validate text in pdf (optional, based on observed code)
+        if text:
+            text_in_pdf = self.validate_text_in_pdf(pdf_path, text)
+            if not text_in_pdf:
+                print(f"DEBUG: Text body not found in PDF for score {score}")
+            self.assertTrue(
+                text_in_pdf, f"Text body not found in PDF for score {score}"
+            )
+
+    def _run_test_with_score(self, score, validation_score=None):
+        if validation_score is None:
+            validation_score = score
+
+        for i, summary_type in enumerate(self.summary_types):
+            # Update participant name to ensure unique PDF filename
+            # This is crucial because create_get_pdf relies on finding a NEW file
+            self.participant.name = (
+                f"Test User {score} {summary_type} {i} {random.randint(10000, 99999)}"
+            )
+            self.participant.save()
+
+            selected_options = self.get_selected_options(score=score)
+            self.create_report(
+                options=selected_options, invitation_code=self.invitation_code
+            )
+
+            # create and get pdf
+            try:
+                pdf_path = self.create_get_pdf()
+            except AssertionError as e:
+                print(f"DEBUG: create_get_pdf failed for {score}/{summary_type}: {e}")
+                # List files in dir to see what happened
+                pdf_folder = os.path.join(settings.BASE_DIR, "media", "reports")
+                if os.path.exists(pdf_folder):
+                    print(f"DEBUG: Files in {pdf_folder}: {os.listdir(pdf_folder)}")
+                raise
+
+            # Validate text in pdf
+            self.__validate_title_and_text(pdf_path, summary_type, validation_score)
 
     def test_generate_pdf_summary_with_100(self):
         """
         Test PDF summary text generation with score 100
         """
-
-        for summary_type in self.summary_types:
-
-            selected_options = self.get_selected_options(score=100)
-            self.create_report(
-                options=selected_options, invitation_code=self.invitation_code
-            )
-
-            # create and get pdf
-            pdf_path = self.create_get_pdf()
-
-            # Validate text in pdf
-            self.__validate_title_and_text(pdf_path, summary_type, 100)
+        self._run_test_with_score(100)
 
     def test_generate_pdf_summary_with_99(self):
         """
         Test PDF summary text generation with score 99
         """
-
-        for summary_type in self.summary_types:
-
-            selected_options = self.get_selected_options(score=100)
-            self.create_report(
-                options=selected_options, invitation_code=self.invitation_code
-            )
-
-            # create and get pdf
-            pdf_path = self.create_get_pdf()
-
-            # Validate text in pdf
-            self.__validate_title_and_text(pdf_path, summary_type, 100)
+        # 99% score with 10 questions results in 90%
+        self._run_test_with_score(99, validation_score=90)
 
     def test_generate_pdf_summary_with_80(self):
         """
         Test PDF summary text generation with score 80
         """
-
-        for summary_type in self.summary_types:
-
-            selected_options = self.get_selected_options(score=80)
-            self.create_report(
-                options=selected_options, invitation_code=self.invitation_code
-            )
-
-            # create and get pdf
-            pdf_path = self.create_get_pdf()
-
-            # Validate text in pdf
-            self.__validate_title_and_text(pdf_path, summary_type, 100)
+        self._run_test_with_score(80)
 
     def test_generate_pdf_summary_with_79(self):
         """
         Test PDF summary text generation with score 79
         """
-
-        for summary_type in self.summary_types:
-
-            selected_options = self.get_selected_options(score=79)
-            self.create_report(
-                options=selected_options, invitation_code=self.invitation_code
-            )
-
-            # create and get pdf
-            pdf_path = self.create_get_pdf()
-
-            # Validate text in pdf
-            self.__validate_title_and_text(pdf_path, summary_type, 79)
+        # 79% score with 10 questions results in 70%
+        self._run_test_with_score(79, validation_score=70)
 
     def test_generate_pdf_summary_with_50(self):
         """
         Test PDF summary text generation with score 50
         """
-
-        for summary_type in self.summary_types:
-
-            selected_options = self.get_selected_options(score=50)
-            self.create_report(
-                options=selected_options, invitation_code=self.invitation_code
-            )
-
-            # create and get pdf
-            pdf_path = self.create_get_pdf()
-
-            # Validate text in pdf
-            self.__validate_title_and_text(pdf_path, summary_type, 79)
+        self._run_test_with_score(50)
 
     def test_generate_pdf_summary_with_49(self):
         """
         Test PDF summary text generation with score 49
         """
-
-        for summary_type in self.summary_types:
-
-            selected_options = self.get_selected_options(score=50)
-            self.create_report(
-                options=selected_options, invitation_code=self.invitation_code
-            )
-
-            # create and get pdf
-            pdf_path = self.create_get_pdf()
-
-            # Validate text in pdf
-            self.__validate_title_and_text(pdf_path, summary_type, 49)
+        # 49% score with 10 questions results in 40%
+        self._run_test_with_score(49, validation_score=40)
 
     def test_generate_pdf_summary_with_0(self):
         """
         Test PDF summary text generation with score 0
         """
-
-        for summary_type in self.summary_types:
-
-            selected_options = self.get_selected_options(score=0)
-            self.create_report(
-                options=selected_options, invitation_code=self.invitation_code
-            )
-
-            # create and get pdf
-            pdf_path = self.create_get_pdf()
-
-            # Validate text in pdf
-            self.__validate_title_and_text(pdf_path, summary_type, 49)
+        self._run_test_with_score(0)
 
 
 class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
@@ -1851,38 +1859,34 @@ class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
             f"Expected completed, got {download.status}. Logs: {download.logs}",
         )
 
+
 from datetime import timedelta
 from django.utils import timezone
 from django.test import TestCase
 from survey.models import FormProgress, Survey
 
+
 class DeleteExpiredProgressCommandTestCase(TestCase):
     def setUp(self):
         self.survey = Survey.objects.create(name="Test Survey")
         self.email = "test@example.com"
-        
+
         # Create expired record
         self.expired = FormProgress.objects.create(
-            email="expired@example.com",
-            survey=self.survey,
-            current_screen=1,
-            data={}
+            email="expired@example.com", survey=self.survey, current_screen=1, data={}
         )
         self.expired.expires_at = timezone.now() - timedelta(days=1)
         self.expired.save()
-        
+
         # Create active record
         self.active = FormProgress.objects.create(
-            email="active@example.com",
-            survey=self.survey,
-            current_screen=1,
-            data={}
+            email="active@example.com", survey=self.survey, current_screen=1, data={}
         )
         # Default expiration is in future, so it should stay
 
     def test_delete_expired(self):
         """Test that expired records are deleted and active ones remain"""
         call_command("delete_expired_progress")
-        
+
         self.assertFalse(FormProgress.objects.filter(pk=self.expired.pk).exists())
         self.assertTrue(FormProgress.objects.filter(pk=self.active.pk).exists())
