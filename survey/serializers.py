@@ -4,6 +4,7 @@ from django.db.models import Sum, Count
 from rest_framework import serializers
 
 from survey import models
+from .choices import GENDER_CHOICES, BIRTH_RANGE_CHOICES, POSITION_CHOICES
 
 from utils.survey_calcs import SurveyCalcs
 
@@ -95,13 +96,9 @@ class HasAnswerSerializer(serializers.Serializer):
 
 
 class ParticipantDataSerializer(serializers.Serializer):
-    gender = serializers.ChoiceField(choices=["m", "f", "o"])
-    birth_range = serializers.ChoiceField(
-        choices=["1946-1964", "1965-1980", "1981-1996", "1997-2012"]
-    )
-    position = serializers.ChoiceField(
-        choices=["director", "manager", "supervisor", "operator", "other"]
-    )
+    gender = serializers.ChoiceField(choices=[c[0] for c in GENDER_CHOICES])
+    birth_range = serializers.ChoiceField(choices=[c[0] for c in BIRTH_RANGE_CHOICES])
+    position = serializers.ChoiceField(choices=[c[0] for c in POSITION_CHOICES])
     name = serializers.CharField(max_length=255)
     email = serializers.EmailField()
 

@@ -1469,6 +1469,7 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
             score(int): Participant score
         """
 
+<<<<<<< HEAD
         # text_entry_all = survey_models.TextPDFSummary.objects.filter(
         #     paragraph_type=summary_type
         # )
@@ -1479,10 +1480,21 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
         #     print(
         #         f"DEBUG: TextPDFSummary for type={summary_type}, score={text_entry.min_score}: {text_entry.text}"
         #     )
+=======
+        text_entry_all = survey_models.TextPDFSummary.objects.filter(
+            paragraph_type=summary_type, min_score__lte=score
+        ).order_by("min_score")
+
+        for text_entry in text_entry_all:
+            print(
+                f"DEBUG: TextPDFSummary for type={summary_type}, score={text_entry.min_score}: {text_entry.text}"
+            )
+>>>>>>> dari
 
         # Find the text with the highest min_score that is less than or equal to the score
         text_entry = (
             survey_models.TextPDFSummary.objects.filter(
+<<<<<<< HEAD
                 paragraph_type=summary_type, min_score__gte=score
             )
             .order_by("min_score")
@@ -1498,6 +1510,21 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
             ).values("min_score", "text")
             print(f"DEBUG: Available for {summary_type}: {list(available)}")
             self.fail(f"No text summary found for {summary_type} with score {score}")
+=======
+                paragraph_type=summary_type, min_score__lte=score
+            )
+            .order_by("min_score")
+            .last()
+        )
+
+        # Set min score
+        if not text_entry:
+            text_entry = (
+                survey_models.TextPDFSummary.objects.filter(paragraph_type=summary_type)
+                .order_by("min_score")
+                .first()
+            )
+>>>>>>> dari
 
         text_summary = text_entry.text
         title, text = text_summary.split("|")
