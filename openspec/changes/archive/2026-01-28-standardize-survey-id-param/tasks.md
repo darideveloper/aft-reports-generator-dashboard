@@ -1,0 +1,3 @@
+- [X] Update `FormProgressSerializer` in `survey/serializers.py` to use `survey_id` instead of `survey` `<!-- id: 0 -->`
+- [X] Update `FormProgressView` methods (GET, POST, DELETE) in `survey/views.py` to use `survey_id` `<!-- id: 1 -->`
+- [X] Verify endpoints with manual testing or existing tests (if any need updating) `<!-- id: 2 -->`

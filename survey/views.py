@@ -153,11 +153,11 @@ class ResponseView(APIView):
 class FormProgressView(APIView):
     def get(self, request):
         email = request.query_params.get("email")
-        survey_id = request.query_params.get("survey")
+        survey_id = request.query_params.get("survey_id")
 
         if not email or not survey_id:
             return Response(
-                {"detail": "email and survey parameters are required."},
+                {"detail": "email and survey_id parameters are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -172,11 +172,11 @@ class FormProgressView(APIView):
 
     def post(self, request):
         email = request.data.get("email")
-        survey_id = request.data.get("survey")
+        survey_id = request.data.get("survey_id")
 
         if not email or not survey_id:
             return Response(
-                {"detail": "email and survey are required."},
+                {"detail": "email and survey_id are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -210,11 +210,11 @@ class FormProgressView(APIView):
 
     def delete(self, request):
         email = request.query_params.get("email")
-        survey_id = request.query_params.get("survey")
+        survey_id = request.query_params.get("survey_id")
 
         if not email or not survey_id:
             return Response(
-                {"detail": "email and survey parameters are required."},
+                {"detail": "email and survey_id parameters are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

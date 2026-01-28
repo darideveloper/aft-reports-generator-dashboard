@@ -1014,7 +1014,7 @@ class FormProgressViewTestCase(TestSurveyViewsBase):
         self.email = "test@example.com"
         self.progress_data = {
             "email": self.email,
-            "survey": self.survey.id,
+            "survey_id": self.survey.id,
             "current_screen": 2,
             "data": {
                 "guestCodeResponse": {"guestCode": "TEST-CODE"},
@@ -1056,7 +1056,7 @@ class FormProgressViewTestCase(TestSurveyViewsBase):
         self.client.post(self.endpoint, self.progress_data, format="json")
 
         response = self.client.get(
-            self.endpoint, {"email": self.email, "survey": self.survey.id}
+            self.endpoint, {"email": self.email, "survey_id": self.survey.id}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["current_screen"], 2)
@@ -1064,7 +1064,7 @@ class FormProgressViewTestCase(TestSurveyViewsBase):
     def test_get_progress_not_found(self):
         """Test retrieving non-existent progress"""
         response = self.client.get(
-            self.endpoint, {"email": "none@example.com", "survey": self.survey.id}
+            self.endpoint, {"email": "none@example.com", "survey_id": self.survey.id}
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -1076,7 +1076,7 @@ class FormProgressViewTestCase(TestSurveyViewsBase):
         )
 
         response = self.client.delete(
-            self.endpoint + f"?email={self.email}&survey={self.survey.id}"
+            self.endpoint + f"?email={self.email}&survey_id={self.survey.id}"
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(

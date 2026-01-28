@@ -211,9 +211,13 @@ class ResponseSerializer(serializers.Serializer):
 
 
 class FormProgressSerializer(serializers.ModelSerializer):
+    survey_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Survey.objects.all(), source="survey"
+    )
+
     class Meta:
         model = models.FormProgress
-        fields = ["email", "survey", "current_screen", "data", "expires_at"]
+        fields = ["email", "survey_id", "current_screen", "data", "expires_at"]
         read_only_fields = ["expires_at"]
 
     def validate(self, data):
