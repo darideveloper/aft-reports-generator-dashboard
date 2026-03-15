@@ -18,6 +18,7 @@ POSITION_CHOICES = {
     "Gerente": "manager",
     "Supervisor": "supervisor",
     "Operador": "operator",
+    "Vicepresidente": "vicepresidente",
     "Otro": "other",
 }
 

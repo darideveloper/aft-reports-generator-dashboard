@@ -5,11 +5,14 @@ from django.contrib import admin
 from django.conf import settings
 
 from utils.text_generation import get_uuid
-from core.choices import STATUS_CHOICES
+from core.choices import (
+    STATUS_CHOICES,
+    GENDER_CHOICES,
+    BIRTH_RANGE_CHOICES,
+    POSITION_CHOICES,
+)
 
 import requests
-
-from .choices import GENDER_CHOICES, BIRTH_RANGE_CHOICES, POSITION_CHOICES
 
 
 class Company(models.Model):

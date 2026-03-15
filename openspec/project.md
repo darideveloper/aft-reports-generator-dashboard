@@ -52,7 +52,7 @@ AFT Reports Generator Dashboard is a comprehensive Django-based web application 
 ## Project Conventions
 
 ### Code Style
-- **Language**: Python 3.x
+- **Language**: Python 3.12 (standard for the project)
 - **Naming Conventions**:
   - Models: PascalCase (e.g., `QuestionGroup`, `ReportQuestionGroupTotal`)
   - Variables/functions: snake_case (e.g., `question_group_index`, `get_survey_for_admin`)
@@ -61,18 +61,21 @@ AFT Reports Generator Dashboard is a comprehensive Django-based web application 
 - **Docstrings**: Use for complex functions and classes
 - **Line Length**: Follow PEP 8 guidelines
 - **Imports**: Organized in groups (standard library, Django, third-party, local)
+- **Styling & Classes**: Prefer `clsx` over `class:list` for complex or conditional classes (for any frontend components).
+- **Git Commit Patterns**: Follow [Conventional Commits](https://www.conventionalcommits.org/) format (`type(scope): subject`).
 
 ### Architecture Patterns
 - **Monolithic Django Application**: Single Django project with multiple apps (`core`, `survey`, `utils`)
 - **App Structure**:
-  - `core`: Base app with shared static files and utilities
-  - `survey`: Main business logic (models, views, serializers, admin)
-  - `utils`: Helper functions and utilities
-- **Model-Driven Design**: Rich domain models with business logic in model methods
-- **Admin-Centric**: Heavy use of Django Admin for CRUD operations
-- **API Layer**: Django REST Framework for external integrations
-- **Signal-Based Automation**: Use Django signals for automated workflows (e.g., report generation)
-- **Environment-Based Configuration**: Separate `.env.dev` and `.env.prod` files
+  - `core`: Base app with shared static files and centralized choices (`core/choices.py`).
+  - `survey`: Main business logic (models, views, serializers, admin).
+  - `utils`: Helper functions, PDF generation, and calculation logic.
+- **Centralized Choice Definitions**: All shared choice definitions (GENDER, BIRTH_RANGE, POSITION) MUST be defined in `core/choices.py` to ensure consistency across the application.
+- **Model-Driven Design**: Rich domain models with business logic in model methods.
+- **Admin-Centric**: Heavy use of Django Jazzmin for a modern admin dashboard.
+- **API Layer**: Django REST Framework for mobile/frontend integration and external workflows.
+- **Signal-Based Automation**: Use Django signals for automated workflows (e.g., triggering report generation).
+- **Environment-Based Configuration**: Use `python-dotenv` with `.env` files for environment-specific settings.
 
 ### Testing Strategy
 - **Test Framework**: Django's built-in test framework
