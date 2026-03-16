@@ -1,7 +1,8 @@
-# Scoring Logic Spec
+# scoring-logic Specification
 
-## MODIFIED Requirements
-
+## Purpose
+TBD - created by archiving change fix-pdf-summary-scoring-logic. Update Purpose after archive.
+## Requirements
 ### Requirement: Dynamic Text Selection
 The system MUST select the PDF summary text based on the highest configured `min_score` that the participant has achieved, rather than using hardcoded score buckets.
 
@@ -27,3 +28,4 @@ Tests MUST verify the actual score logic rather than relying on assumed buckets 
 - **Given** a participant with a score of exactly 99
 - **When** the report is generated
 - **Then** it should select the text appropriate for 99 (likely the > 70 or > 80 bracket depending on config), and NOT blindly validate against the 100-score text unless they share the same config.
+

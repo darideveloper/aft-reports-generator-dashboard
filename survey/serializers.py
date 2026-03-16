@@ -3,8 +3,13 @@ from django.db.models import Sum, Count
 
 from rest_framework import serializers
 
+from core.choices import (
+    GENDER_CHOICES,
+    BIRTH_RANGE_CHOICES,
+    POSITION_CHOICES,
+)
+
 from survey import models
-from .choices import GENDER_CHOICES, BIRTH_RANGE_CHOICES, POSITION_CHOICES
 
 from utils.survey_calcs import SurveyCalcs
 
