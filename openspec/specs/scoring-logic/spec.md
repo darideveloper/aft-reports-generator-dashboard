@@ -24,8 +24,15 @@ The system MUST select the PDF summary text based on the highest configured `min
 ### Requirement: Precise Testing
 Tests MUST verify the actual score logic rather than relying on assumed buckets matching hardcoded values.
 
-#### Scenario: Test with score 99
+#### Scenario: Participant score is below the next threshold (e.g. 69)
+- **Given** a participant score of 69
+- **And** thresholds defined at 50, 70, and 100
+- **When** the test calculates the expected `min_score`
+- **Then** it should expect the text associated with `min_score=50` (the highest threshold $\le$ score)
+
+#### Scenario: Participant score is just below 100 (e.g. 99)
 - **Given** a participant with a score of exactly 99
-- **When** the report is generated
-- **Then** it should select the text appropriate for 99 (likely the > 70 or > 80 bracket depending on config), and NOT blindly validate against the 100-score text unless they share the same config.
+- **And** thresholds defined at 50, 70, and 100
+- **When** the test calculates the expected `min_score`
+- **Then** it should expect the text associated with `min_score=70` (the highest threshold $\le$ score), and NOT blindly validate against the 100-score text.
 

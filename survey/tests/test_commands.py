@@ -693,16 +693,12 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
             score: Score value to test (0, 49, 50, 51, 69, 70, 71, 99, 100)
         """
         # Determine expected min_score based on score
-        # Determine expected min_score based on score
-        # Since we have 10 questions, the score will be a multiple of 10
-        effective_score = int(score / 10) * 10
-
-        if effective_score <= 50:
-            expected_min_score = 50
-        elif effective_score <= 70:
+        if score >= 100:
+            expected_min_score = 100
+        elif score >= 70:
             expected_min_score = 70
         else:
-            expected_min_score = 100
+            expected_min_score = 50
 
         selected_options = self.get_selected_options(score=score)
         self.create_report(
