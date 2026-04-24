@@ -8,6 +8,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.colors import Color
 import numpy as np
+from django.conf import settings
 from .graphics_generator import generate_bell_curve_plot
 
 
@@ -44,7 +45,7 @@ def footer_setting(c: canvas.Canvas, name: str, width: float, color: Color):
         width (float): PDF page width
         color (Color): RGB color to draw text
     """
-    footer_text = f"Reporte AFT de {name}"
+    footer_text = f"Reporte {settings.PDF_REPORT_ACRONYM} de {name}"
     text_width = c.stringWidth(footer_text, "arial", 9)
     x = (width - text_width) / 2 + 15
     c.setFont("arial", 9)
@@ -170,7 +171,7 @@ def generate_report(
             width (float): PDF page width
             color (Color): RGB color to draw text
         """
-        footer_text = f"Reporte AFT de {name}"
+        footer_text = f"Reporte {settings.PDF_REPORT_ACRONYM} de {name}"
         text_width = c.stringWidth(footer_text, "arial", 9)
         x = (width - text_width) / 2 + 15
         c.setFont("arial", 9)
@@ -191,6 +192,11 @@ def generate_report(
     c.setFont("arialbd", 22)
     c.drawRightString(width - 70, 300, name)
     c.drawRightString(width - 70, 270, date)
+
+    # Draw dynamic title
+    c.setFillColor(Color(0, 0, 0))
+    c.setFont("arialbd", 28)
+    c.drawCentredString(width / 2, 435, settings.PDF_REPORT_TITLE)
 
     image_width = 130
     x = (width - image_width) / 2

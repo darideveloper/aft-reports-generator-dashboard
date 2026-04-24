@@ -27,6 +27,8 @@ TEST_HEADLESS = os.getenv("TEST_HEADLESS", "False") == "True"
 PAGE_SIZE = int(os.getenv("PAGE_SIZE", 10))
 BAR_CHART_ENDPOINT = os.getenv("BAR_CHART_ENDPOINT")
 N8N_BASE_WEBHOOKS = os.getenv("N8N_BASE_WEBHOOKS")
+PDF_REPORT_TITLE = os.getenv("PDF_REPORT_TITLE", "Alfabetización Tecnológica")
+PDF_REPORT_ACRONYM = os.getenv("PDF_REPORT_ACRONYM", "AFT")
 
 # Testing env variables
 TEST_BAR_CHART_ENDPOINT = os.getenv("TEST_BAR_CHART_ENDPOINT")
