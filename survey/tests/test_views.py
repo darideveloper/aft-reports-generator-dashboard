@@ -63,6 +63,26 @@ class InvitationCodeViewTestCase(TestSurveyViewsBase):
         self.assertIn("error", response.data["status"])
 
 
+class OptionsViewTestCase(TestSurveyViewsBase):
+    def setUp(self):
+        super().setUp(
+            endpoint="/api/options/", restricted_get=False, restricted_post=True
+        )
+
+    def test_get_options(self):
+        """Test retrieving options returns correct structure"""
+        response = self.client.get(self.endpoint)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        keys = ["status", "gender", "birth_range", "position"]
+        for key in keys:
+            self.assertIn(key, response.data)
+            self.assertIsInstance(response.data[key], list)
+            if len(response.data[key]) > 0:
+                self.assertIn("value", response.data[key][0])
+                self.assertIn("label", response.data[key][0])
+
+
 class SurveyViewTestCase(TestSurveyViewsBase):
     def setUp(self):
         # Set endpoint

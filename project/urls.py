@@ -30,6 +30,7 @@ urlpatterns = [
         survey_views.InvitationCodeView.as_view(),
         name="invitation-code",
     ),
+    path("api/options/", survey_views.OptionsView.as_view(), name="options"),
     path("api/response/", survey_views.ResponseView.as_view()),
     path(
         "api/participant/has-answer/",

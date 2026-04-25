@@ -4,6 +4,25 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from survey import serializers, models
+from core import choices
+
+
+class OptionsView(APIView):
+    def get(self, request):
+        def format_choices(choices_list):
+            return [{"value": c[0], "label": c[1]} for c in choices_list]
+
+        data = {
+            "status": choices.STATUS_CHOICES,
+            "gender": choices.GENDER_CHOICES,
+            "birth_range": choices.BIRTH_RANGE_CHOICES,
+            "position": choices.POSITION_CHOICES,
+        }
+
+        # Format each list
+        formatted_data = {key: format_choices(val) for key, val in data.items()}
+
+        return Response(formatted_data, status=status.HTTP_200_OK)
 
 
 class InvitationCodeView(APIView):
