@@ -7,6 +7,7 @@ from core.choices import (
     GENDER_CHOICES,
     BIRTH_RANGE_CHOICES,
     POSITION_CHOICES,
+    DEPARTMENT_CHOICES,
 )
 
 from survey import models
@@ -104,6 +105,9 @@ class ParticipantDataSerializer(serializers.Serializer):
     gender = serializers.ChoiceField(choices=[c[0] for c in GENDER_CHOICES])
     birth_range = serializers.ChoiceField(choices=[c[0] for c in BIRTH_RANGE_CHOICES])
     position = serializers.ChoiceField(choices=[c[0] for c in POSITION_CHOICES])
+    department = serializers.ChoiceField(
+        choices=[c[0] for c in DEPARTMENT_CHOICES], required=False, allow_null=True
+    )
     name = serializers.CharField(max_length=255)
     email = serializers.EmailField()
 

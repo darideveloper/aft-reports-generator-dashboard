@@ -17,6 +17,7 @@ class OptionsView(APIView):
             "gender": choices.GENDER_CHOICES,
             "birth_range": choices.BIRTH_RANGE_CHOICES,
             "position": choices.POSITION_CHOICES,
+            "department": choices.DEPARTMENT_CHOICES,
         }
 
         # Format each list
