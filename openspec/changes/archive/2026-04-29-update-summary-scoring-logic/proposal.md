@@ -2,10 +2,10 @@
 
 Update the calculation logic for the final summary sections (6 categories) in the PDF report. Instead of using the overall final score, each section will now use an average of scores from specific related topics (QuestionGroups). These calculated averages will be stored in the database for future use.
 
-## Problem Statement
+## Why
 Currently, the 6 summary categories on pages 20-21 of the PDF are selected based on the `Report.total` (the overall score). The business requirement is to use specific averages of the 13 available topics to determine which paragraph to show for each category.
 
-## Proposed Changes
+## What Changes
 1. **Model Updates**:
     - Modify `TextPDFSummary` to include a `ManyToManyField` to `QuestionGroup`. This allows defining which topics contribute to each summary category directly from the admin.
     - Create a new model `ReportSummaryScore` to store the calculated average for each category per report.

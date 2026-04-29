@@ -1,7 +1,8 @@
-# Spec: Summary Scoring Logic
+# summary-scoring-logic Specification
 
-## MODIFIED Requirements
-
+## Purpose
+TBD - created by archiving change update-summary-scoring-logic. Update Purpose after archive.
+## Requirements
 ### Requirement: Calculate Summary Categories based on Thematic Averages
 The system MUST calculate a score for each of the 6 summary categories by averaging the scores of their related topics, and select the summary text where the score is less than or equal to the threshold (`score <= min_score`).
 
@@ -59,3 +60,4 @@ The system MUST render the summary categories in the PDF in the following fixed 
 - **When** the PDF is generated.
 - **Then** the first 4 categories (CD, TN, CS, IP) must appear on page 20 in that specific sequence.
 - **And** the remaining 2 categories (TMA, EDC) must appear on page 21 in that specific sequence.
+
