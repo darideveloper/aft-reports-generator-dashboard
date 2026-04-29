@@ -371,3 +371,32 @@ class TestSurveyModelBase(APITestCase):
             reports_download.reports.set(reports)
 
         return reports_download
+
+    def create_report_summary_score(
+        self,
+        report: survey_models.Report = None,
+        paragraph_type: str = "CD",
+        score: float = 0,
+    ) -> survey_models.ReportSummaryScore:
+        """Create a report summary score object"""
+        if not report:
+            report = self.create_report()
+        return survey_models.ReportSummaryScore.objects.create(
+            report=report, paragraph_type=paragraph_type, score=score
+        )
+
+    def create_text_pdf_summary(
+        self,
+        text: str = "Test summary {x}",
+        min_score: float = 0,
+        paragraph_type: str = "CD",
+        question_groups: list[survey_models.QuestionGroup] = [],
+    ) -> survey_models.TextPDFSummary:
+        """Create a text pdf summary object"""
+        text = self.__replace_random_string__(text)
+        summary = survey_models.TextPDFSummary.objects.create(
+            text=text, min_score=min_score, paragraph_type=paragraph_type
+        )
+        if question_groups:
+            summary.question_groups.set(question_groups)
+        return summary

@@ -78,6 +78,51 @@ class SurveyCalcs:
             report_question_group_total.total = total
             report_question_group_total.save()
 
+    def save_report_summary_scores(self):
+        """
+        Calculate and save aggregate scores for summary categories
+        """
+        from survey.models import (
+            TextPDFSummary,
+            ReportQuestionGroupTotal,
+            ReportSummaryScore,
+            QuestionGroup,
+        )
+
+        # Get all distinct paragraph types
+        types = (
+            TextPDFSummary.objects.values_list("paragraph_type", flat=True)
+            .distinct()
+            .order_by("paragraph_type")
+        )
+
+        for p_type in types:
+            # Get all question groups mapped to this type across any summary record
+            qgs = QuestionGroup.objects.filter(
+                textpdfsummary__paragraph_type=p_type
+            ).distinct()
+
+            if not qgs.exists():
+                # Fallback to overall total if no mapping exists
+                avg_score = self.report.total
+            else:
+                # Get scores for these groups for the current report
+                scores = ReportQuestionGroupTotal.objects.filter(
+                    report=self.report, question_group__in=qgs
+                ).values_list("total", flat=True)
+
+                if not scores:
+                    avg_score = 0
+                else:
+                    avg_score = sum(scores) / len(scores)
+
+            # Save/Update the summary score
+            summary_score, _ = ReportSummaryScore.objects.get_or_create(
+                report=self.report, paragraph_type=p_type
+            )
+            summary_score.score = round(avg_score, 2)
+            summary_score.save()
+
     def get_participant_total(self) -> float:
         """
         Get the total for the current participant
@@ -148,22 +193,22 @@ class SurveyCalcs:
             question_group = group_total.question_group
 
             # Get corresponding text
-            # Find the text with the highest min_score that is less than or equal to the score
+            # Find the text with the lowest min_score that is greater than or equal to the score
             text_entry = (
                 models.TextPDFQuestionGroup.objects.filter(
-                    question_group=question_group, min_score__lte=score
+                    question_group=question_group, min_score__gte=score
                 )
-                .order_by("-min_score")
+                .order_by("min_score")
                 .first()
             )
 
-            # Fallback: if no text found (e.g. score below all thresholds), use the lowest implementation
+            # Fallback: if no text found (e.g. score above all thresholds), use the highest implementation
             if not text_entry:
                 text_entry = (
                     models.TextPDFQuestionGroup.objects.filter(
                         question_group=question_group
                     )
-                    .order_by("min_score")
+                    .order_by("-min_score")
                     .first()
                 )
 
@@ -194,38 +239,59 @@ class SurveyCalcs:
                     },
                 }
         """
-
-        total = models.Report.objects.filter(participant=self.participant)[0].total
+        from survey.models import ReportSummaryScore, TextPDFSummary
 
         result = {}
 
-        # Get all distinct paragraph types available
-        types = models.TextPDFSummary.objects.values_list(
-            "paragraph_type", flat=True
-        ).distinct()
+        # Get all summary scores for this report
+        summary_scores = ReportSummaryScore.objects.filter(report=self.report)
 
         best_matches = {}
 
-        for p_type in types:
-            # Find best match for this type: highest min_score <= total
+        for summary_score in summary_scores:
+            p_type = summary_score.paragraph_type
+            score = summary_score.score
+
+            # Find best match for this type: lowest min_score >= score
             match = (
-                models.TextPDFSummary.objects.filter(
-                    paragraph_type=p_type, min_score__lte=total
-                )
-                .order_by("-min_score")
+                TextPDFSummary.objects.filter(paragraph_type=p_type, min_score__gte=score)
+                .order_by("min_score")
                 .first()
             )
 
             if not match:
-                # Fallback: lowest min_score available for this type
+                # Fallback: highest min_score available for this type
                 match = (
-                    models.TextPDFSummary.objects.filter(paragraph_type=p_type)
-                    .order_by("min_score")
+                    TextPDFSummary.objects.filter(paragraph_type=p_type)
+                    .order_by("-min_score")
                     .first()
                 )
 
             if match:
                 best_matches[p_type] = match.text
+
+        # If some types are missing in ReportSummaryScore, we should ideally still try to find them
+        # (though they should be there if save_report_summary_scores was called)
+        existing_types = [s.paragraph_type for s in summary_scores]
+        all_types = TextPDFSummary.objects.values_list("paragraph_type", flat=True).distinct()
+        
+        for p_type in all_types:
+            if p_type not in existing_types:
+                # Fallback to overall total if no specific score exists yet
+                total = self.report.total
+                match = (
+                    TextPDFSummary.objects.filter(paragraph_type=p_type, min_score__gte=total)
+                    .order_by("min_score")
+                    .first()
+                )
+                if not match:
+                    match = (
+                        TextPDFSummary.objects.filter(paragraph_type=p_type)
+                        .order_by("-min_score")
+                        .first()
+                    )
+                if match:
+                    best_matches[p_type] = match.text
 
         for paragraph_type_code, text in best_matches.items():
             paragraph_type = paragraph_type_code.lower()  # e.g. "Cultura" → "cultura"

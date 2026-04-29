@@ -308,11 +308,16 @@ def generate_report(
     paragraph_y = 620
     paragraph_x = 72
 
-    for element in list(resulting_titles.keys())[:4]:
-        c.setFont("arialbd", 14)
-        c.drawString(title_x, title_y, f"{resulting_titles[element]['subtitle']}")
-        text = resulting_titles[element]["paragraph"]
-        justify_text(c, text, x=paragraph_x, y=paragraph_y)
+    # Define the required order of categories
+    ordered_keys = ["cd", "tn", "cs", "ip", "tma", "edc"]
+
+    for element in ordered_keys[:4]:
+        if element in resulting_titles:
+            c.setFont("arialbd", 14)
+            c.drawString(title_x, title_y, f"{resulting_titles[element]['subtitle']}")
+            text = resulting_titles[element]["paragraph"]
+            justify_text(c, text, x=paragraph_x, y=paragraph_y)
+        
         title_y -= 145
         paragraph_y -= 145
 
@@ -327,11 +332,13 @@ def generate_report(
     paragraph_y = 638
     paragraph_x = 72
 
-    for element in list(resulting_titles.keys())[4:6]:
-        c.setFont("arialbd", 14)
-        c.drawString(title_x, title_y, f"{resulting_titles[element]['subtitle']}")
-        text = resulting_titles[element]["paragraph"]
-        justify_text(c, text, x=paragraph_x, y=paragraph_y)
+    for element in ordered_keys[4:6]:
+        if element in resulting_titles:
+            c.setFont("arialbd", 14)
+            c.drawString(title_x, title_y, f"{resulting_titles[element]['subtitle']}")
+            text = resulting_titles[element]["paragraph"]
+            justify_text(c, text, x=paragraph_x, y=paragraph_y)
+        
         title_y -= 161
         paragraph_y -= 161
 

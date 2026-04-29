@@ -692,13 +692,18 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
             question_group_index: Index of the question group (0-12)
             score: Score value to test (0, 49, 50, 51, 69, 70, 71, 99, 100)
         """
-        # Determine expected min_score based on score
-        if score >= 100:
-            expected_min_score = 100
-        elif score >= 70:
+        # Determine actual score based on the floor logic in get_selected_options
+        # len(selected_options) is 10 for each group in setUp
+        effective_score = int(score * 10 / 100) * 10
+
+        # Determine expected min_score based on effective_score (New Logic: effective_score <= min_score)
+        # Thresholds for TextPDFQuestionGroup are 100, 70, 50
+        if effective_score <= 50:
+            expected_min_score = 50
+        elif effective_score <= 70:
             expected_min_score = 70
         else:
-            expected_min_score = 50
+            expected_min_score = 100
 
         selected_options = self.get_selected_options(score=score)
         self.create_report(
@@ -708,13 +713,15 @@ class GenerateNextReportTextPDFQuestionGroupTestCase(GenerateNextReportBase):
         # create and get pdf
         pdf_path = self.create_get_pdf()
 
+        target_text = survey_models.TextPDFQuestionGroup.objects.get(
+            question_group=self.question_groups[question_group_index],
+            min_score=expected_min_score,
+        ).text
+
         # Validate text in pdf
         text_in_pdf = self.validate_text_in_pdf(
             pdf_path,
-            survey_models.TextPDFQuestionGroup.objects.get(
-                question_group=self.question_groups[question_group_index],
-                min_score=expected_min_score,
-            ).text,
+            target_text,
         )
 
         self.assertTrue(text_in_pdf)
@@ -1465,29 +1472,20 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
             score(int): Participant score
         """
 
-        text_entry_all = survey_models.TextPDFSummary.objects.filter(
-            paragraph_type=summary_type, min_score__lte=score
-        ).order_by("min_score")
-
-        for text_entry in text_entry_all:
-            print(
-                f"DEBUG: TextPDFSummary for type={summary_type}, score={text_entry.min_score}: {text_entry.text}"
-            )
-
-        # Find the text with the highest min_score that is less than or equal to the score
+        # Find the text with the lowest min_score that is greater than or equal to the score
         text_entry = (
             survey_models.TextPDFSummary.objects.filter(
-                paragraph_type=summary_type, min_score__lte=score
+                paragraph_type=summary_type, min_score__gte=score
             )
             .order_by("min_score")
-            .last()
+            .first()
         )
 
-        # Set min score
+        # Fallback: if no match found (score above all thresholds), use the highest implementation
         if not text_entry:
             text_entry = (
                 survey_models.TextPDFSummary.objects.filter(paragraph_type=summary_type)
-                .order_by("min_score")
+                .order_by("-min_score")
                 .first()
             )
 
@@ -1886,3 +1884,126 @@ class DeleteExpiredProgressCommandTestCase(TestCase):
 
         self.assertFalse(FormProgress.objects.filter(pk=self.expired.pk).exists())
         self.assertTrue(FormProgress.objects.filter(pk=self.active.pk).exists())
+
+class GenerateNextReportDifferentiatedSummaryTestCase(GenerateNextReportBase):
+    """
+    Integration test for differentiated summary results in a single PDF
+    """
+
+    def test_differentiated_summaries(self):
+        # Category CD (Topics 1, 2) -> Score 100
+        # Category CS (Topics 5, 7) -> Score 0
+        
+        # Load data (already in setUp of base, but we ensure it)
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+        
+        # Link topics (the command we created)
+        call_command("link_summary_topics")
+        
+        # Clear any existing answers from setUp
+        survey_models.Answer.objects.filter(participant=self.participant).delete()
+        
+        # CD: Topics 1, 2 (Indices 1, 2)
+        qg1 = survey_models.QuestionGroup.objects.get(survey_index=1)
+        qg2 = survey_models.QuestionGroup.objects.get(survey_index=2)
+        
+        # CS: Topics 5, 7 (Indices 5, 7)
+        qg5 = survey_models.QuestionGroup.objects.get(survey_index=5)
+        qg7 = survey_models.QuestionGroup.objects.get(survey_index=7)
+        
+        # Helper to set all answers for a group to a specific score
+        def set_group_score(qg, points):
+            questions = survey_models.Question.objects.filter(question_group=qg)
+            for q in questions:
+                opt = survey_models.QuestionOption.objects.filter(question=q, points=points).first()
+                if not opt:
+                    opt = survey_models.QuestionOption.objects.filter(question=q).first()
+                survey_models.Answer.objects.create(participant=self.participant, question_option=opt)
+
+        # CD -> 100% (using points=1 as per setup in GenerateNextReportBase)
+        set_group_score(qg1, 1)
+        set_group_score(qg2, 1)
+        
+        # CS -> 0% (using points=0 if exists, else it might stay low)
+        # Actually in GenerateNextReportBase.__create_question_and_options, 
+        # questions have options with points=1. We need options with 0 points.
+        # Let's ensure they exist.
+        for qg in [qg1, qg2, qg5, qg7]:
+            for q in survey_models.Question.objects.filter(question_group=qg):
+                survey_models.QuestionOption.objects.get_or_create(question=q, text="no", points=0)
+
+        set_group_score(qg1, 1)
+        set_group_score(qg2, 1)
+        set_group_score(qg5, 0)
+        set_group_score(qg7, 0)
+        
+        # Create report object (pending)
+        report = survey_models.Report.objects.create(
+            participant=self.participant,
+            survey=self.survey,
+            status="pending"
+        )
+
+        # Calculate topic totals
+        survey_calcs = SurveyCalcs(self.participant, self.survey, report)
+        survey_calcs.save_report_question_group_totals()
+        report.total = survey_calcs.get_participant_total()
+        report.save()
+        
+        # Run command to generate PDF (it will call save_report_summary_scores)
+        pdf_path = self.create_get_pdf()
+        report.refresh_from_db()
+        
+        self.assertEqual(report.status, "completed")
+        
+        # Verify CD summary (High) is in PDF
+        # We need to find which summary corresponds to 100%
+        summary_cd = survey_models.TextPDFSummary.objects.filter(paragraph_type="CD", min_score__lte=100).order_by("-min_score").first()
+        title_cd, _ = summary_cd.text.split("|")
+        self.assertTrue(self.validate_text_in_pdf(pdf_path, title_cd.strip()), f"Title '{title_cd.strip()}' not found for CD (100%)")
+        
+        # Verify CS summary (Low) is in PDF
+        # Note: the lowest summary in fixtures has min_score=49
+        summary_cs = survey_models.TextPDFSummary.objects.filter(paragraph_type="CS").order_by("min_score").first()
+        title_cs, _ = summary_cs.text.split("|")
+        self.assertTrue(self.validate_text_in_pdf(pdf_path, title_cs.strip()), f"Title '{title_cs.strip()}' not found for CS (0%)")
+
+
+    def test_rerun_updates_scores(self):
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+        call_command("link_summary_topics")
+        
+        report = survey_models.Report.objects.create(
+            participant=self.participant,
+            survey=self.survey,
+            status="pending"
+        )
+        
+        # Calculate topic totals
+        survey_calcs = SurveyCalcs(self.participant, self.survey, report)
+        survey_calcs.save_report_question_group_totals()
+        report.total = survey_calcs.get_participant_total()
+        report.save()
+
+        # Initial call
+        call_command("generate_next_report")
+        
+        self.assertEqual(survey_models.ReportSummaryScore.objects.filter(report=report, paragraph_type="CD").count(), 1)
+        score_record = survey_models.ReportSummaryScore.objects.get(report=report, paragraph_type="CD")
+        
+        # Mark as pending again to re-process
+        report.status = "pending"
+        report.save()
+        
+        # Change something to see update
+        score_record.score = -1
+        score_record.save()
+        
+        call_command("generate_next_report")
+        
+        score_record.refresh_from_db()
+        self.assertNotEqual(score_record.score, -1)
+        self.assertEqual(survey_models.ReportSummaryScore.objects.filter(report=report, paragraph_type="CD").count(), 1)
+

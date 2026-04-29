@@ -95,6 +95,9 @@ class Command(BaseCommand):
             url = f"{settings.BAR_CHART_ENDPOINT}{url_params}"
             render_image_from_url(url, image_temp_path, width=1000, height=1300)
 
+            # Save summary scores
+            survey_calcs.save_report_summary_scores()
+
             # Generate PDF
             message = "Generating PDF"
             logs += f"{message}\n"

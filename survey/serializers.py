@@ -192,6 +192,9 @@ class ResponseSerializer(serializers.Serializer):
             report.total = total
             report.save()
 
+            # Save summary scores
+            survey_calcs.save_report_summary_scores()
+
             # Update company average total
             total_sum = models.Report.objects.filter(
                 participant__company=participant.company

@@ -298,12 +298,22 @@ class TextPDFSummaryAdmin(admin.ModelAdmin):
     search_fields = ("text",)
     readonly_fields = ("created_at", "updated_at")
     ordering = ("paragraph_type", "-min_score")
+    filter_horizontal = ("question_groups",)
 
     def text_summary(self, obj):
         return obj.text[:100] + "..."
 
     text_summary.short_description = "Texto"
     text_summary.admin_order_field = "text"
+
+
+@admin.register(models.ReportSummaryScore)
+class ReportSummaryScoreAdmin(admin.ModelAdmin):
+    list_display = ("report", "paragraph_type", "score", "created_at")
+    list_filter = ("paragraph_type", "created_at", "updated_at")
+    search_fields = ("report__participant__name", "paragraph_type")
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("report", "paragraph_type")
 
 
 @admin.register(models.CompanyDesiredScore)

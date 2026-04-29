@@ -1,6 +1,8 @@
 from unittest import mock
 from django.conf import settings
+from django.core.management import call_command
 from core.tests_base.test_models import TestSurveyModelBase
+from survey import models as survey_models
 
 
 class ReportsDownloadModelTestCase(TestSurveyModelBase):
@@ -41,3 +43,52 @@ class ReportsDownloadModelTestCase(TestSurveyModelBase):
 
         # Verify status update based on response
         self.assertEqual(download.status, "error")
+
+
+class ReportSummaryScoreModelTestCase(TestSurveyModelBase):
+    def test_report_summary_score_creation(self):
+        from django.contrib.auth.models import User
+        # Need to load initial data for create_report to work (it depends on survey ID=1)
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+
+        # Create superuser and login
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
+
+        self.company = self.create_company()
+
+        report = self.create_report()
+        
+        # Verify that summary scores were created automatically by the serializer
+        summary_scores = survey_models.ReportSummaryScore.objects.filter(report=report)
+        self.assertTrue(summary_scores.exists())
+        
+        # Check specific category
+        cd_score = summary_scores.filter(paragraph_type="CD").first()
+        self.assertIsNotNone(cd_score)
+        # In a fresh test with no answers, score might be 0 or fallback to report.total
+        self.assertEqual(cd_score.score, report.total)
+
+
+class TextPDFSummaryModelTestCase(TestSurveyModelBase):
+    def test_text_pdf_summary_mapping(self):
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+
+        qg1 = survey_models.QuestionGroup.objects.get(survey_index=1)
+        qg2 = survey_models.QuestionGroup.objects.get(survey_index=2)
+
+        summary = self.create_text_pdf_summary(
+            paragraph_type="CD", question_groups=[qg1, qg2]
+        )
+
+        self.assertEqual(summary.question_groups.count(), 2)
+        self.assertIn(qg1, summary.question_groups.all())
+        self.assertIn(qg2, summary.question_groups.all())
