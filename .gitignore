@@ -21,6 +21,8 @@ temp.*
 
 /venv
 
-# AI CLI tool directories
+# AI CLI tool directories and config files
 .claude/
 .gemini/
+CLAUDE.md
+AGENTS.md
