@@ -20,3 +20,7 @@ temp.*
 /temp_files
 
 /venv
+
+# AI CLI tool directories
+.claude/
+.gemini/
