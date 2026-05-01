@@ -1,0 +1,1394 @@
+
+[
+{
+  "model": "survey.question",
+  "pk": 3,
+  "fields": {
+    "question_group": 2,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "La alfabetización tecnológica implica solamente saber cómo usar dispositivos o software.",
+    "details": "",
+    "created_at": "2025-07-22T19:59:48.749Z",
+    "updated_at": "2026-05-01T17:25:18.436Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 4,
+  "fields": {
+    "question_group": 2,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "La alfabetización tecnológica se refiere a la capacidad de comprender, usar y gestionar la tecnología de manera eficaz tanto en contextos personales como profesionales.",
+    "details": "",
+    "created_at": "2025-07-22T20:05:13.401Z",
+    "updated_at": "2025-07-22T20:05:13.401Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 5,
+  "fields": {
+    "question_group": 2,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Uno de los elementos clave de la alfabetización tecnológica es **el pensamiento crítico sobre la tecnología**. Esto implica evaluar las ventajas, limitaciones y riesgos de adoptar nuevas tecnologías.",
+    "details": "",
+    "created_at": "2025-07-22T20:09:55.694Z",
+    "updated_at": "2025-07-22T20:09:55.694Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 6,
+  "fields": {
+    "question_group": 2,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Los líderes no necesitan prepararse para entender e impulsar las iniciativas de los expertos en tecnología.",
+    "details": "",
+    "created_at": "2025-07-22T20:10:57.749Z",
+    "updated_at": "2025-07-22T20:10:57.749Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 7,
+  "fields": {
+    "question_group": 2,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Los líderes son responsables de garantizar que sus organizaciones cuenten con medidas de seguridad sólidas para proteger la información de la empresa y de los clientes.",
+    "details": "",
+    "created_at": "2025-07-22T20:21:18.643Z",
+    "updated_at": "2025-07-22T20:21:18.643Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 8,
+  "fields": {
+    "question_group": 2,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "La alfabetización tecnológica es opcional para los líderes modernos.",
+    "details": "",
+    "created_at": "2025-07-22T21:32:12.960Z",
+    "updated_at": "2025-07-22T21:32:12.960Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 9,
+  "fields": {
+    "question_group": 3,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "¿Cuál considera que es el avance tecnológico más significativo de los últimos 100 años?",
+    "details": "",
+    "created_at": "2025-07-22T21:36:01.854Z",
+    "updated_at": "2025-07-22T21:36:01.854Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 10,
+  "fields": {
+    "question_group": 3,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "¿A qué se refiere la Ley de Moore?",
+    "details": "",
+    "created_at": "2025-07-22T21:38:21.262Z",
+    "updated_at": "2025-07-22T21:38:21.262Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 11,
+  "fields": {
+    "question_group": 3,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "¿Cuáles son los principales desafíos éticos asociados con la biotecnología?",
+    "details": "",
+    "created_at": "2025-07-22T21:39:40.414Z",
+    "updated_at": "2025-07-22T21:39:40.414Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 12,
+  "fields": {
+    "question_group": 3,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "¿Qué es la singularidad tecnológica y por qué es un concepto tan debatido?",
+    "details": "",
+    "created_at": "2025-07-22T21:42:01.705Z",
+    "updated_at": "2025-07-22T21:47:18.689Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 13,
+  "fields": {
+    "question_group": 3,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "¿Cómo te imaginas que será el mundo en 50 años en términos de tecnología?",
+    "details": "",
+    "created_at": "2025-07-22T21:43:48.577Z",
+    "updated_at": "2025-07-22T21:47:09.686Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 14,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "a) Es un sistema de información al que se accede a través de Internet mediante navegadores. \\_\\_\\_\\_\\_\\_\\_",
+    "details": "",
+    "created_at": "2025-07-26T17:07:14.253Z",
+    "updated_at": "2025-08-21T20:05:34.119Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 15,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "b) Es la red global de computadoras interconectadas. \\_\\_\\_\\_\\_\\_\\_",
+    "details": "",
+    "created_at": "2025-07-26T17:07:57.747Z",
+    "updated_at": "2025-08-21T20:05:48.712Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 16,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "c) Es esencialmente **la infraestructura** que permite la comunicación digital y el intercambio de datos en todo el mundo. Incluye todo, desde el correo electrónico hasta los servicios de mensajería, las transferencias de archivos y más. \\_\\_\\_\\_\\_\\_\\_",
+    "details": "",
+    "created_at": "2025-07-26T17:09:18.232Z",
+    "updated_at": "2025-08-21T20:06:12.296Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 17,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "d) Es un **servicio** que se ejecuta en Internet y brinda acceso a documentos y recursos interconectados a través de navegadores web. \\_\\_\\_\\_\\_\\_\\_",
+    "details": "",
+    "created_at": "2025-07-26T17:09:58.483Z",
+    "updated_at": "2025-08-21T20:06:23.366Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 18,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "e) Los líderes que comprenden que \\_\\_\\_\\_\\_\\_\\_ abarca mucho más que solo páginas web (por ejemplo, computación en la nube, VoIP, dispositivos IoT) pueden tomar mejores decisiones sobre la integración de soluciones tecnológicas más amplias en sus modelos de negocio.",
+    "details": "",
+    "created_at": "2025-07-26T17:12:22.507Z",
+    "updated_at": "2025-08-21T20:06:36.679Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 19,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "f) Si bien es fundamental para las plataformas orientadas al cliente (comercio electrónico, marketing), **no representa la gama completa de posibilidades para mejorar las operaciones internas**, las cadenas de suministro o la innovación de productos. \\_\\_\\_\\_\\_\\_\\_",
+    "details": "",
+    "created_at": "2025-07-26T17:13:23.842Z",
+    "updated_at": "2025-08-21T20:06:48.075Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 20,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 7,
+    "question_type": "select",
+    "text": "g) Se puede identificar que tecnologías basadas en \\_\\_\\_\\_\\_\\_\\_ (como la infraestructura en la nube) pueden mejorar **la eficiencia interna**.",
+    "details": "",
+    "created_at": "2025-07-26T17:14:12.796Z",
+    "updated_at": "2025-08-21T20:07:02.033Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 21,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 8,
+    "question_type": "select",
+    "text": "h) \\_\\_\\_\\_\\_\\_\\_ puede mejorar la **interacción con los clientes** y las iniciativas de marketing.",
+    "details": "",
+    "created_at": "2025-07-26T17:15:32.342Z",
+    "updated_at": "2025-08-21T20:07:13.526Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 22,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 9,
+    "question_type": "select",
+    "text": "i) Considerando la ciberseguridad \\_\\_\\_\\_\\_\\_\\_ se ocupa específicamente de los navegadores web, las páginas web y las aplicaciones web. La seguridad aquí implica proteger los sitios web de ataques como el ataque de denegación de servicio distribuido.",
+    "details": "",
+    "created_at": "2025-07-26T17:16:59.038Z",
+    "updated_at": "2025-08-21T20:07:24.263Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 23,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 10,
+    "question_type": "select",
+    "text": "j) Hablando de ciberseguridad es necesario comprender que \\_\\_\\_\\_\\_\\_\\_ es la columna vertebral que sustenta una variedad de comunicaciones, desde correos electrónicos hasta sistemas de planificación de recursos empresariales (ERP).",
+    "details": "",
+    "created_at": "2025-07-26T17:18:00.707Z",
+    "updated_at": "2025-08-21T20:07:34.822Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 24,
+  "fields": {
+    "question_group": 4,
+    "question_group_index": 11,
+    "question_type": "select",
+    "text": "k) Los líderes pueden tomar mejores decisiones de inversión al distinguir entre la infraestructura (\\_\\_\\_\\_\\_\\_\\_) que respalda las funciones organizacionales a largo plazo y la presencia en línea más visible (\\_\\_\\_\\_\\_\\_) que influye en la marca y la participación del cliente.",
+    "details": "",
+    "created_at": "2025-07-26T18:30:56.963Z",
+    "updated_at": "2025-08-21T20:07:47.578Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 27,
+  "fields": {
+    "question_group": 5,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "Soy de los líderes que consideran la ciberseguridad como una prioridad organizacional.",
+    "details": "",
+    "created_at": "2025-07-31T09:34:33.176Z",
+    "updated_at": "2025-07-31T09:34:33.176Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 28,
+  "fields": {
+    "question_group": 5,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Soy de los líderes que utilizan sus dispositivos digitales para analizar rápidamente las tendencias y realizar ajustes a las estrategias sobre la marcha.",
+    "details": "",
+    "created_at": "2025-07-31T09:34:52.891Z",
+    "updated_at": "2025-07-31T09:34:52.891Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 29,
+  "fields": {
+    "question_group": 5,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Soy de los líderes que espero a que me entreguen un reporte de resultados al final de un período.",
+    "details": "",
+    "created_at": "2025-07-31T09:35:17.069Z",
+    "updated_at": "2025-08-07T21:28:36.228Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 30,
+  "fields": {
+    "question_group": 5,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Me distingo por ser un líder que se mantiene conectado con los jugadores clave utilizando las plataformas que se encuentran en los dispositivos digitales.",
+    "details": "",
+    "created_at": "2025-07-31T09:35:52.044Z",
+    "updated_at": "2025-07-31T09:35:52.044Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 31,
+  "fields": {
+    "question_group": 5,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "A veces tengo dificultades para mantenerme conectado considerando la geografía y zonas horarias.",
+    "details": "",
+    "created_at": "2025-07-31T09:36:22.654Z",
+    "updated_at": "2025-07-31T09:36:22.654Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 32,
+  "fields": {
+    "question_group": 5,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "Fui de los primeros en utilizar asistentes personales impulsados ​​por IA como Siri, Google Assistant por mencionar algunos.",
+    "details": "",
+    "created_at": "2025-07-31T09:36:41.511Z",
+    "updated_at": "2025-07-31T09:36:41.511Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 33,
+  "fields": {
+    "question_group": 5,
+    "question_group_index": 7,
+    "question_type": "select",
+    "text": "Aún no me siento cómodo utilizando asistentes personales impulsados ​​por IA como Siri, Google Assistant por mencionar algunos.",
+    "details": "",
+    "created_at": "2025-07-31T09:37:27.242Z",
+    "updated_at": "2025-07-31T09:37:27.243Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 34,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "Conozco los **activos críticos** de mi organización y de mi área (ejemplo, datos de clientes, propiedad intelectual).",
+    "details": "",
+    "created_at": "2025-07-31T09:38:26.351Z",
+    "updated_at": "2025-08-05T11:44:44.065Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 35,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Doy estricto seguimiento y fomento el apego a las políticas organizacionales para fomentar la ciberseguridad.",
+    "details": "",
+    "created_at": "2025-07-31T09:38:38.832Z",
+    "updated_at": "2025-07-31T09:38:38.832Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 36,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Sé como hacer el cifrado de datos para la información sensible.",
+    "details": "",
+    "created_at": "2025-07-31T09:38:57.808Z",
+    "updated_at": "2025-07-31T09:38:57.808Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 37,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Me mantengo actualizado sobre las regulaciones de privacidad internacionales como RGPD (Reglamento general de protección de datos) o regulaciones locales.",
+    "details": "",
+    "created_at": "2025-07-31T09:39:14.934Z",
+    "updated_at": "2025-07-31T09:39:14.934Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 38,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Me aseguro que mi equipo de trabajo comprenda las regulaciones internacionales y locales de privacidad y tenemos conversaciones significativas sobre el impacto del incumplimiento de las mismas.",
+    "details": "",
+    "created_at": "2025-07-31T09:39:34.614Z",
+    "updated_at": "2025-07-31T09:39:34.614Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 39,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "Sé la diferencia entre ingeniería social y phishing y ayudo a otros a comprender las implicaciones.",
+    "details": "",
+    "created_at": "2025-07-31T09:39:53.507Z",
+    "updated_at": "2025-07-31T09:39:53.507Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 40,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 7,
+    "question_type": "select",
+    "text": "Sé que la ingeniería social puede incluir también ataques telefónicos (vishing) o mensajes de texto (smishing) y soy un(a) fiel precursor(a) dentro de la organización para ayudar a otros a protegernos de esto.",
+    "details": "",
+    "created_at": "2025-07-31T09:40:20.067Z",
+    "updated_at": "2025-07-31T09:40:20.067Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 41,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 8,
+    "question_type": "select",
+    "text": "Conozco el Plan de Respuesta a Incidentes (IRP) y sé cómo actuar en caso de una infracción de seguridad.",
+    "details": "",
+    "created_at": "2025-07-31T09:40:42.020Z",
+    "updated_at": "2025-08-04T21:26:30.049Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 42,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 9,
+    "question_type": "select",
+    "text": "Conozco el Plan de Continuidad Comercial (BCP) y de Recuperación de Desastres (DRP).",
+    "details": "",
+    "created_at": "2025-07-31T09:41:00.198Z",
+    "updated_at": "2025-08-04T21:26:29.631Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 43,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 10,
+    "question_type": "select",
+    "text": "Entiendo la diferencia entre un Plan de Respuesta a Incidentes y los Planes de Continuidad Comercial y de Recuperación de Desastres.",
+    "details": "",
+    "created_at": "2025-07-31T09:41:53.422Z",
+    "updated_at": "2025-07-31T09:41:53.422Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 44,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 11,
+    "question_type": "select",
+    "text": "Soy la primera persona en tomar la capacitación en Ciberseguridad.",
+    "details": "",
+    "created_at": "2025-07-31T09:42:11.011Z",
+    "updated_at": "2025-07-31T09:42:11.011Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 45,
+  "fields": {
+    "question_group": 7,
+    "question_group_index": 12,
+    "question_type": "select",
+    "text": "Soy una persona que promueve la capacitación en Ciberseguridad.",
+    "details": "",
+    "created_at": "2025-07-31T09:42:28.839Z",
+    "updated_at": "2025-07-31T09:42:28.839Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 46,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "Compartir logros empresariales en plataformas de negocios puede revelar inadvertidamente estrategias de la empresa o información confidencial a competidores o cibercriminales.",
+    "details": "",
+    "created_at": "2025-07-31T09:43:03.094Z",
+    "updated_at": "2025-07-31T09:43:03.094Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 47,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Cargar informes financieros trimestrales confidenciales en una unidad en la nube sin asegurar los controles de acceso o el cifrado adecuados.",
+    "details": "",
+    "created_at": "2025-07-31T09:43:22.628Z",
+    "updated_at": "2025-07-31T09:43:22.629Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 48,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Grabaciones de audio y video de reuniones virtuales, junto con las presentaciones compartidas.",
+    "details": "",
+    "created_at": "2025-07-31T09:43:38.347Z",
+    "updated_at": "2025-07-31T09:43:38.347Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 49,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Buscar e investigar información de la competencia en línea puede dejar rastros de datos que pueden ser reconocidos por las redes publicitarias.",
+    "details": "",
+    "created_at": "2025-07-31T09:43:57.474Z",
+    "updated_at": "2025-07-31T09:43:57.474Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 50,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "El uso de una aplicación de fitness en un dispositivo de la organización mientras viaja por trabajo que rastrea su ubicación y el uso en el mismo viaje de una aplicación relacionada con los negocios que sincroniza los archivos de la empresa, deja datos personales y laborales en servidores externos, creando una combinación de sus huellas digitales profesionales y personales.",
+    "details": "",
+    "created_at": "2025-07-31T09:44:40.982Z",
+    "updated_at": "2025-07-31T09:44:40.982Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 51,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "Cuando se registra para conseguir informes de la industria puede dejar información de contacto relacionada con el trabajo, creando un rastro de sus actividades e intereses profesionales.",
+    "details": "",
+    "created_at": "2025-07-31T09:44:59.609Z",
+    "updated_at": "2025-07-31T09:44:59.609Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 52,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 7,
+    "question_type": "select",
+    "text": "Realizar compras para viajes de trabajo o suscripciones de software a través de una plataforma en línea puede dejar un registro de la transacción, su información de pago y los detalles de su negocio en sistemas de terceros.",
+    "details": "",
+    "created_at": "2025-07-31T09:45:43.644Z",
+    "updated_at": "2025-07-31T09:45:43.644Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 53,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 8,
+    "question_type": "select",
+    "text": "Revisar el correo electrónico personal en una computadora portátil del trabajo mientras viaja por negocios, podría exponer tanto los datos personales como los de la empresa propensos al seguimiento por parte de sitios web de terceros, que pueden mezclar inadvertidamente la información profesional con las actividades personales.",
+    "details": "",
+    "created_at": "2025-07-31T09:46:01.720Z",
+    "updated_at": "2025-07-31T09:46:16.023Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 54,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 9,
+    "question_type": "select",
+    "text": "Compartir una presentación de PowerPoint sobre una nueva estrategia comercial por correo electrónico no solo deja expuesto el contenido, sino también metadatos sobre quién accedió a él y cuándo, que pueden ser recuperados por terceros con acceso al historial digital del documento.",
+    "details": "",
+    "created_at": "2025-07-31T09:46:40.042Z",
+    "updated_at": "2025-07-31T09:46:40.042Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 55,
+  "fields": {
+    "question_group": 8,
+    "question_group_index": 10,
+    "question_type": "select",
+    "text": "Un líder que supervisa un equipo de proyecto puede cargar archivos confidenciales del proyecto o discutir la estrategia, dejando esas conversaciones y datos en servidores en la nube fuera del control directo de la empresa.",
+    "details": "",
+    "created_at": "2025-07-31T09:46:50.202Z",
+    "updated_at": "2025-07-31T09:46:50.202Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 56,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "Evito el uso indebido de software, datos o propiedad intelectual para obtener ventajas personales o competitivas.",
+    "details": "",
+    "created_at": "2025-07-31T09:48:26.668Z",
+    "updated_at": "2025-07-31T09:48:26.668Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 57,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Al crear informes, presentaciones o contenido, siempre cito las fuentes y doy el crédito correspondiente por el trabajo o las ideas de otros.",
+    "details": "",
+    "created_at": "2025-07-31T09:48:48.090Z",
+    "updated_at": "2025-07-31T09:48:48.090Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 58,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Doy la importancia de los derechos de propiedad intelectual y garantizo el cumplimiento de las leyes de derechos de autor y los principios de uso justo en todas las actividades digitales.",
+    "details": "",
+    "created_at": "2025-07-31T09:49:08.057Z",
+    "updated_at": "2025-07-31T09:49:08.057Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 59,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Soy parte del equipo que desarrolló una política de tolerancia cero para el acoso cibernético, el hostigamiento o cualquier forma de comportamiento abusivo en las comunicaciones digitales y estoy al pendiente de que se aplique.",
+    "details": "",
+    "created_at": "2025-07-31T09:49:32.260Z",
+    "updated_at": "2025-07-31T09:49:32.260Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 60,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Soy un ejemplo en el comportamiento respetuoso en línea, me aseguro de que todas las comunicaciones (ya sean correos electrónicos, comentarios en las redes sociales o mensajes internos) sean cordiales, constructivas y profesionales.",
+    "details": "",
+    "created_at": "2025-07-31T09:50:03.437Z",
+    "updated_at": "2025-07-31T09:50:03.437Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 61,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "Estoy a favor de fomentar la empatía digital promoviendo la idea de que detrás de cada interacción digital hay una persona real que merece respeto y consideración.",
+    "details": "",
+    "created_at": "2025-07-31T09:50:23.162Z",
+    "updated_at": "2025-07-31T09:50:23.162Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 62,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 7,
+    "question_type": "select",
+    "text": "He apoyado la implementación y mantenimiento de la vigencia de las políticas de privacidad que protegen los datos de empleados, clientes y socios, garantizando que la información solo se recopile, use y comparta con el consentimiento adecuado.",
+    "details": "",
+    "created_at": "2025-07-31T09:50:49.601Z",
+    "updated_at": "2025-07-31T09:50:49.601Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 63,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 8,
+    "question_type": "select",
+    "text": "Soy de las personas que lideran las conversaciones sobre alfabetización tecnológica dentro de la organización, asegurando que los empleados conozcan sus derechos y responsabilidades digitales.",
+    "details": "",
+    "created_at": "2025-07-31T09:51:32.569Z",
+    "updated_at": "2025-08-01T09:03:16.765Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 64,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 9,
+    "question_type": "select",
+    "text": "En mi equipo de trabajo reconozco formalmente a los miembros del equipo que demuestran un comportamiento digital responsable, reforzando la idea de que estas prácticas son fundamentales para el éxito de la empresa.",
+    "details": "",
+    "created_at": "2025-07-31T09:52:05.884Z",
+    "updated_at": "2025-07-31T09:52:05.884Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 65,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 10,
+    "question_type": "select",
+    "text": "Asumo la responsabilidad de cualquier error cometido en las prácticas digitales, ya sea una violación de la ciberseguridad o un problema de privacidad, y colaboro de forma oportuna para llevar a cabo las actividades necesarias para rectificar la situación.",
+    "details": "",
+    "created_at": "2025-07-31T09:52:29.697Z",
+    "updated_at": "2025-07-31T09:52:29.697Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 66,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 11,
+    "question_type": "select",
+    "text": "Cuando uso personalmente o promuevo el uso de nuevas tecnologías como IA o big data, dejo claro los propósitos, limitaciones e impactos potenciales en la privacidad y los estándares éticos.",
+    "details": "",
+    "created_at": "2025-07-31T09:53:09.938Z",
+    "updated_at": "2025-07-31T09:53:09.938Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 67,
+  "fields": {
+    "question_group": 9,
+    "question_group_index": 12,
+    "question_type": "select",
+    "text": "Fomento una cultura de apertura, donde los colaboradores se sientan seguros de plantear inquietudes sobre cuestiones éticas relacionadas con el uso de la tecnología sin temor a represalias.",
+    "details": "",
+    "created_at": "2025-07-31T09:54:06.938Z",
+    "updated_at": "2025-07-31T09:54:06.938Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 68,
+  "fields": {
+    "question_group": 10,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "Las herramientas de colaboración en línea (como Microsoft Teams, Slack, Google Workspace, Zoom) están diseñadas para facilitar la comunicación, el intercambio de documentos, el seguimiento de proyectos en tiempo real y la colaboración entre equipos, independientemente de la ubicación.",
+    "details": "",
+    "created_at": "2025-07-31T09:54:54.015Z",
+    "updated_at": "2025-07-31T09:54:54.015Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 69,
+  "fields": {
+    "question_group": 10,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Muchas plataformas de colaboración se pueden integrar con CRM, ERP, gestión de proyectos y otras herramientas organizacionales, lo que mejora la automatización del flujo de trabajo.",
+    "details": "",
+    "created_at": "2025-07-31T09:55:19.527Z",
+    "updated_at": "2025-07-31T09:55:19.527Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 70,
+  "fields": {
+    "question_group": 10,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Con CRM denominamos al Customer Relationship Management, mientras que con ERP nos referimos al Enterprise Resource Planning. El primero trabaja en el “back office”, mientras que el segundo lo hace en el “Front office”, en el control de procesos internos de la empresa.",
+    "details": "",
+    "created_at": "2025-07-31T09:55:51.929Z",
+    "updated_at": "2025-07-31T09:55:51.929Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 71,
+  "fields": {
+    "question_group": 10,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Las herramientas de colaboración modernas suelen incluir capacidades de análisis para realizar un seguimiento del compromiso, la productividad y el progreso del proyecto.",
+    "details": "",
+    "created_at": "2025-07-31T09:56:29.487Z",
+    "updated_at": "2025-07-31T09:56:29.487Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 73,
+  "fields": {
+    "question_group": 10,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Las herramientas de colaboración son la columna vertebral del trabajo remoto y de los modelos de trabajo híbrido. Los líderes deben ser competentes en la gestión de equipos distribuidos y comprender cómo fomentar el compromiso y la productividad a través de estas herramientas.",
+    "details": "",
+    "created_at": "2025-07-31T09:57:43.881Z",
+    "updated_at": "2025-07-31T09:57:43.881Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 74,
+  "fields": {
+    "question_group": 12,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "A lo largo de mi carrera profesional he impulsado el uso de tecnologías de asistencia para integrar a las personas con capacidades diferentes al mundo laboral ayudándolas a superar las barreras con las que se encuentran.",
+    "details": "",
+    "created_at": "2025-07-31T09:59:04.384Z",
+    "updated_at": "2025-07-31T09:59:04.384Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 75,
+  "fields": {
+    "question_group": 12,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Tengo un ejemplo reciente donde apoyé a uno de los colaboradores a utilizar un asistente de voz para transformar el habla en texto, lo que le permitió superar sus dificultades para escribir y expresar sus ideas de manera más fluida en correos electrónicos, mensajes y documentos.",
+    "details": "",
+    "created_at": "2025-07-31T09:59:22.803Z",
+    "updated_at": "2025-07-31T09:59:22.803Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 76,
+  "fields": {
+    "question_group": 12,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Estoy a favor de que las personas que hablan un idioma diferente al del entorno laboral, utilicen un asistente que pueda traducir en tiempo real sus conversaciones, facilitando la comunicación y la integración en el equipo.",
+    "details": "",
+    "created_at": "2025-07-31T09:59:44.145Z",
+    "updated_at": "2025-07-31T09:59:44.145Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 77,
+  "fields": {
+    "question_group": 12,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Gracias a una de mis iniciativas, en la organización, ahora se permite el uso de un asistente de voz que puede guiar a las personas con discapacidad visual a través de un nuevo entorno laboral, proporcionando indicaciones detalladas sobre cómo llegar a diferentes áreas de la oficina, encontrar salas de reuniones o localizar objetos específicos.",
+    "details": "",
+    "created_at": "2025-07-31T10:00:03.401Z",
+    "updated_at": "2025-07-31T10:00:03.401Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 78,
+  "fields": {
+    "question_group": 12,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Personalmente me encargué de que se integrara un sistema que permite a personas con dificultades del habla expresar sus ideas y necesidades a través de imágenes y símbolos.",
+    "details": "",
+    "created_at": "2025-07-31T10:00:21.519Z",
+    "updated_at": "2025-07-31T10:00:21.519Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 79,
+  "fields": {
+    "question_group": 12,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "Soy parte del equipo organizacional que asegura que la organización vaya más allá del cumplimiento de la normatividad básica para facilitar la movilidad. Me aseguro que las personas con dificultades para caminar, puedan contar con la última tecnología en sus equipos personales.",
+    "details": "",
+    "created_at": "2025-07-31T10:01:08.373Z",
+    "updated_at": "2025-07-31T10:01:08.373Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 80,
+  "fields": {
+    "question_group": 13,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "Es crucial que **un líder** sea cuidadoso en su interacción en redes sociales ya que debe considerar:",
+    "details": "",
+    "created_at": "2025-07-31T10:01:44.941Z",
+    "updated_at": "2025-08-05T11:45:22.925Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 81,
+  "fields": {
+    "question_group": 13,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "La interacción en redes sociales también podría afectar algunos factores en el equipo, por ejemplo:",
+    "details": "",
+    "created_at": "2025-07-31T10:03:13.029Z",
+    "updated_at": "2025-07-31T10:03:13.029Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 82,
+  "fields": {
+    "question_group": 13,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Los **resultados del negocio** podrían también sufrir un impacto derivado de la participación de los líderes en redes sociales, por ejemplo:",
+    "details": "",
+    "created_at": "2025-07-31T10:03:37.819Z",
+    "updated_at": "2025-08-05T11:45:44.191Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 83,
+  "fields": {
+    "question_group": 13,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "La **desintoxicación digital** es necesaria para:",
+    "details": "",
+    "created_at": "2025-07-31T10:04:09.998Z",
+    "updated_at": "2025-08-05T11:46:04.930Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 84,
+  "fields": {
+    "question_group": 13,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Algunas preocupaciones del uso excesivo de redes sociales son:",
+    "details": "",
+    "created_at": "2025-07-31T10:04:44.640Z",
+    "updated_at": "2025-07-31T10:04:44.640Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 85,
+  "fields": {
+    "question_group": 13,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "Las señales más comunes de una persona que está siendo víctima de acoso cibernético son:",
+    "details": "",
+    "created_at": "2025-07-31T10:05:30.253Z",
+    "updated_at": "2025-07-31T10:05:30.253Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 87,
+  "fields": {
+    "question_group": 15,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "**Comunicación respetuosa en todas las plataformas**\r\n\r\nLa generación \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ suelen valorar la comunicación formal, como los correos electrónicos y los documentos escritos bien estructurados. Las interacciones digitales abruptas e informales pueden parecer irrespetuosas.",
+    "details": "",
+    "created_at": "2025-07-31T10:07:15.331Z",
+    "updated_at": "2025-08-21T20:09:48.436Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 89,
+  "fields": {
+    "question_group": 15,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "**Respuestas claras y oportunas**\r\n\r\n\r\nLa generación \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ están acostumbrados a las respuestas instantáneas a través de las redes sociales y las aplicaciones de mensajería, y pueden sentirse desconectados si las respuestas se demoran.",
+    "details": "",
+    "created_at": "2025-07-31T10:09:18.537Z",
+    "updated_at": "2025-08-22T01:03:42.859Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 90,
+  "fields": {
+    "question_group": 15,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "**Gestión de la comunicación multicanal**\r\n\r\n\r\nLa generación \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ se sienten cómodos con las plataformas tradicionales y digitales, pero pueden preferir el correo electrónico o el teléfono para conversaciones importantes.",
+    "details": "",
+    "created_at": "2025-07-31T10:09:45.757Z",
+    "updated_at": "2025-08-22T01:03:47.637Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 91,
+  "fields": {
+    "question_group": 15,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "**Respeto por los límites digitales**\r\n\r\n\r\nLa generación \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ generalmente apoyan el equilibrio entre el trabajo y la vida personal y pueden apreciar a un líder que evite la comunicación fuera del horario laboral.",
+    "details": "",
+    "created_at": "2025-07-31T10:10:19.961Z",
+    "updated_at": "2025-08-22T01:03:52.099Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 92,
+  "fields": {
+    "question_group": 15,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "**Lenguaje inclusivo y consciente**\r\n\r\n\r\nLa generación \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ son muy sensibles al lenguaje inclusivo y esperan que los líderes sean conscientes de los problemas de justicia social y utilicen términos que reflejen valores modernos.",
+    "details": "",
+    "created_at": "2025-07-31T10:10:44.228Z",
+    "updated_at": "2025-08-22T01:03:56.278Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 93,
+  "fields": {
+    "question_group": 15,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "**Concienciación sobre la ciberseguridad y privacidad**\r\n\r\n\r\nLa generación \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ suelen ser conscientes de los riesgos de la ciberseguridad, pero pueden esperar soluciones sencillas y fáciles de usar que no demoren el flujo de trabajo.",
+    "details": "",
+    "created_at": "2025-07-31T10:11:05.158Z",
+    "updated_at": "2025-08-22T01:04:00.466Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 94,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "La IA actualmente se usa en algunos sectores como:",
+    "details": "",
+    "created_at": "2025-07-31T10:11:47.541Z",
+    "updated_at": "2025-07-31T10:11:47.541Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 95,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Cada bloque tiene tres componentes principales:",
+    "details": "",
+    "created_at": "2025-07-31T10:12:06.230Z",
+    "updated_at": "2025-07-31T10:12:06.230Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 96,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "La Cadena de Bloques (Block Chain) consta:",
+    "details": "",
+    "created_at": "2025-07-31T10:12:24.891Z",
+    "updated_at": "2025-08-07T21:28:53.887Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 97,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Los principales desafíos de la IA son:",
+    "details": "",
+    "created_at": "2025-07-31T10:12:46.926Z",
+    "updated_at": "2025-07-31T10:12:46.926Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 98,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Los mecanismos de consenso se refieren a:",
+    "details": "",
+    "created_at": "2025-07-31T10:13:07.400Z",
+    "updated_at": "2025-07-31T10:13:07.400Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 99,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "IA limitada (IA débil), está diseñada:",
+    "details": "",
+    "created_at": "2025-07-31T10:13:24.363Z",
+    "updated_at": "2025-07-31T10:13:24.363Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 100,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 7,
+    "question_type": "select",
+    "text": "Inmutabilidad y seguridad se refiere a:",
+    "details": "",
+    "created_at": "2025-07-31T10:14:14.091Z",
+    "updated_at": "2025-07-31T10:14:14.091Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 101,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 8,
+    "question_type": "select",
+    "text": "La IA superinteligente:",
+    "details": "",
+    "created_at": "2025-07-31T10:14:41.310Z",
+    "updated_at": "2025-07-31T10:14:55.429Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 102,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 9,
+    "question_type": "select",
+    "text": "Algunos ejemplos de aplicaciones de la cadena de bloques:",
+    "details": "",
+    "created_at": "2025-07-31T10:15:56.717Z",
+    "updated_at": "2025-07-31T10:15:56.717Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 103,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 10,
+    "question_type": "select",
+    "text": "IA general (IA fuerte):",
+    "details": "",
+    "created_at": "2025-07-31T10:16:35.477Z",
+    "updated_at": "2025-07-31T10:16:45.192Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 104,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 11,
+    "question_type": "select",
+    "text": "La inteligencia artificial (IA) se refiere a:",
+    "details": "",
+    "created_at": "2025-07-31T10:17:08.737Z",
+    "updated_at": "2025-09-17T15:59:48.171Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 105,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 12,
+    "question_type": "select",
+    "text": "Los sistemas de IA dependen de datos, algoritmos y poder computacional para funcionar. Los procesos clave incluyen:",
+    "details": "",
+    "created_at": "2025-07-31T10:17:08.837Z",
+    "updated_at": "2025-09-17T15:59:47.085Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 106,
+  "fields": {
+    "question_group": 11,
+    "question_group_index": 13,
+    "question_type": "select",
+    "text": "El concepto de descentralización cuando se habla de Cadena de Bloques se basa en:",
+    "details": "",
+    "created_at": "2025-07-31T10:18:35.912Z",
+    "updated_at": "2025-07-31T10:18:47.157Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 107,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 1,
+    "question_type": "select",
+    "text": "Opta por dispositivos de bajo consumo de energía",
+    "details": "",
+    "created_at": "2025-08-01T08:38:59.438Z",
+    "updated_at": "2025-08-01T08:38:59.438Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 108,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 2,
+    "question_type": "select",
+    "text": "Apaga los dispositivos cuando no los uses",
+    "details": "",
+    "created_at": "2025-08-01T08:39:19.902Z",
+    "updated_at": "2025-08-01T08:39:19.902Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 109,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 3,
+    "question_type": "select",
+    "text": "Usa el almacenamiento en la nube de manera responsable",
+    "details": "",
+    "created_at": "2025-08-01T08:39:44.578Z",
+    "updated_at": "2025-08-01T08:39:44.578Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 110,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 4,
+    "question_type": "select",
+    "text": "Recicle los aparatos electrónicos",
+    "details": "",
+    "created_at": "2025-08-01T08:40:06.959Z",
+    "updated_at": "2025-08-01T08:40:06.959Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 111,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 5,
+    "question_type": "select",
+    "text": "Elija energías renovables",
+    "details": "",
+    "created_at": "2025-08-01T08:40:24.852Z",
+    "updated_at": "2025-08-01T08:40:24.852Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 112,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 6,
+    "question_type": "select",
+    "text": "Repare, no sustituya",
+    "details": "",
+    "created_at": "2025-08-01T08:40:57.383Z",
+    "updated_at": "2025-08-01T08:40:57.383Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 113,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 7,
+    "question_type": "select",
+    "text": "Reduzca el uso de papel",
+    "details": "",
+    "created_at": "2025-08-01T08:41:12.884Z",
+    "updated_at": "2025-08-01T08:41:12.884Z"
+  }
+},
+{
+  "model": "survey.question",
+  "pk": 114,
+  "fields": {
+    "question_group": 14,
+    "question_group_index": 8,
+    "question_type": "select",
+    "text": "Apoya a las marcas sostenibles",
+    "details": "",
+    "created_at": "2025-08-01T08:41:37.978Z",
+    "updated_at": "2025-08-01T08:41:37.978Z"
+  }
+}
+]
