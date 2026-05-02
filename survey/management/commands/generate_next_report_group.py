@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
         # Render HTML string from template
         self.stdout.write("Rendering HTML template...")
-        html_string = render_to_string("survey/pdf_sample.html", context)
+        html_string = render_to_string("survey/group_report.html", context)
 
         # Output path
         output_dir = os.path.join(settings.BASE_DIR, "media", "temp")

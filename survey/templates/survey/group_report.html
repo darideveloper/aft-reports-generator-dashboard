@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        {% include "survey/group_report.css" %}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-info">
+        {% if logo_url %}
+        <img src="{{ logo_url }}" class="header-logo">
+        {% endif %}
+        <strong>Confidential Business Report - {{ year }}</strong>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-info">
+        AFT Reports Generator Dashboard &copy; {{ year }}
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- First page: Cover -->
+        <div class="cover-page">
+            <div class="cover-content">
+                {% if logo_url %}
+                <img src="{{ logo_url }}" style="height: 100px; filter: brightness(0) invert(1); margin-bottom: 20px;">
+                {% endif %}
+                <h1>{{ title }}</h1>
+                <h2>{{ subtitle }}</h2>
+                <p style="margin-top: 2cm;">Generated on {{ date }}</p>
+            </div>
+        </div>
+
+        <!-- Subsequent pages: Data Table -->
+        <h1>Data Analysis Table</h1>
+        <p>Comprehensive data report with colored status indicators and repeating headers.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Value 1</th>
+                    <th>Value 2</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>#{{ row.id }}</td>
+                    <td><strong>{{ row.name }}</strong></td>
+                    <td style="color: #2c3e50;">${{ row.value1 }}</td>
+                    <td>{{ row.value2 }} units</td>
+                    <td>
+                        <span class="status-pill status-{{ row.status|lower }}">
+                            {{ row.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

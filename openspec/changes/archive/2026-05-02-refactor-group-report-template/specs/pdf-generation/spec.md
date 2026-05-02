@@ -1,8 +1,10 @@
-# pdf-generation Specification
+## RENAMED Requirements
+- FROM: `### Requirement: Sample WeasyPrint PDF Generation`
+- TO: `### Requirement: Group Report Generation`
+- FROM: `### Requirement: Live WeasyPrint PDF Preview`
+- TO: `### Requirement: Live Group Report Preview`
 
-## Purpose
-TBD - created by archiving change add-sample-weasyprint-pdf. Update Purpose after archive.
-## Requirements
+## MODIFIED Requirements
 ### Requirement: Group Report Generation
 The system SHALL provide the capability to generate group reports from HTML templates using WeasyPrint, demonstrating advanced CSS features like headers, footers, and page-breaking tables.
 
@@ -19,4 +21,3 @@ The system SHALL provide an HTTP endpoint to preview the WeasyPrint group report
 - **WHEN** a user navigates to the `/preview-pdf/` URL
 - **THEN** the server compiles the `group_report.html` using WeasyPrint
 - **THEN** the server returns an inline PDF response that the browser renders natively
-

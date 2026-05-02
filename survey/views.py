@@ -23,17 +23,18 @@ def preview_pdf_sample(request):
     rows = []
     statuses = ["Active", "Pending", "Completed", "Failed"]
     for i in range(1, 150):
-        rows.append({
-            "id": i,
-            "name": f"Item {i}",
-            "value1": round(random.uniform(10.0, 999.9), 2),
-            "value2": random.randint(1, 100),
-            "status": random.choice(statuses)
-        })
+        rows.append(
+            {
+                "id": i,
+                "name": f"Item {i}",
+                "value1": round(random.uniform(10.0, 999.9), 2),
+                "value2": random.randint(1, 100),
+                "status": random.choice(statuses),
+            }
+        )
 
     # Pick a random primary color for the sample
-    primary_colors = ["#2c3e50", "#e67e22", "#2980b9", "#8e44ad", "#27ae60"]
-    primary_color = random.choice(primary_colors)
+    primary_color = "#2c3e50"
 
     # Resolve logo URL if exists
     logo_url = None
@@ -51,7 +52,7 @@ def preview_pdf_sample(request):
     }
 
     # Render HTML string from template
-    html_string = render_to_string("survey/pdf_sample.html", context)
+    html_string = render_to_string("survey/group_report.html", context)
 
     # Generate PDF via WeasyPrint
     base_url = request.build_absolute_uri("/")
