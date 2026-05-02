@@ -10,6 +10,7 @@ from core.choices import (
     GENDER_CHOICES,
     BIRTH_RANGE_CHOICES,
     POSITION_CHOICES,
+    DEPARTMENT_CHOICES,
 )
 
 import requests
@@ -285,6 +286,14 @@ class Participant(models.Model):
         choices=POSITION_CHOICES,
         verbose_name="Posición",
         help_text="Posición del participante en la empresa",
+    )
+    department = models.CharField(
+        max_length=255,
+        choices=DEPARTMENT_CHOICES,
+        verbose_name="Departamento",
+        help_text="Departamento o área del participante",
+        null=True,
+        blank=True,
     )
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, verbose_name="Empresa"

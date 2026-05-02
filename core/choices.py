@@ -40,3 +40,11 @@ POSITION_CHOICES = [
     ("vicepresidente", "Vicepresidente"),
     ("other", "Otro"),
 ]
+
+DEPARTMENT_CHOICES = [
+    ("hr", "Human Resources"),
+    ("it", "IT"),
+    ("sales", "Sales"),
+    ("marketing", "Marketing"),
+    ("finance", "Finance"),
+]

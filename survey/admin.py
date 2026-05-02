@@ -162,6 +162,7 @@ class ParticipantAdmin(admin.ModelAdmin):
         "gender",
         "birth_range",
         "position",
+        "department",
         "company",
         "created_at",
     )
@@ -169,6 +170,7 @@ class ParticipantAdmin(admin.ModelAdmin):
         "gender",
         "birth_range",
         "position",
+        "department",
         "company",
         "created_at",
         "updated_at",

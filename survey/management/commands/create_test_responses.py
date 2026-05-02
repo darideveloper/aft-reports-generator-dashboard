@@ -52,6 +52,9 @@ class Command(BaseCommand):
                     "position": random.choice(
                         ["director", "manager", "supervisor", "other"]
                     ),
+                    "department": random.choice(
+                        ["hr", "it", "sales", "marketing", "finance"]
+                    ),
                 },
                 "answers": [],
             }
