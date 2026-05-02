@@ -26,3 +26,10 @@ temp.*
 .gemini/
 CLAUDE.md
 AGENTS.md
+
+# OpenSpec proposals
+openspec/changes/*
+!openspec/changes/archive/
+
+# Docs
+docs/
