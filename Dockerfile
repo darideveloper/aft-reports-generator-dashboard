@@ -101,4 +101,4 @@ RUN python manage.py apps_loaddata
 EXPOSE 80
 
 # Command to run Gunicorn with the WSGI application for production
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "--timeout", "300", "project.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "2", "--timeout", "300", "project.wsgi:application"]
