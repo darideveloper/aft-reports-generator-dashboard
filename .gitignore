@@ -7,8 +7,8 @@ __pycache__/
 .log
 *pyc
 temp.*
-*temp
-*temp*
+*temp.
+*temp*.
 *.xlsx
 
 .vscode/
