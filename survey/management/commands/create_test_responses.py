@@ -53,7 +53,19 @@ class Command(BaseCommand):
                         ["director", "manager", "supervisor", "other"]
                     ),
                     "department": random.choice(
-                        ["hr", "it", "sales", "marketing", "finance"]
+                        [
+                            "direccion_general",
+                            "servicios_medicos",
+                            "prestaciones_sociales_economicas",
+                            "administracion",
+                            "finanzas",
+                            "desarrollo_humano",
+                            "juridica",
+                            "comunicacion_social",
+                            "unidad_control_interno",
+                            "unidad_atencion_derechohabiente",
+                            "oic",
+                        ]
                     ),
                 },
                 "answers": [],

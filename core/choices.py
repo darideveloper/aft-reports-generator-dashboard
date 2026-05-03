@@ -31,7 +31,7 @@ POSITION_CHOICES = [
     ("manager", "Gerente"),
     ("inspector", "Inspector"),
     ("investigador", "Investigador"),
-    ("jefe_departamento", "Jefe de Departamento"),
+    ("jefe_departamento", "Jefe de Área"),
     ("operator", "Operador"),
     ("secretario_ejecutivo", "Secretario Ejecutivo"),
     ("subdirector", "Subdirector"),
@@ -42,9 +42,15 @@ POSITION_CHOICES = [
 ]
 
 DEPARTMENT_CHOICES = [
-    ("hr", "Human Resources"),
-    ("it", "IT"),
-    ("sales", "Sales"),
-    ("marketing", "Marketing"),
-    ("finance", "Finance"),
+    ("direccion_general", "Dirección General"),
+    ("servicios_medicos", "Servicios Médicos"),
+    ("prestaciones_sociales_economicas", "Prestaciones Sociales y Económicas"),
+    ("administracion", "Administración"),
+    ("finanzas", "Finanzas"),
+    ("desarrollo_humano", "Desarrollo Humano"),
+    ("juridica", "Jurídica"),
+    ("comunicacion_social", "Comunicación Social"),
+    ("unidad_control_interno", "Unidad Control Interno"),
+    ("unidad_atencion_derechohabiente", "Unidad Atención al Derechohabiente"),
+    ("oic", "O.I.C."),
 ]

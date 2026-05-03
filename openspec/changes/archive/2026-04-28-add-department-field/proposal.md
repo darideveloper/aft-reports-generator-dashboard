@@ -1,7 +1,7 @@
-# Proposal: Add Department Field
+# Proposal: Add Area Field
 
 ## Why
-Currently, the participant registration only captures email, name, sex, and job position. There is a need to also capture the "department" or "area" of the participant (e.g., Human Resources, IT, Sales) for better data segmentation and reporting.
+Currently, the participant registration only captures email, name, sex, and job position. There is a need to also capture the "area" of the participant (e.g., Human Resources, IT, Sales) for better data segmentation and reporting.
 
 ## What Changes
 1.  **Choice Data**: Add `DEPARTMENT_CHOICES` to `core/choices.py` with 5 sample values.
@@ -12,4 +12,4 @@ Currently, the participant registration only captures email, name, sex, and job 
 
 ## Impact
 - **Affected code**: `core/choices.py`, `survey/models.py`, `survey/serializers.py`, `survey/admin.py`, `survey/management/commands/create_test_responses.py`.
-- **New capability**: `department-field`.
+- **New capability**: `area-field`.
