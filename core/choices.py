@@ -31,7 +31,7 @@ POSITION_CHOICES = [
     ("manager", "Gerente"),
     ("inspector", "Inspector"),
     ("investigador", "Investigador"),
-    ("jefe_departamento", "Jefe de Área"),
+    ("jefe_departamento", "Jefe de Departamento"),
     ("operator", "Operador"),
     ("secretario_ejecutivo", "Secretario Ejecutivo"),
     ("subdirector", "Subdirector"),
