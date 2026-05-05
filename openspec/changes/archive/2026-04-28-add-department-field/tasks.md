@@ -1,4 +1,4 @@
-# Tasks: Add Department Field
+# Tasks: Add Area Field
 
 ## 1. Preparation
 - [x] 1.1 Add `DEPARTMENT_CHOICES` to `core/choices.py`. <!-- id: 1 -->

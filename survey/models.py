@@ -290,8 +290,8 @@ class Participant(models.Model):
     department = models.CharField(
         max_length=255,
         choices=DEPARTMENT_CHOICES,
-        verbose_name="Departamento",
-        help_text="Departamento o área del participante",
+        verbose_name="Área",
+        help_text="Área del participante",
         null=True,
         blank=True,
     )
