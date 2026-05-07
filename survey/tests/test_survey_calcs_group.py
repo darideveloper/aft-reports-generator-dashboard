@@ -13,26 +13,81 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.company = self.create_company()
         self.survey = survey_models.Survey.objects.get(id=1)
 
-        # Create 50 random reports
-        self.reports = []
-        for _ in range(50):
-            self.reports.append(self.create_report())
-
-        # initialize calcs
-        self.calcs = SurveyCalcsGroup(self.reports)
-
-    def create_report(self) -> survey_models.Report:
+    def create_final_report(self, total: float = 50.0) -> survey_models.Report:
         """
         Create a single report
+
+        Args:
+            total (float): The total to set for the report
 
         Returns:
             survey_models.Report: The created report
         """
+
         participant = self.create_participant(company=self.company)
         report = survey_models.Report.objects.create(
-            participant=participant, survey=self.survey, total=50.0
+            participant=participant, survey=self.survey, total=total
         )
         return report
 
+    def create_final_reports(self, total: float = 50.0, count: int = 100):
+        """
+        Create reports with total
+
+        Args:
+            total (float): The total to set for the reports
+            count (int): The number of reports to create
+        """
+
+        for _ in range(count):
+            self.create_final_report(total=total)
+
     def test_get_employees_number(self):
-        self.assertEqual(self.calcs.get_employees_number(), 50)
+        """Validate correct count of reports"""
+
+        # initialize data
+        self.create_final_reports(count=50)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # Valdiate num
+        self.assertEqual(calcs.get_employees_number(), 50)
+
+    def test_get_average_score_0(self):
+        """Validate average number when all reports have 0 total"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=0.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # Validate average
+        self.assertEqual(calcs.get_average_num(), 0)
+
+    def test_get_average_score_50(self):
+        """Validate average number when all reports have 50 total"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=50.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average
+        self.assertEqual(calcs.get_average_num(), 50.0)
+
+    def test_get_average_score_100(self):
+        """Validate average number when all reports have 50 total"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=100.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average
+        self.assertEqual(calcs.get_average_num(), 100.0)
+
+    def test_get_average_employees_0(self):
+        """Validate average number when all reports have 50 total"""
+
+        # initialize data
+        self.create_final_reports(count=0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average
+        self.assertEqual(calcs.get_average_num(), 0.0)
