@@ -73,7 +73,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(calcs.get_average_num(), 50.0)
 
     def test_get_average_score_100(self):
-        """Validate average number when all reports have 50 total"""
+        """Validate average number when all reports have 100 total"""
 
         # initialize data
         self.create_final_reports(count=50, total=100.0)
@@ -83,7 +83,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(calcs.get_average_num(), 100.0)
 
     def test_get_average_employees_0(self):
-        """Validate average number when all reports have 50 total"""
+        """Validate average number when there are no reports"""
 
         # initialize data
         self.create_final_reports(count=0)
@@ -113,7 +113,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(calcs.get_average_range(), "low")
 
     def test_get_average_range_60(self):
-        """Validate average range when all reports have 59 total (low range)"""
+        """Validate average range when all reports have 60 total (medium range)"""
 
         # initialize data
         self.create_final_reports(count=50, total=60.0)
@@ -123,7 +123,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(calcs.get_average_range(), "medium")
 
     def test_get_average_range_79(self):
-        """Validate average range when all reports have 59 total (low range)"""
+        """Validate average range when all reports have 79 total (medium range)"""
 
         # initialize data
         self.create_final_reports(count=50, total=79.0)
@@ -133,7 +133,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(calcs.get_average_range(), "medium")
 
     def test_get_average_range_80(self):
-        """Validate average range when all reports have 59 total (low range)"""
+        """Validate average range when all reports have 80 total (high range)"""
 
         # initialize data
         self.create_final_reports(count=50, total=80.0)
@@ -143,7 +143,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(calcs.get_average_range(), "high")
 
     def test_get_average_range_100(self):
-        """Validate average range when all reports have 59 total (low range)"""
+        """Validate average range when all reports have 100 total (high range)"""
 
         # initialize data
         self.create_final_reports(count=50, total=100.0)
