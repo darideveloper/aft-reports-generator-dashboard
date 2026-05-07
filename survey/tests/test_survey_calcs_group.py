@@ -91,3 +91,63 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # validate average
         self.assertEqual(calcs.get_average_num(), 0.0)
+
+    def test_get_average_range_0(self):
+        """Validate average range when all reports have 0 total (low range)"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=0.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average range
+        self.assertEqual(calcs.get_average_range(), "low")
+
+    def test_get_average_range_59(self):
+        """Validate average range when all reports have 59 total (low range)"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=59.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average range
+        self.assertEqual(calcs.get_average_range(), "low")
+
+    def test_get_average_range_60(self):
+        """Validate average range when all reports have 59 total (low range)"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=60.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average range
+        self.assertEqual(calcs.get_average_range(), "medium")
+
+    def test_get_average_range_79(self):
+        """Validate average range when all reports have 59 total (low range)"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=79.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average range
+        self.assertEqual(calcs.get_average_range(), "medium")
+
+    def test_get_average_range_80(self):
+        """Validate average range when all reports have 59 total (low range)"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=80.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average range
+        self.assertEqual(calcs.get_average_range(), "high")
+
+    def test_get_average_range_100(self):
+        """Validate average range when all reports have 59 total (low range)"""
+
+        # initialize data
+        self.create_final_reports(count=50, total=100.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # validate average range
+        self.assertEqual(calcs.get_average_range(), "high")

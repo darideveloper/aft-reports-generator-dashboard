@@ -31,3 +31,20 @@ class SurveyCalcsGroup:
         return (
             sum(report.total for report in self.reports) / self.get_employees_number()
         )
+
+    def get_average_range(self) -> str:
+        """
+        Get the average range of the employees in the company (low / medium / high)
+
+        Returns:
+            str: Average range label
+        """
+
+        average = self.get_average_num()
+
+        if average <= 59:
+            return "low"
+        elif average <= 79:
+            return "medium"
+        else:
+            return "high"
