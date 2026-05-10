@@ -63,6 +63,29 @@ def preview_pdf_sample(request):
     return response
 
 
+def preview_report_pdf(request):
+    """
+    View to preview the WeasyPrint PDF report using the html-pdf template.
+    """
+    # Path to the HTML template in its new location
+    template_dir = os.path.join(settings.BASE_DIR, "survey", "pdf_templates", "html-pdf")
+    template_path = os.path.join(template_dir, "index.html")
+    base_url = template_dir
+
+    try:
+        with open(template_path, "r", encoding="utf-8") as f:
+            html_content = f.read()
+    except FileNotFoundError:
+        return HttpResponse(f"HTML template not found at {template_path}", status=404)
+
+    # Generate PDF via WeasyPrint
+    pdf_bytes = HTML(string=html_content, base_url=base_url).write_pdf()
+
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    response["Content-Disposition"] = "inline; filename='preview_report.pdf'"
+    return response
+
+
 class OptionsView(APIView):
     def get(self, request):
         def format_choices(choices_list):
