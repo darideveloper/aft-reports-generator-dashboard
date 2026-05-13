@@ -1,18 +1,17 @@
-from rest_framework import viewsets
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from django.conf import settings
-from weasyprint import HTML
-import random
 import os
+import random
 from datetime import datetime
 
-from survey import serializers, models
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from weasyprint import HTML
+
 from core import choices
+from survey import models, serializers
 
 
 def preview_pdf_sample(request):
@@ -67,19 +66,21 @@ def preview_report_pdf(request):
     """
     View to preview the WeasyPrint PDF report using the html-pdf template.
     """
-    # Path to the HTML template in its new location
-    template_dir = os.path.join(settings.BASE_DIR, "survey", "pdf_templates", "html-pdf")
-    template_path = os.path.join(template_dir, "index.html")
-    base_url = template_dir
+    # Context for the template
+    context = {
+        "company_name": "Acme Corp ",
+        "total_participants": 123,
+        "report_date": "13 de mayo 2026",
+    }
 
-    try:
-        with open(template_path, "r", encoding="utf-8") as f:
-            html_content = f.read()
-    except FileNotFoundError:
-        return HttpResponse(f"HTML template not found at {template_path}", status=404)
+    # Render HTML string from template
+    html_string = render_to_string("survey/pdf/report_template.html", context)
+
+    # Base URL for assets resolution
+    base_url = os.path.join(settings.BASE_DIR, "survey", "templates", "survey", "pdf")
 
     # Generate PDF via WeasyPrint
-    pdf_bytes = HTML(string=html_content, base_url=base_url).write_pdf()
+    pdf_bytes = HTML(string=html_string, base_url=base_url).write_pdf()
 
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = "inline; filename='preview_report.pdf'"
@@ -109,7 +110,6 @@ class InvitationCodeView(APIView):
     def post(self, request):
         serializer = serializers.InvitationCodeSerializer(data=request.data)
         if serializer.is_valid():
-
             # Validate data structure
             invitation_code = serializer.validated_data["invitation_code"]
 
