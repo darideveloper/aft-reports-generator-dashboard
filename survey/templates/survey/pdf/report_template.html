@@ -122,60 +122,16 @@
                 <div class="text-content">
                     <p>
                         El grupo evaluado obtuvo un Índice de Alfabetización
-                        Tecnológica de <strong>67 puntos</strong>, lo que indica
-                        un nivel <strong>intermedio</strong> de dominio
+                        Tecnológica de <strong>{{ average_score }} puntos</strong>, lo que indica
+                        un nivel <strong>{{ level }}</strong> de dominio
                         tecnológico.
                     </p>
 
+                    {% for paragraph in summary_paragraphs %}
                     <p>
-                        Este resultado sugiere que los participantes cuentan con
-                        una base tecnológica funcional que les permite utilizar
-                        herramientas digitales en su trabajo diario. Sin
-                        embargo, aún existen oportunidades para fortalecer la
-                        comprensión de temas tecnológicos estratégicos.
+                        {{ paragraph|safe }}
                     </p>
-
-                    <p>
-                        Las principales <strong>fortalezas</strong> del grupo se
-                        observan en las áreas de
-                        <strong>Ecosistema digital de colaboración</strong> y
-                        <strong>Cultura digital</strong>, lo que indica que los
-                        líderes han desarrollado capacidades relevantes en estos
-                        ámbitos tecnológicos.
-                    </p>
-
-                    <p>
-                        Las principales <strong>áreas de oportunidad</strong> se
-                        concentran en <strong>Ciberseguridad</strong> y
-                        <strong>Tecnología y negocios</strong>, lo que sugiere
-                        la necesidad de fortalecer la comprensión de riesgos y
-                        consolidar el dominio en estos temas.
-                    </p>
-
-                    <p>
-                        Los resultados muestran diferencias moderadas entre
-                        participantes, lo que indica que el nivel de
-                        alfabetización tecnológica no es completamente homogéneo
-                        dentro del grupo. Esto puede generar distintas
-                        velocidades de adopción tecnológica dentro de la
-                        organización.
-                    </p>
-
-                    <p>
-                        Observar la variabilidad entre los participantes permite
-                        identificar tanto posibles focos de riesgo como líderes
-                        que pueden actuar como aliados de la transformación
-                        digital.
-                    </p>
-
-                    <p>
-                        Resulta prioritario fortalecer la comprensión de cómo
-                        las decisiones tecnológicas impactan en el negocio
-                        considerando también los riesgos asociados a la
-                        seguridad de la información. Esto permitirá evaluar con
-                        mayor criterio iniciativas y reducir vulnerabilidades
-                        operativas.
-                    </p>
+                    {% endfor %}
                 </div>
             </main>
         </section>
@@ -237,8 +193,8 @@
 
                 <p class="simple-text margin-top-30">
                     Como ya se mencionó anteriormente, el grupo obtuvo un Índice
-                    de Alfabetización Tecnológica de <strong>67 puntos</strong>,
-                    lo que corresponde a un <strong>nivel intermedio</strong> de
+                    de Alfabetización Tecnológica de <strong>{{ average_score }} puntos</strong>,
+                    lo que corresponde a un <strong>nivel {{ level|lower }}</strong> de
                     alfabetización tecnológica.
                 </p>
 
@@ -252,25 +208,21 @@
                     <tbody>
                         <tr>
                             <td>Promedio grupo</td>
-                            <td class="result-value">67</td>
+                            <td class="result-value">{{ average_score }}</td>
                         </tr>
                         <tr>
                             <td>Resultado máximo</td>
-                            <td class="result-value">91</td>
+                            <td class="result-value">{{ max_score }}</td>
                         </tr>
                         <tr>
                             <td>Resultado mínimo</td>
-                            <td class="result-value">43</td>
+                            <td class="result-value">{{ min_score }}</td>
                         </tr>
                     </tbody>
                 </table>
 
                 <p class="simple-text margin-top-30">
-                    Los resultados muestran diferencias moderadas entre
-                    participantes, lo que indica que el nivel de alfabetización
-                    tecnológica no es completamente homogéneo dentro del grupo.
-                    Esto puede generar distintas velocidades de adopción
-                    tecnológica dentro de la organización.
+                    {{ global_index_interpretation }}
                 </p>
             </main>
         </section>
@@ -300,36 +252,18 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for item in participant_distribution %}
                         <tr>
                             <td class="text-left">
                                 <span
-                                    class="dot dot-green margin-right-10"
+                                    class="dot dot-{{ item.dot_color }} margin-right-10"
                                 ></span>
-                                Avanzado
+                                {{ item.level }}
                             </td>
-                            <td>5</td>
-                            <td>12 %</td>
+                            <td>{{ item.count }}</td>
+                            <td>{{ item.percentage }} %</td>
                         </tr>
-                        <tr>
-                            <td class="text-left">
-                                <span
-                                    class="dot dot-yellow margin-right-10"
-                                ></span>
-                                Intermedio
-                            </td>
-                            <td>26</td>
-                            <td>62 %</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">
-                                <span
-                                    class="dot dot-red margin-right-10"
-                                ></span>
-                                Básico
-                            </td>
-                            <td>11</td>
-                            <td>26 %</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
 
@@ -349,34 +283,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for area in area_results %}
                         <tr>
                             <td class="text-left">
-                                Ecosistema digital de colaboración
+                                {{ area.name }}
                             </td>
-                            <td>74</td>
+                            <td>{{ area.score }}</td>
                         </tr>
-                        <tr>
-                            <td class="text-left">Cultura digital</td>
-                            <td>72</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">Impacto personal</td>
-                            <td>69</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">
-                                Futuro sustentable e inclusivo
-                            </td>
-                            <td>64</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">Tecnología y negocios</td>
-                            <td>61</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">Ciberseguridad</td>
-                            <td>58</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
 
@@ -416,79 +330,15 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for theme in theme_ranking %}
                         <tr>
-                            <td>1</td>
+                            <td>{{ forloop.counter }}</td>
                             <td class="text-left">
-                                Herramientas de colaboración
+                                {{ theme.name }}
                             </td>
-                            <td>76</td>
+                            <td>{{ theme.score }}</td>
                         </tr>
-                        <tr>
-                            <td>2</td>
-                            <td class="text-left">Uso de la tecnología</td>
-                            <td>74</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td class="text-left">Internet y conectividad</td>
-                            <td>72</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td class="text-left">Etiqueta digital</td>
-                            <td>71</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td class="text-left">Dispositivos digitales</td>
-                            <td>69</td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td class="text-left">Tecnologías de asistencia</td>
-                            <td>66</td>
-                        </tr>
-                        <tr>
-                            <td>7</td>
-                            <td class="text-left">Huella digital</td>
-                            <td>63</td>
-                        </tr>
-                        <tr>
-                            <td>8</td>
-                            <td class="text-left">
-                                Rol del líder y la tecnología
-                            </td>
-                            <td>62</td>
-                        </tr>
-                        <tr>
-                            <td>9</td>
-                            <td class="text-left">Tecnologías emergentes</td>
-                            <td>60</td>
-                        </tr>
-                        <tr>
-                            <td>10</td>
-                            <td class="text-left">
-                                Tecnología y medio ambiente
-                            </td>
-                            <td>59</td>
-                        </tr>
-                        <tr>
-                            <td>11</td>
-                            <td class="text-left">
-                                Evolución de la tecnología
-                            </td>
-                            <td>58</td>
-                        </tr>
-                        <tr>
-                            <td>12</td>
-                            <td class="text-left">Ciberseguridad</td>
-                            <td>55</td>
-                        </tr>
-                        <tr>
-                            <td>13</td>
-                            <td class="text-left">Antecedentes tecnológicos</td>
-                            <td>52</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </main>
@@ -522,86 +372,18 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for participant in nominal_ranking %}
                         <tr>
-                            <td>1</td>
+                            <td>{{ forloop.counter }}</td>
                             <td class="text-left">
-                                Laura Isabel Martínez Hinojosa
+                                {{ participant.name }}
                             </td>
-                            <td>Director</td>
-                            <td>89</td>
-                            <td>Avanzado</td>
-                            <td><span class="dot dot-green"></span></td>
+                            <td>{{ participant.position }}</td>
+                            <td>{{ participant.score }}</td>
+                            <td>{{ participant.level }}</td>
+                            <td><span class="dot dot-{{ participant.dot_color }}"></span></td>
                         </tr>
-                        <tr>
-                            <td>2</td>
-                            <td class="text-left">
-                                Carlos Enrqiue Gómez Martínez
-                            </td>
-                            <td>Gerente</td>
-                            <td>85</td>
-                            <td>Avanzado</td>
-                            <td><span class="dot dot-green"></span></td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td class="text-left">
-                                Ana María Torres de la Garza
-                            </td>
-                            <td>Jefe de Departamento</td>
-                            <td>77</td>
-                            <td>Intermedio</td>
-                            <td><span class="dot dot-yellow"></span></td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td class="text-left">
-                                Luis Alfonso Herrera Barrera
-                            </td>
-                            <td>Gerente</td>
-                            <td>72</td>
-                            <td>Intermedio</td>
-                            <td><span class="dot dot-yellow"></span></td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td class="text-left">
-                                Mariana de Jesús Ríos González
-                            </td>
-                            <td>Coordinadora</td>
-                            <td>68</td>
-                            <td>Intermedio</td>
-                            <td><span class="dot dot-yellow"></span></td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td class="text-left">
-                                Javier Ignacio López García
-                            </td>
-                            <td>Supervisor</td>
-                            <td>59</td>
-                            <td>Básico</td>
-                            <td><span class="dot dot-red"></span></td>
-                        </tr>
-                        <tr>
-                            <td>7</td>
-                            <td class="text-left">
-                                Patricia del Rocío Núñez Jimenez
-                            </td>
-                            <td>Gerente</td>
-                            <td>54</td>
-                            <td>Básico</td>
-                            <td><span class="dot dot-red"></span></td>
-                        </tr>
-                        <tr>
-                            <td>42</td>
-                            <td class="text-left">
-                                Ricardo Díaz Sánchez-Cordero
-                            </td>
-                            <td>Director</td>
-                            <td>51</td>
-                            <td>Básico</td>
-                            <td><span class="dot dot-red"></span></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </main>
@@ -630,192 +412,24 @@
                         <thead>
                             <tr>
                                 <th class="name-col"><div>Nombre</div></th>
+                                {% for theme_name in heatmap_themes %}
                                 <th class="vertical-col">
-                                    <div>Antecedentes tecnológicos</div>
+                                    <div>{{ theme_name }}</div>
                                 </th>
-                                <th class="vertical-col">
-                                    <div>Evolución de la tecnología</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Internet y conectividad</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Dispositivos digitales</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Ciberseguridad</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Huella digital</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Uso de la tecnología</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Herramientas de colaboración</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Tecnologías emergentes</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Tecnologías de asistencia</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Rol del líder y la tecnología</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Tecnología y medio ambiente</div>
-                                </th>
-                                <th class="vertical-col">
-                                    <div>Etiqueta digital</div>
-                                </th>
+                                {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
+                            {% for row in heatmap_data %}
                             <tr>
                                 <td class="text-center">
-                                    Laura Isabel Martínez Hinojosa
+                                    {{ row.name }}
                                 </td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-green"></span></td>
+                                {% for dot_color in row.dots %}
+                                <td><span class="dot dot-{{ dot_color }}"></span></td>
+                                {% endfor %}
                             </tr>
-                            <tr>
-                                <td class="text-center">
-                                    Carlos Enrqiue Gómez Martínez
-                                </td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    Ana María Torres de la Garza
-                                </td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-green"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    Luis Alfonso Herrera Barrera
-                                </td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    Mariana de Jesús Ríos González
-                                </td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    Javier Ignacio López García
-                                </td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    Patricia del Rocío Núñez Jimenez
-                                </td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    Ricardo Díaz Sánchez-Cordero
-                                </td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                                <td><span class="dot dot-red"></span></td>
-                                <td><span class="dot dot-yellow"></span></td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -892,10 +506,11 @@
                         transversal en la organización.
                     </p>
                     <ul class="name-list">
-                        <li>
-                            En este grupo no se encontraron {Embajador
-                            Estratégico}s
-                        </li>
+                        {% for name in strategic_profiles.ambassadors %}
+                        <li>{{ name }}</li>
+                        {% empty %}
+                        <li>En este grupo no se encontraron Embajadores Estratégicos</li>
+                        {% endfor %}
                     </ul>
                 </div>
 
@@ -911,9 +526,11 @@
                         tecnológicas.
                     </p>
                     <ul class="name-list">
-                        <li>Carlos Enrique Gómez Martínez</li>
-                        <li>Ana María Torres de la Garza</li>
-                        <li>Luis Alfonso Herrera Barrera</li>
+                        {% for name in strategic_profiles.champions %}
+                        <li>{{ name }}</li>
+                        {% empty %}
+                        <li>En este grupo no se encontraron Champions de Transformación</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </main>
@@ -945,8 +562,11 @@
                         prioridad de intervención individual.
                     </p>
                     <ul class="name-list">
-                        <li>Ricardo Díaz López</li>
-                        <li>Mariana Ríos González</li>
+                        {% for name in strategic_profiles.risks %}
+                        <li>{{ name }}</li>
+                        {% empty %}
+                        <li>En este grupo no se encontraron perfiles de Riesgo Crítico</li>
+                        {% endfor %}
                     </ul>
                 </div>
 
@@ -1000,41 +620,16 @@
                     para atender.
                 </h3>
 
-                <div class="action-block">
-                    <div class="subset-title">Antecedentes tecnológicos</div>
+                {% for action_block in priority_actions %}
+                <div class="action-block {% if not forloop.first %}margin-top-30{% endif %}">
+                    <div class="subset-title">{{ action_block.title }}</div>
                     <ul class="name-list">
-                        <li>
-                            Reforzar conceptos básicos sobre cómo funciona la
-                            tecnología y su evolución en el negocio.
-                        </li>
-                        <li>
-                            Integrar fundamentos tecnológicos en sesiones de
-                            inducción o actualización interna.
-                        </li>
-                        <li>
-                            Relacionar conceptos tecnológicos con casos
-                            prácticos del entorno organizacional.
-                        </li>
+                        {% for item in action_block.items %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
-
-                <div class="action-block margin-top-30">
-                    <div class="subset-title">Ciberseguridad</div>
-                    <ul class="name-list">
-                        <li>
-                            Implementar lineamientos básicos de seguridad
-                            digital para toda la organización.
-                        </li>
-                        <li>
-                            Sensibilizar sobre riesgos comunes como phishing,
-                            accesos indebidos y manejo de información.
-                        </li>
-                        <li>
-                            Integrar prácticas de seguridad en el uso cotidiano
-                            de herramientas digitales.
-                        </li>
-                    </ul>
-                </div>
+                {% endfor %}
             </main>
         </section>
 
@@ -1054,17 +649,12 @@
             <main>
                 <h2 class="section-title">10. Recomendaciones adicionales</h2>
 
-                <div class="placeholders-text">
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-                    <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
+                <div class="text-content">
+                    {% for rec in additional_recommendations %}
+                    <p>{{ rec|safe }}</p>
+                    {% empty %}
+                    <p>No hay recomendaciones adicionales.</p>
+                    {% endfor %}
                 </div>
 
                 <div class="lf-message">

@@ -66,11 +66,97 @@ def preview_report_pdf(request):
     """
     View to preview the WeasyPrint PDF report using the html-pdf template.
     """
-    # Context for the template
+    # Mock data for all dynamic sections
     context = {
-        "company_name": "Acme Corp ",
-        "total_participants": 123,
+        "company_name": "Acme Corp (Dynamic Preview)",
+        "total_participants": 42,
         "report_date": "13 de mayo 2026",
+        "average_score": 67,
+        "max_score": 91,
+        "min_score": 43,
+        "level": "Intermedio",
+        "summary_paragraphs": [
+            "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario.",
+            "Las principales <strong>fortalezas</strong> del grupo se observan en las áreas de <strong>Ecosistema digital de colaboración</strong> y <strong>Cultura digital</strong>.",
+            "Las principales <strong>áreas de oportunidad</strong> se concentran en <strong>Ciberseguridad</strong> y <strong>Tecnología y negocios</strong>."
+        ],
+        "global_index_interpretation": "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo.",
+        "participant_distribution": [
+            {"level": "Avanzado", "count": 5, "percentage": 12, "dot_color": "green"},
+            {"level": "Intermedio", "count": 26, "percentage": 62, "dot_color": "yellow"},
+            {"level": "Básico", "count": 11, "percentage": 26, "dot_color": "red"},
+        ],
+        "area_results": [
+            {"name": "Ecosistema digital de colaboración", "score": 74},
+            {"name": "Cultura digital", "score": 72},
+            {"name": "Impacto personal", "score": 69},
+            {"name": "Futuro sustentable e inclusivo", "score": 64},
+            {"name": "Tecnología y negocios", "score": 61},
+            {"name": "Ciberseguridad", "score": 58},
+        ],
+        "theme_ranking": [
+            {"name": "Herramientas de colaboración", "score": 76},
+            {"name": "Uso de la tecnología", "score": 74},
+            {"name": "Internet y conectividad", "score": 72},
+            {"name": "Etiqueta digital", "score": 71},
+            {"name": "Dispositivos digitales", "score": 69},
+            {"name": "Tecnologías de asistencia", "score": 66},
+            {"name": "Huella digital", "score": 63},
+            {"name": "Rol del líder y la tecnología", "score": 62},
+            {"name": "Tecnologías emergentes", "score": 60},
+            {"name": "Tecnología y medio ambiente", "score": 59},
+            {"name": "Evolución de la tecnología", "score": 58},
+            {"name": "Ciberseguridad", "score": 55},
+            {"name": "Antecedentes tecnológicos", "score": 52},
+        ],
+        "nominal_ranking": [
+            {"name": "Laura Isabel Martínez Hinojosa", "position": "Director", "score": 89, "level": "Avanzado", "dot_color": "green"},
+            {"name": "Carlos Enrique Gómez Martínez", "position": "Gerente", "score": 85, "level": "Avanzado", "dot_color": "green"},
+            {"name": "Ana María Torres de la Garza", "position": "Jefe de Departamento", "score": 77, "level": "Intermedio", "dot_color": "yellow"},
+            {"name": "Luis Alfonso Herrera Barrera", "position": "Gerente", "score": 72, "level": "Intermedio", "dot_color": "yellow"},
+            {"name": "Mariana de Jesús Ríos González", "position": "Coordinadora", "score": 68, "level": "Intermedio", "dot_color": "yellow"},
+            {"name": "Javier Ignacio López García", "position": "Supervisor", "score": 59, "level": "Básico", "dot_color": "red"},
+            {"name": "Patricia del Rocío Núñez Jimenez", "position": "Gerente", "score": 54, "level": "Básico", "dot_color": "red"},
+            {"name": "Ricardo Díaz Sánchez-Cordero", "position": "Director", "score": 51, "level": "Básico", "dot_color": "red"},
+        ],
+        "heatmap_themes": [
+            "Antecedentes tecnológicos", "Evolución de la tecnología", "Internet y conectividad",
+            "Dispositivos digitales", "Ciberseguridad", "Huella digital", "Uso de la tecnología",
+            "Herramientas de colaboración", "Tecnologías emergentes", "Tecnologías de asistencia",
+            "Rol del líder y la tecnología", "Tecnología y medio ambiente", "Etiqueta digital"
+        ],
+        "heatmap_data": [
+            {"name": "Laura Isabel Martínez Hinojosa", "dots": ["green", "green", "green", "green", "green", "green", "green", "green", "green", "green", "green", "yellow", "green"]},
+            {"name": "Carlos Enrique Gómez Martínez", "dots": ["yellow", "yellow", "green", "yellow", "yellow", "yellow", "green", "green", "yellow", "yellow", "green", "yellow", "green"]},
+            {"name": "Ana María Torres de la Garza", "dots": ["yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "green", "yellow", "yellow", "yellow", "yellow", "green"]},
+        ],
+        "strategic_profiles": {
+            "ambassadors": [],
+            "champions": ["Carlos Enrique Gómez Martínez", "Ana María Torres de la Garza", "Luis Alfonso Herrera Barrera"],
+            "risks": ["Ricardo Díaz López", "Mariana Ríos González"]
+        },
+        "priority_actions": [
+            {
+                "title": "Antecedentes tecnológicos",
+                "items": [
+                    "Reforzar conceptos básicos sobre cómo funciona la tecnología y su evolución en el negocio.",
+                    "Integrar fundamentos tecnológicos en sesiones de inducción o actualización interna.",
+                    "Relacionar conceptos tecnológicos con casos prácticos del entorno organizacional."
+                ]
+            },
+            {
+                "title": "Ciberseguridad",
+                "items": [
+                    "Implementar lineamientos básicos de seguridad digital para toda la organización.",
+                    "Sensibilizar sobre riesgos comunes como phishing, accesos indebidos y manejo de información.",
+                    "Integrar prácticas de seguridad en el uso cotidiano de herramientas digitales."
+                ]
+            }
+        ],
+        "additional_recommendations": [
+            "Establecer un programa de mentoría interna donde los 'Champions' apoyen a otros líderes.",
+            "Realizar talleres prácticos trimestrales sobre tecnologías emergentes aplicadas al sector."
+        ]
     }
 
     # Render HTML string from template
