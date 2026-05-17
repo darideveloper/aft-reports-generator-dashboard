@@ -2,6 +2,8 @@ from django.db.models import QuerySet
 
 from survey import models
 
+from django.db.models import Avg
+
 
 class SurveyCalcsGroup:
 
@@ -48,3 +50,30 @@ class SurveyCalcsGroup:
             return "medium"
         else:
             return "high"
+
+    def get_average_question_groups_ordered(self) -> dict[str, float]:
+        """
+        Get the average of each area in the company ordered by average
+
+        Returns:
+            dict[str, float]: Average of each area ordered by average
+        """
+        # Initialize dictionary to store average areas
+        area_averages = {}
+
+        # Get all areas
+        question_groups = models.QuestionGroup.objects.all()
+
+        # Calculate average for each question group
+        for question_group in question_groups:
+            question_group_totals = models.ReportQuestionGroupTotal.objects.filter(
+                question_group=question_group,
+                report__in=self.reports,
+            )
+            question_group_total_avg = question_group_totals.aggregate(Avg("total"))[
+                "total__avg"
+            ]
+            area_averages[question_group.name] = question_group_total_avg
+
+        # Order by average
+        return dict(reversed(sorted(area_averages.items(), key=lambda item: item[1])))
