@@ -1,6 +1,11 @@
 :root {
-    --page-width: 210mm;
-    --page-height: 297mm;
+    --page-size: Letter;
+    --font-size-normal: 11pt;
+    --font-size-heading: 13pt;
+    --font-size-sub-heading: 11pt;
+    --page-width: 8.5in;
+
+    --page-height: 11in;
     --margin: 20mm;
     --font-main: "Arial", sans-serif;
     --color-text: #000;
@@ -17,9 +22,10 @@
 
 /* Page Definition - Perfect Paged Media Header/Footer */
 @page {
-    size: A4;
+    size: var(--page-size) portrait;
     margin: var(--margin);
     margin-bottom: 25mm; /* Space for footer */
+    font-size: var(--font-size-normal);
     @bottom-center {
         content: element(footer);
         width: 100%;
@@ -42,6 +48,7 @@ body {
     background: #f0f0f0;
     font-family: var(--font-main);
     color: var(--color-text);
+    font-size: var(--font-size-normal);
 }
 
 /* Browser Preview Styling */
@@ -96,8 +103,24 @@ header {
     text-align: center;
 }
 
+h1,
+h2,
+h3,
+h5,
+h6 {
+    font-size: var(--font-size-heading);
+    font-weight: bold;
+}
+
+h4,
+.subset-title {
+    font-size: var(--font-size-sub-heading);
+    font-weight: bold;
+}
+
 .report-title {
-    font-size: 44px;
+    font-size: 37px;
+    margin-top: 85px;
     margin-bottom: 20px;
     font-weight: bold;
 }
@@ -112,14 +135,14 @@ header {
 }
 
 .report-subtitle {
-    font-size: 32px;
+    font-size: 37px;
     margin-bottom: 40px;
     font-weight: bold;
 }
 
 .report-info {
     text-align: left;
-    font-size: 18px;
+    font-size: 22px;
     line-height: 1.5;
     align-self: flex-start;
     margin-left: 15%;
@@ -177,21 +200,21 @@ footer {
 }
 
 .section-title {
-    font-size: 24px;
-    margin-top: 40px;
-    margin-bottom: 30px;
+    font-size: var(--font-size-heading);
+    margin-top: 20px;
+    margin-bottom: 20px;
     font-weight: bold;
 }
 
 .toc-list {
     list-style-position: inside;
     line-height: 2.2;
-    font-size: 16px;
+    font-size: var(--font-size-normal);
 }
 
 .text-content {
     line-height: 1.6;
-    font-size: 16px;
+    font-size: var(--font-size-normal);
     text-align: justify;
 }
 
@@ -200,14 +223,14 @@ footer {
 }
 
 .subset-title {
-    font-size: 18px;
+    font-size: var(--font-size-sub-heading);
     font-weight: bold;
     margin-top: 30px;
     margin-bottom: 10px;
 }
 
 .simple-text {
-    font-size: 16px;
+    font-size: var(--font-size-normal);
     line-height: 1.6;
 }
 
@@ -347,7 +370,7 @@ td {
 
 .classification-table td {
     text-align: center;
-    font-size: 16px;
+    font-size: var(--font-size-normal);
 }
 
 .classification-detail {
@@ -363,14 +386,14 @@ td {
 }
 
 .name-list {
-    list-style: none;
+    list-style: disc;
     margin-top: 15px;
     padding-left: 20px;
 }
 
 .name-list li {
     margin-bottom: 8px;
-    font-size: 16px;
+    font-size: var(--font-size-normal);
     position: relative;
 }
 

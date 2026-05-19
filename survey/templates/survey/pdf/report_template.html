@@ -34,7 +34,9 @@
         <!-- Page 1 -->
         <section class="page" id="page-1">
             <header>
-                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-left" style="font-weight: bold">
+                    LeadForward Global Solutions MJ
+                </div>
                 <div class="header-right">
                     <img
                         src="assets/images/lead-forward-logo.png"
@@ -55,7 +57,9 @@
                     />
                 </div>
 
-                <h2 class="report-subtitle">Alfabetización Tecnológica</h2>
+                <h2 class="report-subtitle" style="margin: 40px 0">
+                    Alfabetización Tecnológica
+                </h2>
 
                 <div class="report-info">
                     <p><strong>Empresa:</strong> {{ company_name }}</p>
@@ -85,8 +89,10 @@
             </header>
 
             <main>
-                <h2 class="section-title">Contenido</h2>
-                <ol class="toc-list">
+                <h2 class="section-title" style="margin-bottom: 10px">
+                    Contenido
+                </h2>
+                <ol class="toc-list" style="margin-left: 20px">
                     <li>Resumen ejecutivo</li>
                     <li>Índice global del grupo</li>
                     <li>Distribución de participantes</li>
@@ -122,15 +128,14 @@
                 <div class="text-content">
                     <p>
                         El grupo evaluado obtuvo un Índice de Alfabetización
-                        Tecnológica de <strong>{{ average_score }} puntos</strong>, lo que indica
-                        un nivel <strong>{{ level }}</strong> de dominio
+                        Tecnológica de
+                        <strong>{{ average_score }} puntos</strong>, lo que
+                        indica un nivel <strong>{{ level }}</strong> de dominio
                         tecnológico.
                     </p>
 
                     {% for paragraph in summary_paragraphs %}
-                    <p>
-                        {{ paragraph|safe }}
-                    </p>
+                    <p>{{ paragraph|safe }}</p>
                     {% endfor %}
                 </div>
             </main>
@@ -152,14 +157,14 @@
             <main>
                 <h2 class="section-title">2. Índice global del grupo</h2>
 
-                <div class="subset-title">Muestra Evaluada</div>
+                <p class="simple-text">Muestra Evaluada</p>
                 <p class="simple-text">
                     Participaron
                     <strong>{{ total_participants }}</strong> personas
                     pertenecientes a distintas áreas de la organización.
                 </p>
 
-                <div class="subset-title">Escala de Interpretación.</div>
+                <div class="simple-text">Escala de Interpretación.</div>
                 <table class="interpretation-table">
                     <thead>
                         <tr>
@@ -193,8 +198,9 @@
 
                 <p class="simple-text margin-top-30">
                     Como ya se mencionó anteriormente, el grupo obtuvo un Índice
-                    de Alfabetización Tecnológica de <strong>{{ average_score }} puntos</strong>,
-                    lo que corresponde a un <strong>nivel {{ level|lower }}</strong> de
+                    de Alfabetización Tecnológica de
+                    <strong>{{ average_score }} puntos</strong>, lo que
+                    corresponde a un <strong>nivel {{ level|lower }}</strong> de
                     alfabetización tecnológica.
                 </p>
 
@@ -285,16 +291,12 @@
                     <tbody>
                         {% for area in area_results %}
                         <tr>
-                            <td class="text-left">
-                                {{ area.name }}
-                            </td>
+                            <td class="text-left">{{ area.name }}</td>
                             <td>{{ area.score }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-
-                <h2 class="section-title">5. Ranking de los 13 temas</h2>
             </main>
         </section>
 
@@ -312,6 +314,7 @@
             </header>
 
             <main>
+                <h2 class="section-title">5. Ranking de los 13 temas</h2>
                 <p class="simple-text">
                     El ranking de los 13 temas permite identificar con mayor
                     precisión las prioridades de desarrollo del grupo en la
@@ -333,9 +336,7 @@
                         {% for theme in theme_ranking %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td class="text-left">
-                                {{ theme.name }}
-                            </td>
+                            <td class="text-left">{{ theme.name }}</td>
                             <td>{{ theme.score }}</td>
                         </tr>
                         {% endfor %}
@@ -375,13 +376,15 @@
                         {% for participant in nominal_ranking %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td class="text-left">
-                                {{ participant.name }}
-                            </td>
+                            <td class="text-left">{{ participant.name }}</td>
                             <td>{{ participant.position }}</td>
                             <td>{{ participant.score }}</td>
                             <td>{{ participant.level }}</td>
-                            <td><span class="dot dot-{{ participant.dot_color }}"></span></td>
+                            <td>
+                                <span
+                                    class="dot dot-{{ participant.dot_color }}"
+                                ></span>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -422,11 +425,13 @@
                         <tbody>
                             {% for row in heatmap_data %}
                             <tr>
-                                <td class="text-center">
-                                    {{ row.name }}
-                                </td>
+                                <td class="text-center">{{ row.name }}</td>
                                 {% for dot_color in row.dots %}
-                                <td><span class="dot dot-{{ dot_color }}"></span></td>
+                                <td>
+                                    <span
+                                        class="dot dot-{{ dot_color }}"
+                                    ></span>
+                                </td>
                                 {% endfor %}
                             </tr>
                             {% endfor %}
@@ -509,7 +514,10 @@
                         {% for name in strategic_profiles.ambassadors %}
                         <li>{{ name }}</li>
                         {% empty %}
-                        <li>En este grupo no se encontraron Embajadores Estratégicos</li>
+                        <li>
+                            En este grupo no se encontraron Embajadores
+                            Estratégicos
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -529,7 +537,10 @@
                         {% for name in strategic_profiles.champions %}
                         <li>{{ name }}</li>
                         {% empty %}
-                        <li>En este grupo no se encontraron Champions de Transformación</li>
+                        <li>
+                            En este grupo no se encontraron Champions de
+                            Transformación
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -565,7 +576,10 @@
                         {% for name in strategic_profiles.risks %}
                         <li>{{ name }}</li>
                         {% empty %}
-                        <li>En este grupo no se encontraron perfiles de Riesgo Crítico</li>
+                        <li>
+                            En este grupo no se encontraron perfiles de Riesgo
+                            Crítico
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -621,7 +635,9 @@
                 </h3>
 
                 {% for action_block in priority_actions %}
-                <div class="action-block {% if not forloop.first %}margin-top-30{% endif %}">
+                <div
+                    class="action-block {% if not forloop.first %}margin-top-30{% endif %}"
+                >
                     <div class="subset-title">{{ action_block.title }}</div>
                     <ul class="name-list">
                         {% for item in action_block.items %}
@@ -769,7 +785,6 @@
                         <li>Cultura Digital.</li>
                         <li>Tecnología y Negocio.</li>
                         <li>Ciberseguridad.</li>
-                        <li>Impacto Personal.</li>
                     </ul>
                 </div>
             </main>
@@ -791,6 +806,7 @@
             <main>
                 <div class="annex-section">
                     <ul class="name-list">
+                        <li>Impacto Personal.</li>
                         <li>Futuro Sustentable e Inclusivo.</li>
                         <li>Ecosistema Digital de Colaboración.</li>
                     </ul>
