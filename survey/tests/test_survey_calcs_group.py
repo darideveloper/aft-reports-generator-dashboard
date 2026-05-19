@@ -1,3 +1,4 @@
+import math
 import random
 
 from core.tests_base.test_models import TestSurveyModelBase
@@ -27,6 +28,27 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         )
         self.client.login(username=username, password=password)
 
+    def get_lower_outlier_value(self, target_std_dev, missing_count=1):
+        """
+        Calculates the lower value needed for a set of missing identical numbers
+        alongside a set of values equal to 100 to achieve a specific target
+        standard deviation in Django. Total dataset size is always 100.
+
+        Args:
+            target_std_dev (float): The standard deviation value to achieve
+            missing_count (int): How many identical missing items you need to fill (e.g., 1, 10)
+            sample (bool): Set to True if you use Django's StdDev(sample=True)
+
+        Returns:
+            float: The exact value needed for the missing items
+        """
+        TOTAL_ITEMS = 100
+        identical_count = TOTAL_ITEMS - missing_count
+
+        # Population StdDev formula adjustment for multiple identical outliers
+        factor = TOTAL_ITEMS / math.sqrt(identical_count * missing_count)
+        return 100.0 - (target_std_dev * factor)
+
     def create_final_reports(
         self, total: float = 50.0, count: int = 100, total_random: bool = False
     ):
@@ -43,6 +65,11 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         for _ in range(count):
             options = self.get_selected_options(score=total, random_score=total_random)
             report = self.create_report(options=options)
+            
+            if not total_random:
+                report.total = total
+                report.save()
+
             reports.append(report)
 
         return reports
@@ -208,3 +235,73 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(data[qg_upper.name], 100)
         self.assertNotEqual(qg_lower.name, list(data.keys())[0])
         self.assertNotEqual(qg_upper.name, list(data.keys())[-1])
+
+    def test_get_standard_deviation_total_50(self):
+        """Validate standard deviation total when all reports have same total (50)"""
+
+        # initialize data
+        self.create_final_reports(count=10, total=50.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # Validate standard deviation
+        self.assertEqual(calcs.get_standard_deviation_total(), 0.0)
+
+    def test_get_standard_deviation_total_random(self):
+        """Validate standard deviation total when all reports have random total"""
+
+        # initialize data
+        self.create_final_reports(count=10, total_random=True)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # Validate standard deviation
+        self.assertNotEqual(calcs.get_standard_deviation_total(), 0.0)
+
+    def test_get_standard_deviation_total_99_100__1_90(self):
+        """Validate standard deviation total when all reports have 100 and one has 90 total"""
+
+        # initialize data
+        self.create_final_reports(count=99, total=100.0)
+        self.create_final_reports(count=1, total=90.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # Validate standard deviation
+        self.assertLess(calcs.get_standard_deviation_total(), 1.0)
+
+    def test_get_standard_deviation_total_9_100__1_90(self):
+        """Validate standard deviation total when all reports have 100 and one has 90 total"""
+
+        # initialize data
+        self.create_final_reports(count=9, total=100.0)
+        self.create_final_reports(count=1, total=90.0)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        # Validate standard deviation
+        self.assertEqual(calcs.get_standard_deviation_total(), 3.0)
+
+    def test_get_standard_deviation_total_range(self):
+        """Validate standard deviation total range for all required values"""
+        values = {
+            0.0: "low",
+            7.9: "low",
+            8.0: "low",
+            8.1: "medium",
+            14.9: "medium",
+            15.0: "medium",
+            15.1: "high",
+        }
+
+        for value, expected_range in values.items():
+            with self.subTest(value=value):
+                survey_models.Report.objects.all().delete()
+                self.create_final_reports(count=90, total=100)
+                required_value = self.get_lower_outlier_value(
+                    target_std_dev=value, missing_count=10
+                )
+                self.create_final_reports(count=10, total=required_value)
+                calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+                self.assertAlmostEqual(
+                    calcs.get_standard_deviation_total(), value, places=1
+                )
+                self.assertEqual(
+                    calcs.get_standard_deviation_total_range(), expected_range
+                )

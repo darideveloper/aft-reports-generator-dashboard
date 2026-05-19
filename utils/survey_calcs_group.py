@@ -3,6 +3,7 @@ from django.db.models import QuerySet
 from survey import models
 
 from django.db.models import Avg
+from django.db.models import StdDev
 
 
 class SurveyCalcsGroup:
@@ -77,3 +78,31 @@ class SurveyCalcsGroup:
 
         # Order by average
         return dict(reversed(sorted(area_averages.items(), key=lambda item: item[1])))
+
+    def get_standard_deviation_total(self) -> float:
+        """
+        Get the standard deviation of the total of the reports in the company
+
+        Returns:
+            float: Standard deviation of the total of the reports
+        """
+        # Naming it 'std_dev' explicitly makes the dictionary lookup cleaner
+        result = self.reports.aggregate(std_dev=StdDev("total"))
+        return result["std_dev"] or 0.0
+
+    def get_standard_deviation_total_range(self) -> str:
+        """
+        Get the standard deviation range of the total of the reports in the company (low / medium / high)
+
+        Returns:
+            str: Standard deviation range label
+        """
+
+        standard_deviation = round(self.get_standard_deviation_total(), 1)
+
+        if standard_deviation <= 8:
+            return "low"
+        elif standard_deviation <= 15:
+            return "medium"
+        else:
+            return "high"
