@@ -637,15 +637,15 @@
       id="page-12"
     >
       <main>
+        {% if additional_recommendations %}
         <h2 class="section-title">10. Recomendaciones adicionales</h2>
 
         <div class="text-content">
           {% for rec in additional_recommendations %}
           <p>{{ rec|safe }}</p>
-          {% empty %}
-          <p>No hay recomendaciones adicionales.</p>
           {% endfor %}
         </div>
+        {% endif %}
 
         <div class="lf-message">
           <h3 class="subset-title">

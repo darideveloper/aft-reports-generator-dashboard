@@ -55,6 +55,12 @@ class Company(models.Model):
         verbose_name="Promedio",
         help_text="Promedio de los reportes de la empresa (automáticamente calculado)",
     )
+    additional_recommendations = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Recomendaciones Adicionales",
+        help_text="Recomendaciones personalizadas para el reporte grupal en PDF. Una por línea.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

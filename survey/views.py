@@ -204,8 +204,9 @@ class GroupReportPDFView(View):
             # --------------------------
             "priority_actions": calcs.get_priority_actions(),
             "additional_recommendations": [
-                "Establecer un programa de mentoría interna donde los 'Champions' apoyen a otros líderes.",
-                "Realizar talleres prácticos trimestrales sobre tecnologías emergentes aplicadas al sector.",
+                line.strip()
+                for line in (company.additional_recommendations or "").splitlines()
+                if line.strip()
             ],
         }
 
