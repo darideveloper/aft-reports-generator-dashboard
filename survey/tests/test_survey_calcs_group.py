@@ -287,6 +287,39 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(calcs.get_max_score(), 95.75)
         self.assertEqual(calcs.get_min_score(), 42.25)
 
+    def test_get_participant_distribution(self):
+        """Validate get_participant_distribution returns correct counts and percentages"""
+        self.create_final_reports(count=5)
+        reports = list(survey_models.Report.objects.all())
+        # Set specific total scores:
+        # Advanced (total >= 80): 2
+        # Intermediate (total >= 60 and < 80): 2
+        # Basic (total < 60): 1
+        reports[0].total = 85.0
+        reports[0].save()
+        reports[1].total = 80.0
+        reports[1].save()
+        reports[2].total = 79.9
+        reports[2].save()
+        reports[3].total = 60.0
+        reports[3].save()
+        reports[4].total = 59.9
+        reports[4].save()
+
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        distribution = calcs.get_participant_distribution()
+
+        # We expect a list of three objects:
+        # high: count=2, percentage=40%
+        # medium: count=2, percentage=40%
+        # low: count=1, percentage=20%
+        expected = [
+            {"level": "high", "count": 2, "percentage": 40},
+            {"level": "medium", "count": 2, "percentage": 40},
+            {"level": "low", "count": 1, "percentage": 20},
+        ]
+        self.assertEqual(distribution, expected)
+
     def test_get_average_question_groups_ordered_random_options(self):
         """Validate average areas ordered by average (max to min)"""
 

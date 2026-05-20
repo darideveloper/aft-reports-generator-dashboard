@@ -20,7 +20,7 @@ from utils.survey_calcs_group import SurveyCalcsGroupTexts
 
 class GroupReportPDFView(View):
 
-    def get_average_range_es(self, range: str) -> str:
+    def get_range_es(self, range_val: str) -> str:
         """
         Convert average range to Spanish
         """
@@ -29,7 +29,18 @@ class GroupReportPDFView(View):
             "medium": "intermedio",
             "high": "avanzado",
         }
-        return ranges.get(range, "")
+        return ranges.get(range_val, "")
+
+    def get_dot_color(self, range_val: str) -> str:
+        """
+        Get dot color for a range
+        """
+        colors = {
+            "low": "red",
+            "medium": "yellow",
+            "high": "green",
+        }
+        return colors.get(range_val, "")
 
     def get(self, request, company_id):
         """
@@ -83,7 +94,7 @@ class GroupReportPDFView(View):
             # --------------------------
             # Paragraph 1
             "average_score": calcs.get_average(),
-            "level": self.get_average_range_es(calcs.get_average_range()),
+            "level": self.get_range_es(calcs.get_average_range()),
             # Paragraph 2
             "general_summary": calcs.get_general_summary(),
             # Paragraph 3
@@ -99,30 +110,28 @@ class GroupReportPDFView(View):
             # --------------------------
             "max_score": calcs.get_max_score(),
             "min_score": calcs.get_min_score(),
-            "global_index_interpretation": calcs.get_dispersion_summary(),
+            # --------------------------
+            # Data page 6
+            # --------------------------
             "participant_distribution": [
                 {
-                    "level": "Avanzado",
-                    "count": 5,
-                    "percentage": 12,
-                    "dot_color": "green",
-                },
-                {
-                    "level": "Intermedio",
-                    "count": 26,
-                    "percentage": 62,
-                    "dot_color": "yellow",
-                },
-                {"level": "Básico", "count": 11, "percentage": 26, "dot_color": "red"},
+                    "level": self.get_range_es(item["level"]).capitalize(),
+                    "count": item["count"],
+                    "percentage": item["percentage"],
+                    "dot_color": self.get_dot_color(item["level"]),
+                }
+                for item in calcs.get_participant_distribution()
             ],
             "area_results": [
-                {"name": "Ecosistema digital de colaboración", "score": 74},
-                {"name": "Cultura digital", "score": 72},
-                {"name": "Impacto personal", "score": 69},
-                {"name": "Futuro sustentable e inclusivo", "score": 64},
-                {"name": "Tecnología y negocios", "score": 61},
-                {"name": "Ciberseguridad", "score": 58},
+                {
+                    "name": item["display_name"],
+                    "score": round(item["average"]),
+                }
+                for item in calcs.get_average_areas_ordered(use_summary=True)
             ],
+            # --------------------------
+            # Data page 7
+            # --------------------------
             "theme_ranking": [
                 {"name": "Herramientas de colaboración", "score": 76},
                 {"name": "Uso de la tecnología", "score": 74},

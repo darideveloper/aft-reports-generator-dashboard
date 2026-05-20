@@ -23,6 +23,7 @@ class SurveyCalcsGroup:
         self._standard_deviation_total = None
         self._max_score = None
         self._min_score = None
+        self._participant_distribution = None
 
     def get_employees_number(self) -> int:
         """
@@ -105,7 +106,9 @@ class SurveyCalcsGroup:
 
                     # Map IDs back to QuestionGroup instances
                     qg_ids = [item["question_group"] for item in results]
-                    qgs = {qg.id: qg for qg in QuestionGroup.objects.filter(id__in=qg_ids)}
+                    qgs = {
+                        qg.id: qg for qg in QuestionGroup.objects.filter(id__in=qg_ids)
+                    }
 
                     final_results = []
                     for item in results:
@@ -141,13 +144,15 @@ class SurveyCalcsGroup:
                     question_group=question_group,
                     report__in=self.reports,
                 )
-                question_group_total_avg = question_group_totals.aggregate(Avg("total"))[
-                    "total__avg"
-                ]
+                question_group_total_avg = question_group_totals.aggregate(
+                    Avg("total")
+                )["total__avg"]
                 area_averages[question_group.name] = question_group_total_avg
 
             # Order by average
-            self._average_question_groups_ordered = dict(reversed(sorted(area_averages.items(), key=lambda item: item[1])))
+            self._average_question_groups_ordered = dict(
+                reversed(sorted(area_averages.items(), key=lambda item: item[1]))
+            )
 
         return self._average_question_groups_ordered
 
@@ -194,6 +199,66 @@ class SurveyCalcsGroup:
                 self._min_score = round(result["min_score"] or 0.0, 2)
         return self._min_score
 
+    def _get_level_from_score(self, score: float) -> str:
+        """
+        Helper method to map a score to low, medium, or high range.
+        """
+        if score < 60:
+            return "low"
+        elif score < 80:
+            return "medium"
+        return "high"
+
+    def get_participant_distribution(self) -> list[dict]:
+        """
+        Get the distribution of participants across basic, intermediate, and advanced levels.
+
+        Returns:
+            list[dict]: Array of objects containing level, count, and percentage.
+        """
+        if self._participant_distribution is None:
+            advanced_count = 0
+            intermediate_count = 0
+            basic_count = 0
+
+            for report in self.reports:
+                lvl = self._get_level_from_score(report.total)
+                if lvl == "high":
+                    advanced_count += 1
+                elif lvl == "medium":
+                    intermediate_count += 1
+                else:
+                    basic_count += 1
+
+            total_reports = self.reports.count()
+            if total_reports > 0:
+                advanced_pct = int(round((advanced_count / total_reports) * 100))
+                intermediate_pct = int(round((intermediate_count / total_reports) * 100))
+                basic_pct = 100 - advanced_pct - intermediate_pct
+            else:
+                advanced_pct = 0
+                intermediate_pct = 0
+                basic_pct = 0
+
+            self._participant_distribution = [
+                {
+                    "level": "high",
+                    "count": advanced_count,
+                    "percentage": advanced_pct,
+                },
+                {
+                    "level": "medium",
+                    "count": intermediate_count,
+                    "percentage": intermediate_pct,
+                },
+                {
+                    "level": "low",
+                    "count": basic_count,
+                    "percentage": basic_pct,
+                },
+            ]
+        return self._participant_distribution
+
 
 class SurveyCalcsGroupTexts(SurveyCalcsGroup):
 
@@ -230,14 +295,7 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
             str: Average range label
         """
         if self._average_range is None:
-            average = self.get_average()
-
-            if average <= 59:
-                self._average_range = "low"
-            elif average <= 79:
-                self._average_range = "medium"
-            else:
-                self._average_range = "high"
+            self._average_range = self._get_level_from_score(self.get_average())
         return self._average_range
 
     def get_general_summary(self) -> str:
@@ -311,7 +369,9 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                 "high": "Los resultados muestran diferencias importantes entre participantes en su nivel de alfabetización tecnológica. Esta variabilidad puede generar distintos niveles de comprensión tecnológica, riesgos  y decisiones no homogéneas dentro de la organización.",
             }
 
-            self._dispersion_summary = summaries.get(self.get_standard_deviation_total_range(), "")
+            self._dispersion_summary = summaries.get(
+                self.get_standard_deviation_total_range(), ""
+            )
         return self._dispersion_summary
 
     def get_priority_summary(self) -> str:
@@ -337,13 +397,12 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                     "Impacto personal": "D",
                     "Tecnología y medio ambiente": "E",
                     "Futuro sustentable e inclusivo": "E",
-                    "Futuro Sustentable e Inclusivo": "E",
                     "Ecosistema digital de colaboración": "F",
                 }
-                
+
                 w1_letter = name_to_letter.get(weaknesses[0])
                 w2_letter = name_to_letter.get(weaknesses[1])
-                
+
                 if not w1_letter or not w2_letter:
                     self._priority_summary = (
                         "Se debe estructurar un plan de acción conjunto enfocado en mejorar "
@@ -351,7 +410,7 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                     )
                 else:
                     l1, l2 = sorted([w1_letter, w2_letter])
-                    
+
                     summaries = {
                         ("A", "B"): (
                             "Resulta prioritario fortalecer la comprensión de cómo la tecnología impacta "
@@ -432,10 +491,10 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                             "el ecosistema digital para generar impacto positivo en la forma de trabajar."
                         ),
                     }
-                    
+
                     self._priority_summary = summaries.get(
                         (l1, l2),
                         "Se debe estructurar un plan de acción conjunto enfocado en mejorar "
-                        f"las áreas de '{weaknesses[0]}' y '{weaknesses[1]}'."
+                        f"las áreas de '{weaknesses[0]}' y '{weaknesses[1]}'.",
                     )
         return self._priority_summary
