@@ -22,7 +22,7 @@ class GroupReportPDFView(View):
     NOMINAL_RANKING_CHUNK_SIZE = 16
     HEATMAP_CHUNK_SIZE = 15
 
-    def chunk_list(self, lst: list, chunk_size: int) -> list[list]:
+    def _chunk_list(self, lst: list, chunk_size: int) -> list[list]:
         """
         Split a list into chunks of a specified size.
         """
@@ -30,7 +30,7 @@ class GroupReportPDFView(View):
             return []
         return [lst[i : i + chunk_size] for i in range(0, len(lst), chunk_size)]
 
-    def get_range_es(self, range_val: str) -> str:
+    def _get_range_es(self, range_val: str) -> str:
         """
         Convert average range to Spanish
         """
@@ -41,7 +41,7 @@ class GroupReportPDFView(View):
         }
         return ranges.get(range_val, "")
 
-    def get_dot_color(self, range_val: str) -> str:
+    def _get_dot_color(self, range_val: str) -> str:
         """
         Get dot color for a range
         """
@@ -103,10 +103,10 @@ class GroupReportPDFView(View):
             for idx, report in enumerate(reports.order_by("-total"))
         ]
 
-        nominal_ranking_chunks = self.chunk_list(
+        nominal_ranking_chunks = self._chunk_list(
             nominal_ranking_raw, self.NOMINAL_RANKING_CHUNK_SIZE
         )
-        heatmap_chunks = self.chunk_list(
+        heatmap_chunks = self._chunk_list(
             calcs.get_heatmap_data(), self.HEATMAP_CHUNK_SIZE
         )
 
@@ -129,7 +129,7 @@ class GroupReportPDFView(View):
             # --------------------------
             # Paragraph 1
             "average_score": calcs.get_average(),
-            "level": self.get_range_es(calcs.get_average_range()),
+            "level": self._get_range_es(calcs.get_average_range()),
             # Paragraph 2
             "general_summary": calcs.get_general_summary(),
             # Paragraph 3
@@ -150,10 +150,10 @@ class GroupReportPDFView(View):
             # --------------------------
             "participant_distribution": [
                 {
-                    "level": self.get_range_es(item["level"]).capitalize(),
+                    "level": self._get_range_es(item["level"]).capitalize(),
                     "count": item["count"],
                     "percentage": item["percentage"],
-                    "dot_color": self.get_dot_color(item["level"]),
+                    "dot_color": self._get_dot_color(item["level"]),
                 }
                 for item in calcs.get_participant_distribution()
             ],
