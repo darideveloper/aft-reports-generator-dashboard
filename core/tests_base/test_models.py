@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+import random
 
 from django.conf import settings
 from django.core.files import File
@@ -283,7 +284,9 @@ class TestSurveyModelBase(APITestCase):
             question_option=question_option,
         )
 
-    def create_report(self, options: list[int] = [], invitation_code: str = None):
+    def create_report(
+        self, options: list[int] = [], invitation_code: str = None
+    ) -> survey_models.Report:
         """
         Create report calling the api
 
@@ -400,3 +403,55 @@ class TestSurveyModelBase(APITestCase):
         if question_groups:
             summary.question_groups.set(question_groups)
         return summary
+
+    def create_question_and_options(self) -> tuple:
+        """
+        Create questions and options in each question group
+
+        Returns:
+            tuple: questions and options
+        """
+
+        # Set question gorup scores to same percentage
+        question_groups = survey_models.QuestionGroup.objects.all()
+        for question_group in question_groups:
+            question_group.survey_percentage = 100 / len(question_groups)
+            question_group.save()
+
+        # Create 10 questions in each question group
+        questions = []
+        options = []
+        for question_group in question_groups:
+            for _ in range(10):
+                question = self.create_question(question_group=question_group)
+                questions.append(question)
+                options.append(
+                    self.create_question_option(question=question, text="yes", points=1)
+                )
+
+        return questions, options
+
+    def get_selected_options(self, score: int, random_score: bool = False) -> list[int]:
+        """
+        Get selected options in each question group based on score
+
+        Args:
+            score: Score to get selected options
+            random_score: Boolean to get random score (override score)
+
+        Returns:
+            list[int]: Selected options ids
+        """
+        selected_options_ids = []
+        question_groups = survey_models.QuestionGroup.objects.all()
+        for question_group in question_groups:
+            selected_options = survey_models.QuestionOption.objects.filter(
+                points=1, question__question_group=question_group
+            )
+            selected_options_num = int(score * len(selected_options) / 100)
+            if random_score:
+                selected_options_num = random.randint(0, len(selected_options))
+            selected_options = selected_options[:selected_options_num]
+            for option in selected_options:
+                selected_options_ids.append(option.id)
+        return selected_options_ids
