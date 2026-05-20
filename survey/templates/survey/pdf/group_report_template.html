@@ -16,6 +16,7 @@
       href="group_report_style.css"
     />
   </head>
+
   <body>
     <!-- Global Header for Paged Media -->
     <header id="page-header">
@@ -380,7 +381,9 @@
           <table class="heatmap-table dark-header">
             <thead>
               <tr>
-                <th class="name-col"><div>Nombre</div></th>
+                <th class="name-col">
+                  <div>Nombre</div>
+                </th>
                 {% for theme_name in heatmap_themes %}
                 <th class="vertical-col">
                   <div>{{ theme_name }}</div>
@@ -462,13 +465,11 @@
             tecnológicos y facilitar la adopción transversal en la organización.
           </p>
           <ul class="name-list">
-            {% if strategic_ambassadors_chunks %}
-              {% for name in strategic_ambassadors_chunks.0 %}
-              <li>{{ name }}</li>
-              {% endfor %}
-            {% else %}
-              <li>En este grupo no se encontraron Embajador Estratégico</li>
-            {% endif %}
+            {% for name in strategic_ambassadors_chunks.0 %}
+            <li>{{ name }}</li>
+            {% empty %}
+            <li>En este grupo no se encontraron Embajador Estratégico</li>
+            {% endfor %}
           </ul>
         </div>
 
@@ -484,21 +485,18 @@
             de capacidades tecnológicas.
           </p>
           <ul class="name-list">
-            {% if strategic_champions_chunks %}
-              {% for name in strategic_champions_chunks.0 %}
-              <li>{{ name }}</li>
-              {% endfor %}
-            {% else %}
-              <li>En este grupo no se encontraron Champion de Transformación</li>
-            {% endif %}
+            {% for name in strategic_champions_chunks.0 %}
+            <li>{{ name }}</li>
+            {% empty %}
+            <li>En este grupo no se encontraron Champion de Transformación</li>
+            {% endfor %}
           </ul>
         </div>
       </main>
     </section>
 
-    <!-- Ambassadors overflow pages -->
-    {% for chunk in strategic_ambassadors_chunks %}
-      {% if forloop.counter0 > 0 %}
+    <!-- Ambassadors overflow pages (chunks after the first) -->
+    {% for chunk in strategic_ambassadors_chunks|slice:"1:" %}
     <section class="page">
       <main>
         <div class="classification-detail">
@@ -514,12 +512,10 @@
         </div>
       </main>
     </section>
-      {% endif %}
     {% endfor %}
 
-    <!-- Champions overflow pages -->
-    {% for chunk in strategic_champions_chunks %}
-      {% if forloop.counter0 > 0 %}
+    <!-- Champions overflow pages (chunks after the first) -->
+    {% for chunk in strategic_champions_chunks|slice:"1:" %}
     <section class="page">
       <main>
         <div class="classification-detail">
@@ -535,7 +531,6 @@
         </div>
       </main>
     </section>
-      {% endif %}
     {% endfor %}
 
     <!-- Page 10: Risks -->
@@ -554,13 +549,11 @@
             tecnológicos. Se considera una prioridad de intervención individual.
           </p>
           <ul class="name-list">
-            {% if strategic_risks_chunks %}
-              {% for name in strategic_risks_chunks.0 %}
-              <li>{{ name }}</li>
-              {% endfor %}
-            {% else %}
-              <li>En este grupo no se encontraron Riesgo Crítico</li>
-            {% endif %}
+            {% for name in strategic_risks_chunks.0 %}
+            <li>{{ name }}</li>
+            {% empty %}
+            <li>En este grupo no se encontraron Riesgo Crítico</li>
+            {% endfor %}
           </ul>
         </div>
 
@@ -572,9 +565,8 @@
       </main>
     </section>
 
-    <!-- Risks overflow pages -->
-    {% for chunk in strategic_risks_chunks %}
-      {% if forloop.counter0 > 0 %}
+    <!-- Risks overflow pages (chunks after the first) -->
+    {% for chunk in strategic_risks_chunks|slice:"1:" %}
     <section class="page">
       <main>
         <div class="classification-detail">
@@ -590,7 +582,6 @@
         </div>
       </main>
     </section>
-      {% endif %}
     {% endfor %}
 
     <!-- Page 11 -->
