@@ -54,3 +54,36 @@ DEPARTMENT_CHOICES = [
     ("unidad_atencion_derechohabiente", "Unidad Atención al Derechohabiente"),
     ("oic", "O.I.C."),
 ]
+
+INFLUENCE_HIGH = "high"
+INFLUENCE_MEDIUM = "medium"
+INFLUENCE_LOW = "low"
+
+INFLUENCE_LEVELS = [
+    (INFLUENCE_HIGH, "Alta Influencia"),
+    (INFLUENCE_MEDIUM, "Mediana Influencia"),
+    (INFLUENCE_LOW, "Baja Influencia"),
+]
+
+POSITION_INFLUENCE_MAP = {
+    "subsecretario": INFLUENCE_HIGH,
+    "secretario_ejecutivo": INFLUENCE_HIGH,
+    "vicepresidente": INFLUENCE_HIGH,
+    "contralor": INFLUENCE_HIGH,
+    "director": INFLUENCE_HIGH,
+    "director_general": INFLUENCE_HIGH,
+    "director_general_adjunto": INFLUENCE_HIGH,
+    "asesor": INFLUENCE_MEDIUM,
+    "coordinador": INFLUENCE_MEDIUM,
+    "manager": INFLUENCE_MEDIUM,
+    "jefe_departamento": INFLUENCE_MEDIUM,
+    "subdirector": INFLUENCE_MEDIUM,
+    "supervisor": INFLUENCE_MEDIUM,
+    "analista": INFLUENCE_LOW,
+    "auxiliar": INFLUENCE_LOW,
+    "enlace_informacion": INFLUENCE_LOW,
+    "operator": INFLUENCE_LOW,
+    "investigador": INFLUENCE_LOW,
+    "inspector": INFLUENCE_LOW,
+    "other": INFLUENCE_LOW,
+}
