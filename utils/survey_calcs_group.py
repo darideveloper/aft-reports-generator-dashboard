@@ -1,4 +1,4 @@
-from django.db.models import Avg, QuerySet, StdDev
+from django.db.models import Avg, Max, Min, QuerySet, StdDev
 
 from survey import models
 from survey.models import (
@@ -21,6 +21,8 @@ class SurveyCalcsGroup:
         self._average_areas_ordered = {}  # {use_summary: result}
         self._average_question_groups_ordered = None
         self._standard_deviation_total = None
+        self._max_score = None
+        self._min_score = None
 
     def get_employees_number(self) -> int:
         """
@@ -162,6 +164,36 @@ class SurveyCalcsGroup:
             self._standard_deviation_total = result["std_dev"] or 0.0
         return self._standard_deviation_total
 
+    def get_max_score(self) -> float:
+        """
+        Get the maximum score among the reports in the company
+
+        Returns:
+            float: Maximum score
+        """
+        if self._max_score is None:
+            if not self.reports.exists():
+                self._max_score = 0.0
+            else:
+                result = self.reports.aggregate(max_score=Max("total"))
+                self._max_score = round(result["max_score"] or 0.0, 2)
+        return self._max_score
+
+    def get_min_score(self) -> float:
+        """
+        Get the minimum score among the reports in the company
+
+        Returns:
+            float: Minimum score
+        """
+        if self._min_score is None:
+            if not self.reports.exists():
+                self._min_score = 0.0
+            else:
+                result = self.reports.aggregate(min_score=Min("total"))
+                self._min_score = round(result["min_score"] or 0.0, 2)
+        return self._min_score
+
 
 class SurveyCalcsGroupTexts(SurveyCalcsGroup):
 
@@ -173,6 +205,7 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         self._weakness_areas = None
         self._standard_deviation_total_range = None
         self._dispersion_summary = None
+        self._priority_summary = None
 
     def _get_extreme_areas(self, indices: list[int]) -> list[str]:
         """
@@ -280,3 +313,129 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
 
             self._dispersion_summary = summaries.get(self.get_standard_deviation_total_range(), "")
         return self._dispersion_summary
+
+    def get_priority_summary(self) -> str:
+        """
+        Get a priority summary description based on the two weakness areas.
+
+        Returns:
+            str: Priority summary paragraph.
+        """
+        if self._priority_summary is None:
+            weaknesses = self.get_weakness_areas()
+            if len(weaknesses) < 2:
+                self._priority_summary = (
+                    "No se han identificado suficientes áreas de oportunidad para establecer "
+                    "una prioridad de intervención específica."
+                )
+            else:
+                name_to_letter = {
+                    "Cultura digital": "A",
+                    "Tecnología y negocios": "B",
+                    "Ciber seguridad": "C",
+                    "Ciberseguridad": "C",
+                    "Impacto personal": "D",
+                    "Tecnología y medio ambiente": "E",
+                    "Futuro sustentable e inclusivo": "E",
+                    "Futuro Sustentable e Inclusivo": "E",
+                    "Ecosistema digital de colaboración": "F",
+                }
+                
+                w1_letter = name_to_letter.get(weaknesses[0])
+                w2_letter = name_to_letter.get(weaknesses[1])
+                
+                if not w1_letter or not w2_letter:
+                    self._priority_summary = (
+                        "Se debe estructurar un plan de acción conjunto enfocado en mejorar "
+                        f"las áreas de '{weaknesses[0]}' y '{weaknesses[1]}'."
+                    )
+                else:
+                    l1, l2 = sorted([w1_letter, w2_letter])
+                    
+                    summaries = {
+                        ("A", "B"): (
+                            "Resulta prioritario fortalecer la comprensión de cómo la tecnología impacta "
+                            "directamente en los resultados del negocio y en la forma en que se toman decisiones "
+                            "operativas. Esto permitirá que los equipos utilicen la tecnología con mayor criterio "
+                            "y alineación estratégica."
+                        ),
+                        ("A", "C"): (
+                            "Resulta prioritario fortalecer la cultura digital incorporando prácticas básicas de "
+                            "seguridad tecnológica en el uso cotidiano de herramientas y plataformas. Esto permitirá "
+                            "reducir riesgos asociados al manejo de información y al uso de entornos digitales."
+                        ),
+                        ("A", "D"): (
+                            "Resulta prioritario fortalecer la cultura digital promoviendo una mayor conciencia "
+                            "sobre cómo el uso de la tecnología influye en las prácticas de trabajo. Esto permitirá "
+                            "mejorar la adopción y el aprovechamiento de herramientas digitales en el entorno laboral."
+                        ),
+                        ("A", "E"): (
+                            "Resulta prioritario fortalecer la cultura digital incorporando una visión más amplia "
+                            "sobre el impacto de la tecnología en sostenibilidad, inclusión y responsabilidad "
+                            "organizacional. Esto permitirá utilizar la tecnología de forma más consciente y alineada "
+                            "con los retos del entorno."
+                        ),
+                        ("A", "F"): (
+                            "Resulta prioritario fortalecer la cultura digital para aprovechar de forma más efectiva "
+                            "las plataformas y herramientas de colaboración disponibles. Esto permitirá mejorar la "
+                            "coordinación entre equipos y el flujo de trabajo en entornos digitales."
+                        ),
+                        ("B", "C"): (
+                            "Resulta prioritario fortalecer la comprensión de cómo las decisiones tecnológicas "
+                            "impactan en el negocio considerando también los riesgos asociados a la seguridad de "
+                            "la información. Esto permitirá evaluar con mayor criterio iniciativas y reducir "
+                            "vulnerabilidades operativas."
+                        ),
+                        ("B", "D"): (
+                            "Resulta prioritario fortalecer la comprensión de cómo las decisiones tecnológicas "
+                            "impactan en la forma de trabajar de los equipos. Esto permitirá implementar herramientas "
+                            "digitales con mayor claridad and mejorar su adopción en la organización."
+                        ),
+                        ("B", "E"): (
+                            "Resulta prioritario fortalecer la comprensión de cómo la tecnología influye en el modelo "
+                            "de negocio considerando también criterios de sostenibilidad e impacto organizacional. "
+                            "Esto permitirá tomar decisiones tecnológicas con una visión más amplia de largo plazo."
+                        ),
+                        ("B", "F"): (
+                            "Resulta prioritario fortalecer la comprensión de cómo las herramientas digitales pueden "
+                            "habilitar procesos de negocio más eficientes. Esto permitirá aprovechar mejor el "
+                            "ecosistema tecnológico disponible para mejorar resultados operativos."
+                        ),
+                        ("C", "D"): (
+                            "Resulta prioritario fortalecer la conciencia sobre riesgos tecnológicos y promover "
+                            "prácticas responsables en el uso de herramientas digitales. Esto permitirá reducir "
+                            "incidentes asociados al manejo de información y al comportamiento digital."
+                        ),
+                        ("C", "E"): (
+                            "Resulta prioritario fortalecer la comprensión de los riesgos tecnológicos incorporando "
+                            "criterios de responsabilidad digital y sostenibilidad. Esto permitirá gestionar la "
+                            "tecnología considerando sus implicaciones a largo plazo."
+                        ),
+                        ("C", "F"): (
+                            "Resulta prioritario fortalecer prácticas de seguridad en el uso de herramientas de "
+                            "colaboración digital. Esto permitirá establecer políticas más robustas y proteger "
+                            "mejor la información que circula en plataformas tecnológicas de trabajo."
+                        ),
+                        ("D", "E"): (
+                            "Resulta prioritario fortalecer la comprensión del impacto que el uso de la tecnología "
+                            "tiene en las personas y en la evolución del trabajo. Esto permitirá adoptar herramientas "
+                            "digitales de manera más consciente y sostenible."
+                        ),
+                        ("D", "F"): (
+                            "Resulta prioritario fortalecer el uso responsable de herramientas de colaboración "
+                            "digital considerando su impacto en la dinámica de trabajo de los equipos. Esto "
+                            "permitirá mejorar la interacción y coordinación en entornos tecnológicos."
+                        ),
+                        ("E", "F"): (
+                            "Resulta prioritario fortalecer la comprensión del papel que la tecnología puede jugar "
+                            "en la sostenibilidad e inclusión dentro de la organización. Esto permitirá aprovechar "
+                            "el ecosistema digital para generar impacto positivo en la forma de trabajar."
+                        ),
+                    }
+                    
+                    self._priority_summary = summaries.get(
+                        (l1, l2),
+                        "Se debe estructurar un plan de acción conjunto enfocado en mejorar "
+                        f"las áreas de '{weaknesses[0]}' y '{weaknesses[1]}'."
+                    )
+        return self._priority_summary

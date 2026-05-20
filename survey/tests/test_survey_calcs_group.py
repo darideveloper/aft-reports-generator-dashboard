@@ -4,7 +4,7 @@ import random
 from core.tests_base.test_models import TestSurveyModelBase
 from django.core.management import call_command
 from survey import models as survey_models
-from utils.survey_calcs_group import SurveyCalcsGroupTexts
+from utils.survey_calcs_group import SurveyCalcsGroup, SurveyCalcsGroupTexts
 from django.contrib.auth.models import User
 
 
@@ -250,6 +250,42 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
             summary = calcs.get_weakness_areas()
             # lowest is at -1, second lowest at -2
             self.assertEqual(summary, ["Ciber seguridad", "Tecnología y negocios"])
+
+    def test_get_priority_summary(self):
+        """Validate the returned text for priority summary based on weakness pairs"""
+        from unittest.mock import patch
+        
+        with patch.object(SurveyCalcsGroupTexts, "get_weakness_areas", return_value=["Cultura digital", "Ciber seguridad"]):
+            calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
+            self.assertIn("Resulta prioritario fortalecer la cultura digital incorporando prácticas básicas de seguridad tecnológica", calcs.get_priority_summary())
+
+        with patch.object(SurveyCalcsGroupTexts, "get_weakness_areas", return_value=["Tecnología y negocios", "Tecnología y medio ambiente"]):
+            calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
+            self.assertIn("Resulta prioritario fortalecer la comprensión de cómo la tecnología influye en el modelo de negocio", calcs.get_priority_summary())
+
+        with patch.object(SurveyCalcsGroupTexts, "get_weakness_areas", return_value=["Cultura digital"]):
+            calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
+            self.assertIn("No se han identificado suficientes áreas de oportunidad", calcs.get_priority_summary())
+
+    def test_get_max_min_scores(self):
+        """Validate get_max_score and get_min_score return correct values"""
+        self.create_final_reports(count=5)
+        # Set specific total scores
+        reports = list(survey_models.Report.objects.all())
+        reports[0].total = 85.50
+        reports[0].save()
+        reports[1].total = 42.25
+        reports[1].save()
+        reports[2].total = 95.75
+        reports[2].save()
+        reports[3].total = 60.00
+        reports[3].save()
+        reports[4].total = 55.50
+        reports[4].save()
+
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        self.assertEqual(calcs.get_max_score(), 95.75)
+        self.assertEqual(calcs.get_min_score(), 42.25)
 
     def test_get_average_question_groups_ordered_random_options(self):
         """Validate average areas ordered by average (max to min)"""

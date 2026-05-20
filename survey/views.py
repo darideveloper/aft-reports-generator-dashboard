@@ -70,10 +70,11 @@ class GroupReportPDFView(View):
             # Global data
             # --------------------------
             "company_name": company.name,
+            "total_participants": calcs.get_employees_number(),
+            "dispersion_summary": calcs.get_dispersion_summary(),
             # --------------------------
             # Data page 1
             # --------------------------
-            "total_participants": calcs.get_employees_number(),
             "report_date": current_date_es,
             # --------------------------
             # Data page 2
@@ -90,9 +91,14 @@ class GroupReportPDFView(View):
             # Paragraph 4
             "weakness_areas": calcs.get_weakness_areas(),
             # Paragraph 5
-            "dispersion_summary": calcs.get_dispersion_summary(),
-            "max_score": "",
-            "min_score": "",
+            # Paragraph 6
+            "priority_summary": calcs.get_priority_summary(),
+            # Paragraph 7
+            # --------------------------
+            # Data page 5
+            # --------------------------
+            "max_score": calcs.get_max_score(),
+            "min_score": calcs.get_min_score(),
             "global_index_interpretation": calcs.get_dispersion_summary(),
             "participant_distribution": [
                 {
