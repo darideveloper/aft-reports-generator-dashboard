@@ -199,6 +199,41 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         with patch.object(calcs, "get_average_range", return_value="high"):
             self.assertIn("base tecnológica sólida", calcs.get_general_summary())
 
+    def test_get_strength_areas(self):
+        """Validate the returned list for strength areas based on top 2 areas"""
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        from unittest.mock import patch
+        
+        # Mock get_average_areas_ordered to return specific areas
+        mock_ordered_areas = [
+            {"area": "CD", "average": 90.0},
+            {"area": "CS", "average": 85.0},
+            {"area": "TN", "average": 70.0}
+        ]
+        
+        with patch.object(calcs, "get_average_areas_ordered", return_value=mock_ordered_areas):
+            summary = calcs.get_strength_areas()
+            self.assertEqual(summary, ["Cultura digital", "Ciber seguridad"])
+
+    def test_get_weakness_areas(self):
+        """Validate the returned list for weakness areas based on bottom 2 areas"""
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+
+        from unittest.mock import patch
+        
+        # Mock get_average_areas_ordered to return specific areas
+        mock_ordered_areas = [
+            {"area": "CD", "average": 90.0},
+            {"area": "TN", "average": 70.0},
+            {"area": "CS", "average": 65.0}
+        ]
+        
+        with patch.object(calcs, "get_average_areas_ordered", return_value=mock_ordered_areas):
+            summary = calcs.get_weakness_areas()
+            # lowest is at -1, second lowest at -2
+            self.assertEqual(summary, ["Ciber seguridad", "Tecnología y negocios"])
+
     def test_get_average_question_groups_ordered_random_options(self):
         """Validate average areas ordered by average (max to min)"""
 
@@ -347,7 +382,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         # Update 2 random areas score, in each employee
         area_lower = survey_models.TextPDFSummary.objects.order_by("?").first()
         area_upper = survey_models.TextPDFSummary.objects.order_by("?").first()
-        if area_lower == area_upper:
+        if area_lower.paragraph_type == area_upper.paragraph_type:
             self.test_get_average_areas_ordered_specific_order()
             return
 

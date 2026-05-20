@@ -71,6 +71,54 @@ class SurveyCalcsGroup:
 
         return summaries.get(self.get_average_range(), "")
 
+    def get_strength_areas(self) -> list[str]:
+        """
+        Get the names of the top 2 summary areas (strengths).
+
+        Returns:
+            list[str]: A list of area names.
+        """
+        ordered_areas = self.get_average_areas_ordered(use_summary=True)
+
+        if len(ordered_areas) < 2:
+            return []
+
+        top_1_code = ordered_areas[0]["area"]
+        top_2_code = ordered_areas[1]["area"]
+
+        from survey.models import TextPDFSummary
+
+        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
+
+        top_1_name = choices_dict.get(top_1_code, top_1_code)
+        top_2_name = choices_dict.get(top_2_code, top_2_code)
+
+        return [top_1_name, top_2_name]
+
+    def get_weakness_areas(self) -> list[str]:
+        """
+        Get the names of the bottom 2 summary areas (weaknesses).
+
+        Returns:
+            list[str]: A list of area names.
+        """
+        ordered_areas = self.get_average_areas_ordered(use_summary=True)
+
+        if len(ordered_areas) < 2:
+            return []
+
+        bottom_1_code = ordered_areas[-1]["area"]
+        bottom_2_code = ordered_areas[-2]["area"]
+
+        from survey.models import TextPDFSummary
+
+        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
+
+        bottom_1_name = choices_dict.get(bottom_1_code, bottom_1_code)
+        bottom_2_name = choices_dict.get(bottom_2_code, bottom_2_code)
+
+        return [bottom_1_name, bottom_2_name]
+
     def get_average_areas_ordered(self, use_summary: bool = False) -> list[dict]:
         """
         Get the average for each area (QuestionGroup or Summary Category),
