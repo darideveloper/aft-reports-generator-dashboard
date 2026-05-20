@@ -499,3 +499,65 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         self.assertEqual(upper_item["average"], 100)
         self.assertNotEqual(area_lower.paragraph_type, data[0]["area"])
         self.assertNotEqual(area_upper.paragraph_type, data[-1]["area"])
+
+    def test_get_strategic_profiles(self):
+        """Validate get_strategic_profiles correctly classifies participants"""
+        # Clear existing reports to make the test hermetic
+        survey_models.Report.objects.all().delete()
+        survey_models.Participant.objects.all().delete()
+
+        options = self.get_selected_options(score=0)
+
+        # p1: High Score (90), Position director -> High Influence => Ambassador
+        p1_report = self.create_report(options=options)
+        p1_report.participant.position = "director"
+        p1_report.participant.name = "Monica Rodriguez"
+        p1_report.participant.save()
+        p1_report.total = 90.0
+        p1_report.save()
+
+        # p2: High Score (85), Position analista -> Low Influence => Champion
+        p2_report = self.create_report(options=options)
+        p2_report.participant.position = "analista"
+        p2_report.participant.name = "John Doe"
+        p2_report.participant.save()
+        p2_report.total = 85.0
+        p2_report.save()
+
+        # p3: Low Score (45), Position director -> High Influence => Risk
+        p3_report = self.create_report(options=options)
+        p3_report.participant.position = "director"
+        p3_report.participant.name = "Carlos Rodriguez"
+        p3_report.participant.save()
+        p3_report.total = 45.0
+        p3_report.save()
+
+        # p4: Medium Score (70), Position director -> High Influence => Excluded (None)
+        p4_report = self.create_report(options=options)
+        p4_report.participant.position = "director"
+        p4_report.participant.name = "Sarah Smith"
+        p4_report.participant.save()
+        p4_report.total = 70.0
+        p4_report.save()
+
+        # p5: Low Score (50), Position analista -> Low Influence => Excluded (None)
+        p5_report = self.create_report(options=options)
+        p5_report.participant.position = "analista"
+        p5_report.participant.name = "David Miller"
+        p5_report.participant.save()
+        p5_report.total = 50.0
+        p5_report.save()
+
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        profiles = calcs.get_strategic_profiles()
+
+        self.assertEqual(profiles["ambassadors"], ["Monica Rodriguez"])
+        self.assertEqual(profiles["champions"], ["John Doe"])
+        self.assertEqual(profiles["risks"], ["Carlos Rodriguez"])
+        # Medium tech participants and low-influence low-tech are excluded
+        all_names = (
+            profiles["ambassadors"] + profiles["champions"] + profiles["risks"]
+        )
+        self.assertNotIn("Sarah Smith", all_names)
+        self.assertNotIn("David Miller", all_names)
+

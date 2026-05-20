@@ -21,6 +21,7 @@ from utils.survey_calcs_group import SurveyCalcsGroupTexts
 class GroupReportPDFView(View):
     NOMINAL_RANKING_CHUNK_SIZE = 16
     HEATMAP_CHUNK_SIZE = 15
+    STRATEGIC_CHUNK_SIZE = 20
 
     def _chunk_list(self, lst: list, chunk_size: int) -> list[list]:
         """
@@ -109,7 +110,7 @@ class GroupReportPDFView(View):
         heatmap_chunks = self._chunk_list(
             calcs.get_heatmap_data(), self.HEATMAP_CHUNK_SIZE
         )
-
+        strategic_profiles = calcs.get_strategic_profiles()
 
         # Mock data for all dynamic sections
         context = {
@@ -188,13 +189,25 @@ class GroupReportPDFView(View):
             # --------------------------
             # Data page 10
             # --------------------------
-            "strategic_profiles": calcs.get_strategic_profiles(),
+            "strategic_profiles": strategic_profiles,
+            "strategic_ambassadors_chunks": self._chunk_list(
+                strategic_profiles["ambassadors"], self.STRATEGIC_CHUNK_SIZE
+            ),
+            "strategic_champions_chunks": self._chunk_list(
+                strategic_profiles["champions"], self.STRATEGIC_CHUNK_SIZE
+            ),
+            "strategic_risks_chunks": self._chunk_list(
+                strategic_profiles["risks"], self.STRATEGIC_CHUNK_SIZE
+            ),
             "strategic_labels": {
                 "high_tech": self._get_range_es("high").capitalize(),
                 "low_tech": self._get_range_es("low").capitalize(),
                 "high_influence": "Alta",
                 "medium_low_influence": "Media/Baja",
             },
+            # --------------------------
+            # Data page 11
+            # --------------------------
             "priority_actions": [
                 {
                     "title": "Antecedentes tecnológicos",

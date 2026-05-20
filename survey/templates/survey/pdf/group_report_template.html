@@ -122,8 +122,8 @@
         <div class="text-content">
           <p>
             El grupo evaluado obtuvo un Índice de Alfabetización Tecnológica de
-            <strong>{{ average_score|floatformat:2 }} puntos</strong>, lo que indica un nivel
-            <strong>{{ level }}</strong> de dominio tecnológico.
+            <strong>{{ average_score|floatformat:2 }} puntos</strong>, lo que
+            indica un nivel <strong>{{ level }}</strong> de dominio tecnológico.
           </p>
 
           <p>{{ general_summary|safe }}</p>
@@ -197,9 +197,9 @@
         <p class="simple-text margin-top-30">
           Como ya se mencionó anteriormente, el grupo obtuvo un Índice de
           Alfabetización Tecnológica de
-          <strong>{{ average_score|floatformat:2 }} puntos</strong>, lo que corresponde a un
-          <strong>nivel {{ level|lower }}</strong> de alfabetización
-          tecnológica.
+          <strong>{{ average_score|floatformat:2 }} puntos</strong>, lo que
+          corresponde a un <strong>nivel {{ level|lower }}</strong> de
+          alfabetización tecnológica.
         </p>
 
         <table class="indicators-table">
@@ -450,6 +450,7 @@
           </tbody>
         </table>
 
+        <!-- Ambassadors: first chunk -->
         <div class="classification-detail">
           <div class="classification-header">
             <span class="dot dot-green margin-right-10"></span>
@@ -461,14 +462,17 @@
             tecnológicos y facilitar la adopción transversal en la organización.
           </p>
           <ul class="name-list">
-            {% for name in strategic_profiles.ambassadors %}
-            <li>{{ name }}</li>
-            {% empty %}
-            <li>En este grupo no se encontraron Embajador Estratégico</li>
-            {% endfor %}
+            {% if strategic_ambassadors_chunks %}
+              {% for name in strategic_ambassadors_chunks.0 %}
+              <li>{{ name }}</li>
+              {% endfor %}
+            {% else %}
+              <li>En este grupo no se encontraron Embajador Estratégico</li>
+            {% endif %}
           </ul>
         </div>
 
+        <!-- Champions: first chunk -->
         <div class="classification-detail margin-top-30">
           <div class="classification-header">
             <span class="dot dot-green margin-right-10"></span>
@@ -480,17 +484,61 @@
             de capacidades tecnológicas.
           </p>
           <ul class="name-list">
-            {% for name in strategic_profiles.champions %}
-            <li>{{ name }}</li>
-            {% empty %}
-            <li>En este grupo no se encontraron Champion de Transformación</li>
-            {% endfor %}
+            {% if strategic_champions_chunks %}
+              {% for name in strategic_champions_chunks.0 %}
+              <li>{{ name }}</li>
+              {% endfor %}
+            {% else %}
+              <li>En este grupo no se encontraron Champion de Transformación</li>
+            {% endif %}
           </ul>
         </div>
       </main>
     </section>
 
-    <!-- Page 10 -->
+    <!-- Ambassadors overflow pages -->
+    {% for chunk in strategic_ambassadors_chunks %}
+      {% if forloop.counter0 > 0 %}
+    <section class="page">
+      <main>
+        <div class="classification-detail">
+          <div class="classification-header">
+            <span class="dot dot-green margin-right-10"></span>
+            Embajador Estratégico (continuación)
+          </div>
+          <ul class="name-list">
+            {% for name in chunk %}
+            <li>{{ name }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </main>
+    </section>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Champions overflow pages -->
+    {% for chunk in strategic_champions_chunks %}
+      {% if forloop.counter0 > 0 %}
+    <section class="page">
+      <main>
+        <div class="classification-detail">
+          <div class="classification-header">
+            <span class="dot dot-green margin-right-10"></span>
+            Champion de Transformación (continuación)
+          </div>
+          <ul class="name-list">
+            {% for name in chunk %}
+            <li>{{ name }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </main>
+    </section>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Page 10: Risks -->
     <section
       class="page"
       id="page-10"
@@ -506,11 +554,13 @@
             tecnológicos. Se considera una prioridad de intervención individual.
           </p>
           <ul class="name-list">
-            {% for name in strategic_profiles.risks %}
-            <li>{{ name }}</li>
-            {% empty %}
-            <li>En este grupo no se encontraron Riesgo Crítico</li>
-            {% endfor %}
+            {% if strategic_risks_chunks %}
+              {% for name in strategic_risks_chunks.0 %}
+              <li>{{ name }}</li>
+              {% endfor %}
+            {% else %}
+              <li>En este grupo no se encontraron Riesgo Crítico</li>
+            {% endif %}
           </ul>
         </div>
 
@@ -521,6 +571,27 @@
         </p>
       </main>
     </section>
+
+    <!-- Risks overflow pages -->
+    {% for chunk in strategic_risks_chunks %}
+      {% if forloop.counter0 > 0 %}
+    <section class="page">
+      <main>
+        <div class="classification-detail">
+          <div class="classification-header">
+            <span class="dot dot-red margin-right-10"></span>
+            Riesgo Crítico (continuación)
+          </div>
+          <ul class="name-list">
+            {% for name in chunk %}
+            <li>{{ name }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </main>
+    </section>
+      {% endif %}
+    {% endfor %}
 
     <!-- Page 11 -->
     <section
