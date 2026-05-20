@@ -132,7 +132,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "low")
+        self.assertEqual(calcs.get_average_range(), "bajo")
 
     def test_get_average_range_59(self):
         """Validate average range when all reports have 59 total (low range)"""
@@ -142,7 +142,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "low")
+        self.assertEqual(calcs.get_average_range(), "bajo")
 
     def test_get_average_range_60(self):
         """Validate average range when all reports have 60 total (medium range)"""
@@ -152,7 +152,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "medium")
+        self.assertEqual(calcs.get_average_range(), "medio")
 
     def test_get_average_range_79(self):
         """Validate average range when all reports have 79 total (medium range)"""
@@ -162,7 +162,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "medium")
+        self.assertEqual(calcs.get_average_range(), "medio")
 
     def test_get_average_range_80(self):
         """Validate average range when all reports have 80 total (high range)"""
@@ -172,7 +172,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "high")
+        self.assertEqual(calcs.get_average_range(), "alto")
 
     def test_get_average_range_100(self):
         """Validate average range when all reports have 100 total (high range)"""
@@ -182,7 +182,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "high")
+        self.assertEqual(calcs.get_average_range(), "alto")
 
     def test_get_average_question_groups_ordered_random_options(self):
         """Validate average areas ordered by average (max to min)"""
@@ -281,13 +281,13 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
     def test_get_standard_deviation_total_range(self):
         """Validate standard deviation total range for all required values"""
         values = {
-            0.0: "low",
-            7.9: "low",
-            8.0: "low",
-            8.1: "medium",
-            14.9: "medium",
-            15.0: "medium",
-            15.1: "high",
+            0.0: "baja",
+            7.9: "baja",
+            8.0: "baja",
+            8.1: "media",
+            14.9: "media",
+            15.0: "media",
+            15.1: "alta",
         }
 
         for value, expected_range in values.items():
@@ -315,7 +315,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         data = calcs.get_average_areas_ordered()
 
         # Validate if areas are in correct order
-        data_values = list(data.values())
+        data_values = [item["average"] for item in data]
         data_values_max_to_min = sorted(data_values, reverse=True)
         self.assertEqual(data_values, data_values_max_to_min)
 
@@ -347,14 +347,19 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # Do calcs
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
-        data = calcs.get_average_areas_ordered()
-        print(data)
+        data = calcs.get_average_areas_ordered(use_summary=True)
 
         # Validate if options are in correct order
-        data_values = list(data.values())
+        data_values = [item["average"] for item in data]
         data_values_max_to_min = sorted(data_values, reverse=True)
         self.assertEqual(data_values, data_values_max_to_min)
-        self.assertEqual(data[area_lower.paragraph_type], 0)
-        self.assertEqual(data[area_upper.paragraph_type], 100)
-        self.assertNotEqual(area_lower.paragraph_type, list(data.keys())[0])
-        self.assertNotEqual(area_upper.paragraph_type, list(data.keys())[-1])
+        
+        lower_item = next((item for item in data if item["area"] == area_lower.paragraph_type), None)
+        upper_item = next((item for item in data if item["area"] == area_upper.paragraph_type), None)
+        
+        self.assertIsNotNone(lower_item)
+        self.assertIsNotNone(upper_item)
+        self.assertEqual(lower_item["average"], 0)
+        self.assertEqual(upper_item["average"], 100)
+        self.assertNotEqual(area_lower.paragraph_type, data[0]["area"])
+        self.assertNotEqual(area_upper.paragraph_type, data[-1]["area"])
