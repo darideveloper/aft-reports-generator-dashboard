@@ -122,6 +122,7 @@ class SurveyCalcsGroup:
                             )
                     self._average_areas_ordered[use_summary] = final_results
 
+        print(self._average_areas_ordered[use_summary])
         return self._average_areas_ordered[use_summary]
 
     def get_average_question_groups_ordered(self) -> dict[str, float]:
@@ -233,7 +234,9 @@ class SurveyCalcsGroup:
             total_reports = self.reports.count()
             if total_reports > 0:
                 advanced_pct = int(round((advanced_count / total_reports) * 100))
-                intermediate_pct = int(round((intermediate_count / total_reports) * 100))
+                intermediate_pct = int(
+                    round((intermediate_count / total_reports) * 100)
+                )
                 basic_pct = 100 - advanced_pct - intermediate_pct
             else:
                 advanced_pct = 0
@@ -392,11 +395,9 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                 name_to_letter = {
                     "Cultura digital": "A",
                     "Tecnología y negocios": "B",
-                    "Ciber seguridad": "C",
                     "Ciberseguridad": "C",
                     "Impacto personal": "D",
                     "Tecnología y medio ambiente": "E",
-                    "Futuro sustentable e inclusivo": "E",
                     "Ecosistema digital de colaboración": "F",
                 }
 

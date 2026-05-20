@@ -415,7 +415,7 @@ class TextPDFSummary(models.Model):
     TEXT_TYPE_CHOICES = [
         ("CD", "Cultura digital"),
         ("TN", "Tecnología y negocios"),
-        ("CS", "Ciber seguridad"),
+        ("CS", "Ciberseguridad"),
         ("IP", "Impacto personal"),
         ("TMA", "Tecnología y medio ambiente"),
         ("EDC", "Ecosistema digital de colaboración"),

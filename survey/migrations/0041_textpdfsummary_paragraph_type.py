@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='textpdfsummary',
             name='paragraph_type',
-            field=models.CharField(choices=[('CD', 'Cultura digital'), ('TN', 'Tecnología y negocios'), ('CS', 'Ciber seguridad'), ('IP', 'Impacto personal'), ('TMA', 'Tecnología y medio ambiente'), ('EDC', 'Ecosistema digital de colaboración')], default=1, max_length=50, verbose_name='Tipo de Párrafo'),
+            field=models.CharField(choices=[('CD', 'Cultura digital'), ('TN', 'Tecnología y negocios'), ('CS', 'Ciberseguridad'), ('IP', 'Impacto personal'), ('TMA', 'Tecnología y medio ambiente'), ('EDC', 'Ecosistema digital de colaboración')], default=1, max_length=50, verbose_name='Tipo de Párrafo'),
             preserve_default=False,
         ),
     ]

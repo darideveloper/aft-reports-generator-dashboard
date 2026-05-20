@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             name='ReportSummaryScore',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('paragraph_type', models.CharField(choices=[('CD', 'Cultura digital'), ('TN', 'Tecnología y negocios'), ('CS', 'Ciber seguridad'), ('IP', 'Impacto personal'), ('TMA', 'Tecnología y medio ambiente'), ('EDC', 'Ecosistema digital de colaboración')], max_length=50, verbose_name='Tipo de Párrafo')),
+                ('paragraph_type', models.CharField(choices=[('CD', 'Cultura digital'), ('TN', 'Tecnología y negocios'), ('CS', 'Ciberseguridad'), ('IP', 'Impacto personal'), ('TMA', 'Tecnología y medio ambiente'), ('EDC', 'Ecosistema digital de colaboración')], max_length=50, verbose_name='Tipo de Párrafo')),
                 ('score', models.FloatField(default=0, verbose_name='Calificación')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

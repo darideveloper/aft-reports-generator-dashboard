@@ -231,7 +231,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         
         with patch.object(calcs, "get_average_areas_ordered", return_value=mock_ordered_areas):
             summary = calcs.get_strength_areas()
-            self.assertEqual(summary, ["Cultura digital", "Ciber seguridad"])
+            self.assertEqual(summary, ["Cultura digital", "Ciberseguridad"])
 
     def test_get_weakness_areas(self):
         """Validate the returned list for weakness areas based on bottom 2 areas"""
@@ -249,13 +249,13 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         with patch.object(calcs, "get_average_areas_ordered", return_value=mock_ordered_areas):
             summary = calcs.get_weakness_areas()
             # lowest is at -1, second lowest at -2
-            self.assertEqual(summary, ["Ciber seguridad", "Tecnología y negocios"])
+            self.assertEqual(summary, ["Ciberseguridad", "Tecnología y negocios"])
 
     def test_get_priority_summary(self):
         """Validate the returned text for priority summary based on weakness pairs"""
         from unittest.mock import patch
         
-        with patch.object(SurveyCalcsGroupTexts, "get_weakness_areas", return_value=["Cultura digital", "Ciber seguridad"]):
+        with patch.object(SurveyCalcsGroupTexts, "get_weakness_areas", return_value=["Cultura digital", "Ciberseguridad"]):
             calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
             self.assertIn("Resulta prioritario fortalecer la cultura digital incorporando prácticas básicas de seguridad tecnológica", calcs.get_priority_summary())
 

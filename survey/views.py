@@ -125,7 +125,7 @@ class GroupReportPDFView(View):
             "area_results": [
                 {
                     "name": item["display_name"],
-                    "score": round(item["average"]),
+                    "score": item["average"],
                 }
                 for item in calcs.get_average_areas_ordered(use_summary=True)
             ],
@@ -133,20 +133,15 @@ class GroupReportPDFView(View):
             # Data page 7
             # --------------------------
             "theme_ranking": [
-                {"name": "Herramientas de colaboración", "score": 76},
-                {"name": "Uso de la tecnología", "score": 74},
-                {"name": "Internet y conectividad", "score": 72},
-                {"name": "Etiqueta digital", "score": 71},
-                {"name": "Dispositivos digitales", "score": 69},
-                {"name": "Tecnologías de asistencia", "score": 66},
-                {"name": "Huella digital", "score": 63},
-                {"name": "Rol del líder y la tecnología", "score": 62},
-                {"name": "Tecnologías emergentes", "score": 60},
-                {"name": "Tecnología y medio ambiente", "score": 59},
-                {"name": "Evolución de la tecnología", "score": 58},
-                {"name": "Ciberseguridad", "score": 55},
-                {"name": "Antecedentes tecnológicos", "score": 52},
+                {
+                    "name": item["area"].name,
+                    "score": item["average"],
+                }
+                for item in calcs.get_average_areas_ordered(use_summary=False)
             ],
+            # --------------------------
+            # Data page 8
+            # --------------------------
             "nominal_ranking": [
                 {
                     "name": "Laura Isabel Martínez Hinojosa",
