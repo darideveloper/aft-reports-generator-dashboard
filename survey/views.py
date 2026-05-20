@@ -15,7 +15,7 @@ from weasyprint import HTML
 from core import choices
 from survey import models, serializers
 
-from utils.survey_calcs_group import SurveyCalcsGroup
+from utils.survey_calcs_group import SurveyCalcsGroupTexts
 
 
 class GroupReportPDFView(View):
@@ -63,7 +63,7 @@ class GroupReportPDFView(View):
         current_date_es = f"{now.day} de {MONTHS_ES[now.month]} {now.year}"
 
         # Calculate group calcs
-        calcs = SurveyCalcsGroup(reports=reports)
+        calcs = SurveyCalcsGroupTexts(reports=reports)
 
         # Mock data for all dynamic sections
         context = {
@@ -81,7 +81,7 @@ class GroupReportPDFView(View):
             # Data page 3
             # --------------------------
             # Paragraph 1
-            "average_score": calcs.get_average_num(),
+            "average_score": calcs.get_average(),
             "level": self.get_average_range_es(calcs.get_average_range()),
             # Paragraph 2
             "general_summary": calcs.get_general_summary(),

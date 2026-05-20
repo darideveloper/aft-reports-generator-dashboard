@@ -1,9 +1,12 @@
-from django.db.models import QuerySet
+from django.db.models import Avg, QuerySet, StdDev
 
 from survey import models
-
-from django.db.models import Avg
-from django.db.models import StdDev
+from survey.models import (
+    QuestionGroup,
+    ReportQuestionGroupTotal,
+    ReportSummaryScore,
+    TextPDFSummary,
+)
 
 
 class SurveyCalcsGroup:
@@ -23,7 +26,7 @@ class SurveyCalcsGroup:
         """
         return self.reports.count() or 1
 
-    def get_average_num(self) -> float:
+    def get_average(self) -> float:
         """
         Get the average number of employees in the company
 
@@ -39,86 +42,6 @@ class SurveyCalcsGroup:
             2,
         )
 
-    def get_average_range(self) -> str:
-        """
-        Get the average range of the employees in the company (low / medium / high)
-
-        Returns:
-            str: Average range label
-        """
-
-        average = self.get_average_num()
-
-        if average <= 59:
-            return "low"
-        elif average <= 79:
-            return "medium"
-        else:
-            return "high"
-
-    def get_general_summary(self) -> str:
-        """
-        Get a general summary description based on the average range.
-
-        Returns:
-            str: General summary paragraph.
-        """
-        summaries = {
-            "low": "Este resultado sugiere que el grupo presenta una base tecnológica limitada, lo que puede dificultar la interacción cotidiana con herramientas digitales. También puede afectar la participación informada en iniciativas tecnológicas dentro de la organización.",
-            "medium": "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos.",
-            "high": "Este resultado indica que el grupo cuenta con una base tecnológica sólida que facilita la adopción de herramientas digitales. Esto permite a los participantes participar con mayor criterio en iniciativas tecnológicas y decisiones relacionadas con innovación.",
-        }
-
-        return summaries.get(self.get_average_range(), "")
-
-    def get_strength_areas(self) -> list[str]:
-        """
-        Get the names of the top 2 summary areas (strengths).
-
-        Returns:
-            list[str]: A list of area names.
-        """
-        ordered_areas = self.get_average_areas_ordered(use_summary=True)
-
-        if len(ordered_areas) < 2:
-            return []
-
-        top_1_code = ordered_areas[0]["area"]
-        top_2_code = ordered_areas[1]["area"]
-
-        from survey.models import TextPDFSummary
-
-        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
-
-        top_1_name = choices_dict.get(top_1_code, top_1_code)
-        top_2_name = choices_dict.get(top_2_code, top_2_code)
-
-        return [top_1_name, top_2_name]
-
-    def get_weakness_areas(self) -> list[str]:
-        """
-        Get the names of the bottom 2 summary areas (weaknesses).
-
-        Returns:
-            list[str]: A list of area names.
-        """
-        ordered_areas = self.get_average_areas_ordered(use_summary=True)
-
-        if len(ordered_areas) < 2:
-            return []
-
-        bottom_1_code = ordered_areas[-1]["area"]
-        bottom_2_code = ordered_areas[-2]["area"]
-
-        from survey.models import TextPDFSummary
-
-        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
-
-        bottom_1_name = choices_dict.get(bottom_1_code, bottom_1_code)
-        bottom_2_name = choices_dict.get(bottom_2_code, bottom_2_code)
-
-        return [bottom_1_name, bottom_2_name]
-
     def get_average_areas_ordered(self, use_summary: bool = False) -> list[dict]:
         """
         Get the average for each area (QuestionGroup or Summary Category),
@@ -131,14 +54,6 @@ class SurveyCalcsGroup:
             list[dict]: List of areas and their averages, e.g.:
                 [{"area": <instance>, "average": 85.5}, ...]
         """
-        from django.db.models import Avg
-        from survey.models import (
-            ReportQuestionGroupTotal,
-            ReportSummaryScore,
-            QuestionGroup,
-            TextPDFSummary,
-        )
-
         if not self.reports.exists():
             return []
 
@@ -230,6 +145,85 @@ class SurveyCalcsGroup:
         # Naming it 'std_dev' explicitly makes the dictionary lookup cleaner
         result = self.reports.aggregate(std_dev=StdDev("total"))
         return result["std_dev"] or 0.0
+
+
+class SurveyCalcsGroupTexts(SurveyCalcsGroup):
+
+    def get_average_range(self) -> str:
+        """
+        Get the average range of the employees in the company (low / medium / high)
+
+        Returns:
+            str: Average range label
+        """
+
+        average = self.get_average()
+
+        if average <= 59:
+            return "low"
+        elif average <= 79:
+            return "medium"
+        else:
+            return "high"
+
+    def get_general_summary(self) -> str:
+        """
+        Get a general summary description based on the average range.
+
+        Returns:
+            str: General summary paragraph.
+        """
+        summaries = {
+            "low": "Este resultado sugiere que el grupo presenta una base tecnológica limitada, lo que puede dificultar la interacción cotidiana con herramientas digitales. También puede afectar la participación informada en iniciativas tecnológicas dentro de la organización.",
+            "medium": "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos.",
+            "high": "Este resultado indica que el grupo cuenta con una base tecnológica sólida que facilita la adopción de herramientas digitales. Esto permite a los participantes participar con mayor criterio en iniciativas tecnológicas y decisiones relacionadas con innovación.",
+        }
+
+        return summaries.get(self.get_average_range(), "")
+
+    def get_strength_areas(self) -> list[str]:
+        """
+        Get the names of the top 2 summary areas (strengths).
+
+        Returns:
+            list[str]: A list of area names.
+        """
+        ordered_areas = self.get_average_areas_ordered(use_summary=True)
+
+        if len(ordered_areas) < 2:
+            return []
+
+        top_1_code = ordered_areas[0]["area"]
+        top_2_code = ordered_areas[1]["area"]
+
+        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
+
+        top_1_name = choices_dict.get(top_1_code, top_1_code)
+        top_2_name = choices_dict.get(top_2_code, top_2_code)
+
+        return [top_1_name, top_2_name]
+
+    def get_weakness_areas(self) -> list[str]:
+        """
+        Get the names of the bottom 2 summary areas (weaknesses).
+
+        Returns:
+            list[str]: A list of area names.
+        """
+        ordered_areas = self.get_average_areas_ordered(use_summary=True)
+
+        if len(ordered_areas) < 2:
+            return []
+
+        bottom_1_code = ordered_areas[-1]["area"]
+        bottom_2_code = ordered_areas[-2]["area"]
+
+        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
+
+        bottom_1_name = choices_dict.get(bottom_1_code, bottom_1_code)
+        bottom_2_name = choices_dict.get(bottom_2_code, bottom_2_code)
+
+        return [bottom_1_name, bottom_2_name]
 
     def get_standard_deviation_total_range(self) -> str:
         """

@@ -4,7 +4,7 @@ import random
 from core.tests_base.test_models import TestSurveyModelBase
 from django.core.management import call_command
 from survey import models as survey_models
-from utils.survey_calcs_group import SurveyCalcsGroup
+from utils.survey_calcs_group import SurveyCalcsGroupTexts
 from django.contrib.auth.models import User
 
 
@@ -79,7 +79,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # Valdiate num
         self.assertEqual(calcs.get_employees_number(), 10)
@@ -89,47 +89,47 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total=0.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # Validate average
-        self.assertEqual(calcs.get_average_num(), 0)
+        self.assertEqual(calcs.get_average(), 0)
 
     def test_get_average_score_50(self):
         """Validate average number when all reports have 50 total"""
 
         # initialize data
         self.create_final_reports(count=10, total=50.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average
-        self.assertEqual(calcs.get_average_num(), 50.0)
+        self.assertEqual(calcs.get_average(), 50.0)
 
     def test_get_average_score_100(self):
         """Validate average number when all reports have 100 total"""
 
         # initialize data
         self.create_final_reports(count=10, total=100.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average
-        self.assertEqual(calcs.get_average_num(), 100.0)
+        self.assertEqual(calcs.get_average(), 100.0)
 
     def test_get_average_employees_0(self):
         """Validate average number when there are no reports"""
 
         # initialize data
         self.create_final_reports(count=0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average
-        self.assertEqual(calcs.get_average_num(), 0.0)
+        self.assertEqual(calcs.get_average(), 0.0)
 
     def test_get_average_range_0(self):
         """Validate average range when all reports have 0 total (low range)"""
 
         # initialize data
         self.create_final_reports(count=10, total=0.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average range
         self.assertEqual(calcs.get_average_range(), "low")
@@ -139,7 +139,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total=59.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average range
         self.assertEqual(calcs.get_average_range(), "low")
@@ -149,7 +149,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total=60.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average range
         self.assertEqual(calcs.get_average_range(), "medium")
@@ -159,7 +159,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total=79.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average range
         self.assertEqual(calcs.get_average_range(), "medium")
@@ -169,7 +169,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total=80.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average range
         self.assertEqual(calcs.get_average_range(), "high")
@@ -179,14 +179,14 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total=100.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # validate average range
         self.assertEqual(calcs.get_average_range(), "high")
 
     def test_get_general_summary(self):
         """Validate the returned text for each general summary range"""
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.none())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
 
         from unittest.mock import patch
         
@@ -201,7 +201,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
     def test_get_strength_areas(self):
         """Validate the returned list for strength areas based on top 2 areas"""
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         from unittest.mock import patch
         
@@ -218,7 +218,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
     def test_get_weakness_areas(self):
         """Validate the returned list for weakness areas based on bottom 2 areas"""
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         from unittest.mock import patch
         
@@ -239,7 +239,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total_random=True)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
         data = calcs.get_average_question_groups_ordered()
 
         # Validate if options are in correct order
@@ -274,7 +274,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         qg_upper_all_results.update(total=100)
 
         # Do calcs
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
         data = calcs.get_average_question_groups_ordered()
 
         # Validate if options are in correct order
@@ -291,7 +291,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total=50.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # Validate standard deviation
         self.assertEqual(calcs.get_standard_deviation_total(), 0.0)
@@ -301,7 +301,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total_random=True)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # Validate standard deviation
         self.assertNotEqual(calcs.get_standard_deviation_total(), 0.0)
@@ -312,7 +312,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         # initialize data
         self.create_final_reports(count=99, total=100.0)
         self.create_final_reports(count=1, total=90.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # Validate standard deviation
         self.assertLess(calcs.get_standard_deviation_total(), 1.0)
@@ -323,7 +323,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         # initialize data
         self.create_final_reports(count=9, total=100.0)
         self.create_final_reports(count=1, total=90.0)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
 
         # Validate standard deviation
         self.assertEqual(calcs.get_standard_deviation_total(), 3.0)
@@ -348,7 +348,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
                     target_std_dev=value, missing_count=10
                 )
                 self.create_final_reports(count=10, total=required_value)
-                calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+                calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
                 self.assertAlmostEqual(
                     calcs.get_standard_deviation_total(), value, places=1
                 )
@@ -361,7 +361,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         # initialize data
         self.create_final_reports(count=10, total_random=True)
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
         data = calcs.get_average_areas_ordered()
 
         # Validate if areas are in correct order
@@ -396,7 +396,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         area_upper_all_results.update(score=100)
 
         # Do calcs
-        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())
         data = calcs.get_average_areas_ordered(use_summary=True)
 
         # Validate if options are in correct order
