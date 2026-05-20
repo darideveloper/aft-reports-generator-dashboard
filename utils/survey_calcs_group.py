@@ -613,3 +613,98 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                         f"las áreas de '{weaknesses[0]}' y '{weaknesses[1]}'.",
                     )
         return self._priority_summary
+
+    def get_priority_actions(self) -> list[dict]:
+        """
+        Get priority actions for the lowest scored areas.
+        """
+        PRIORITY_ACTIONS_MAPPING = {
+            "Antecedentes tecnológicos": [
+                "Reforzar conceptos básicos sobre cómo funciona la tecnología y su evolución en el negocio.",
+                "Integrar fundamentos tecnológicos en sesiones de inducción o actualización interna.",
+                "Relacionar conceptos tecnológicos con casos prácticos del entorno organizacional.",
+            ],
+            "Evolución de la tecnología": [
+                "Generar espacios periódicos de actualización sobre tendencias tecnológicas relevantes.",
+                "Analizar cómo los cambios tecnológicos impactan procesos y modelos de negocio.",
+                "Incorporar la evolución tecnológica en ejercicios de planeación estratégica.",
+            ],
+            "Internet y conectividad": [
+                "Fortalecer el entendimiento del funcionamiento de redes y conectividad en el trabajo digital.",
+                "Identificar riesgos y dependencias asociados a la conectividad en la operación.",
+                "Promover buenas prácticas para el uso eficiente de entornos digitales conectados.",
+            ],
+            "Dispositivos digitales": [
+                "Estandarizar el uso adecuado de dispositivos digitales en el entorno laboral.",
+                "Capacitar en configuraciones básicas que mejoren seguridad y desempeño.",
+                "Promover el uso eficiente de dispositivos según el tipo de actividad laboral.",
+            ],
+            "Ciberseguridad": [
+                "Implementar lineamientos básicos de seguridad digital para toda la organización.",
+                "Sensibilizar sobre riesgos comunes como phishing, accesos indebidos y manejo de información.",
+                "Integrar prácticas de seguridad en el uso cotidiano de herramientas digitales.",
+            ],
+            "Huella digital": [
+                "Concientizar sobre el impacto del uso de información en entornos digitales.",
+                "Promover buenas prácticas en el manejo de datos personales y organizacionales.",
+                "Integrar criterios de responsabilidad digital en el trabajo cotidiano.",
+            ],
+            "Uso de la tecnología": [
+                "Promover el uso efectivo de herramientas digitales en procesos clave del trabajo.",
+                "Identificar oportunidades de mejora en la adopción tecnológica actual.",
+                "Vincular el uso de tecnología con indicadores de productividad y eficiencia.",
+            ],
+            "Herramientas de colaboración": [
+                "Estandarizar el uso de plataformas de colaboración dentro de los equipos.",
+                "Definir buenas prácticas para comunicación y trabajo digital compartido.",
+                "Reducir retrabajos mediante mejor uso de herramientas colaborativas.",
+            ],
+            "Tecnologías emergentes": [
+                "Generar espacios de aprendizaje sobre nuevas tecnologías aplicables al negocio.",
+                "Analizar casos de uso relevantes para la organización.",
+                "Promover la exploración de oportunidades a partir de tendencias tecnológicas.",
+            ],
+            "Tecnologías de asistencia": [
+                "Identificar herramientas que faciliten tareas repetitivas o de bajo valor.",
+                "Promover el uso de soluciones que mejoren la productividad individual.",
+                "Integrar herramientas de apoyo en procesos operativos clave.",
+            ],
+            "Rol del líder y la tecnología": [
+                "Clarificar el papel del liderazgo en la adopción tecnológica.",
+                "Incorporar criterios tecnológicos en la toma de decisiones del equipo.",
+                "Promover el uso de tecnología como habilitador del desempeño del equipo.",
+            ],
+            "Tecnología y medio ambiente": [
+                "Sensibilizar sobre el impacto ambiental del uso de tecnología.",
+                "Promover prácticas digitales responsables en el uso de recursos.",
+                "Integrar criterios de sostenibilidad en decisiones tecnológicas.",
+            ],
+            "Etiqueta digital": [
+                "Establecer lineamientos de comunicación digital en la organización.",
+                "Promover prácticas claras y eficientes en entornos virtuales.",
+                "Reducir malentendidos mediante normas de interacción digital.",
+            ],
+        }
+
+        ordered_areas_no_summary = self.get_average_areas_ordered(use_summary=False)
+        lowest_areas = []
+        if len(ordered_areas_no_summary) >= 2:
+            lowest_areas = [
+                ordered_areas_no_summary[-2]["area"].name,
+                ordered_areas_no_summary[-1]["area"].name,
+            ]
+        elif len(ordered_areas_no_summary) == 1:
+            lowest_areas = [ordered_areas_no_summary[-1]["area"].name]
+
+        priority_actions = []
+        for area_name in lowest_areas:
+            action_title = area_name
+            items = []
+            for key, action_items in PRIORITY_ACTIONS_MAPPING.items():
+                if key.lower() in area_name.lower():
+                    action_title = key
+                    items = action_items
+                    break
+            priority_actions.append({"title": action_title, "items": items})
+
+        return priority_actions

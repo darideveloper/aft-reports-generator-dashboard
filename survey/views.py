@@ -202,24 +202,7 @@ class GroupReportPDFView(View):
             # --------------------------
             # Data page 11
             # --------------------------
-            "priority_actions": [
-                {
-                    "title": "Antecedentes tecnológicos",
-                    "items": [
-                        "Reforzar conceptos básicos sobre cómo funciona la tecnología y su evolución en el negocio.",
-                        "Integrar fundamentos tecnológicos en sesiones de inducción o actualización interna.",
-                        "Relacionar conceptos tecnológicos con casos prácticos del entorno organizacional.",
-                    ],
-                },
-                {
-                    "title": "Ciberseguridad",
-                    "items": [
-                        "Implementar lineamientos básicos de seguridad digital para toda la organización.",
-                        "Sensibilizar sobre riesgos comunes como phishing, accesos indebidos y manejo de información.",
-                        "Integrar prácticas de seguridad en el uso cotidiano de herramientas digitales.",
-                    ],
-                },
-            ],
+            "priority_actions": calcs.get_priority_actions(),
             "additional_recommendations": [
                 "Establecer un programa de mentoría interna donde los 'Champions' apoyen a otros líderes.",
                 "Realizar talleres prácticos trimestrales sobre tecnologías emergentes aplicadas al sector.",
