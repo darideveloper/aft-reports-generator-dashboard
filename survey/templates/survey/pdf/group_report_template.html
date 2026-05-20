@@ -122,7 +122,7 @@
         <div class="text-content">
           <p>
             El grupo evaluado obtuvo un Índice de Alfabetización Tecnológica de
-            <strong>{{ average_score }} puntos</strong>, lo que indica un nivel
+            <strong>{{ average_score|floatformat:2 }} puntos</strong>, lo que indica un nivel
             <strong>{{ level }}</strong> de dominio tecnológico.
           </p>
 
@@ -207,7 +207,7 @@
         <p class="simple-text margin-top-30">
           Como ya se mencionó anteriormente, el grupo obtuvo un Índice de
           Alfabetización Tecnológica de
-          <strong>{{ average_score }} puntos</strong>, lo que corresponde a un
+          <strong>{{ average_score|floatformat:2 }} puntos</strong>, lo que corresponde a un
           <strong>nivel {{ level|lower }}</strong> de alfabetización
           tecnológica.
         </p>
@@ -222,7 +222,7 @@
           <tbody>
             <tr>
               <td>Promedio grupo</td>
-              <td class="result-value">{{ average_score }}</td>
+              <td class="result-value">{{ average_score|floatformat:2 }}</td>
             </tr>
             <tr>
               <td>Resultado máximo</td>
@@ -265,7 +265,7 @@
                 {{ item.level }}
               </td>
               <td>{{ item.count }}</td>
-              <td>{{ item.percentage }} %</td>
+              <td>{{ item.percentage|floatformat:2 }} %</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -290,7 +290,7 @@
             {% for area in area_results %}
             <tr>
               <td class="text-left">{{ area.name }}</td>
-              <td>{{ area.score }}</td>
+              <td>{{ area.score|floatformat:2 }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -326,7 +326,7 @@
             <tr>
               <td>{{ forloop.counter }}</td>
               <td class="text-left">{{ theme.name }}</td>
-              <td>{{ theme.score }}</td>
+              <td>{{ theme.score|floatformat:2 }}</td>
             </tr>
             {% endfor %}
           </tbody>

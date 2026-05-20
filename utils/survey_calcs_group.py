@@ -167,7 +167,7 @@ class SurveyCalcsGroup:
         if self._standard_deviation_total is None:
             # Naming it 'std_dev' explicitly makes the dictionary lookup cleaner
             result = self.reports.aggregate(std_dev=StdDev("total"))
-            self._standard_deviation_total = result["std_dev"] or 0.0
+            self._standard_deviation_total = round(result["std_dev"] or 0.0, 2)
         return self._standard_deviation_total
 
     def get_max_score(self) -> float:
@@ -233,15 +233,13 @@ class SurveyCalcsGroup:
 
             total_reports = self.reports.count()
             if total_reports > 0:
-                advanced_pct = int(round((advanced_count / total_reports) * 100))
-                intermediate_pct = int(
-                    round((intermediate_count / total_reports) * 100)
-                )
-                basic_pct = 100 - advanced_pct - intermediate_pct
+                advanced_pct = round((advanced_count / total_reports) * 100, 2)
+                intermediate_pct = round((intermediate_count / total_reports) * 100, 2)
+                basic_pct = round(100.0 - advanced_pct - intermediate_pct, 2)
             else:
-                advanced_pct = 0
-                intermediate_pct = 0
-                basic_pct = 0
+                advanced_pct = 0.0
+                intermediate_pct = 0.0
+                basic_pct = 0.0
 
             self._participant_distribution = [
                 {
@@ -348,7 +346,7 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
             str: Standard deviation range label
         """
         if self._standard_deviation_total_range is None:
-            standard_deviation = round(self.get_standard_deviation_total(), 1)
+            standard_deviation = round(self.get_standard_deviation_total(), 2)
 
             if standard_deviation <= 8:
                 self._standard_deviation_total_range = "low"

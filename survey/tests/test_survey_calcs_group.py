@@ -314,9 +314,9 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         # medium: count=2, percentage=40%
         # low: count=1, percentage=20%
         expected = [
-            {"level": "high", "count": 2, "percentage": 40},
-            {"level": "medium", "count": 2, "percentage": 40},
-            {"level": "low", "count": 1, "percentage": 20},
+            {"level": "high", "count": 2, "percentage": 40.0},
+            {"level": "medium", "count": 2, "percentage": 40.0},
+            {"level": "low", "count": 1, "percentage": 20.0},
         ]
         self.assertEqual(distribution, expected)
 
