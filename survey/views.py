@@ -14,7 +14,7 @@ from core import choices
 from survey import models, serializers
 
 
-def preview_report_pdf(request):
+def group_report_pdf(request):
     """
     View to preview the WeasyPrint PDF report using the html-pdf template.
     """
@@ -115,7 +115,7 @@ def preview_report_pdf(request):
     }
 
     # Render HTML string from template
-    html_string = render_to_string("survey/pdf/report_template.html", context)
+    html_string = render_to_string("survey/pdf/group_report_template.html", context)
 
     # Base URL for assets resolution
     base_url = os.path.join(settings.BASE_DIR, "survey", "templates", "survey", "pdf")
@@ -124,7 +124,7 @@ def preview_report_pdf(request):
     pdf_bytes = HTML(string=html_string, base_url=base_url).write_pdf()
 
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
-    response["Content-Disposition"] = "inline; filename='preview_report.pdf'"
+    response["Content-Disposition"] = "inline; filename='group_report.pdf'"
     return response
 
 

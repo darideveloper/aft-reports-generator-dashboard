@@ -38,7 +38,7 @@ urlpatterns = [
         name="participant-has-answer",
     ),
     path("api/progress/", survey_views.FormProgressView.as_view(), name="progress"),
-    path("preview-report-pdf/", survey_views.preview_report_pdf, name="preview-report-pdf"),
+    path("group-report-pdf/", survey_views.group_report_pdf, name="group-report-pdf"),
 ]
 
 if not settings.STORAGE_AWS:
