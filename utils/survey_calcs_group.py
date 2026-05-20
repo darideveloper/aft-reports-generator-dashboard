@@ -16,6 +16,11 @@ class SurveyCalcsGroup:
         reports: QuerySet[models.Report],
     ):
         self.reports = reports
+        self._employees_number = None
+        self._average = None
+        self._average_areas_ordered = {}  # {use_summary: result}
+        self._average_question_groups_ordered = None
+        self._standard_deviation_total = None
 
     def get_employees_number(self) -> int:
         """
@@ -24,7 +29,9 @@ class SurveyCalcsGroup:
         Returns:
             int: Number of employees
         """
-        return self.reports.count() or 1
+        if self._employees_number is None:
+            self._employees_number = self.reports.count() or 1
+        return self._employees_number
 
     def get_average(self) -> float:
         """
@@ -33,14 +40,15 @@ class SurveyCalcsGroup:
         Returns:
             float: Average number of employees
         """
-
-        return round(
-            (
-                sum(report.total for report in self.reports)
-                / self.get_employees_number()
-            ),
-            2,
-        )
+        if self._average is None:
+            self._average = round(
+                (
+                    sum(report.total for report in self.reports)
+                    / self.get_employees_number()
+                ),
+                2,
+            )
+        return self._average
 
     def get_average_areas_ordered(self, use_summary: bool = False) -> list[dict]:
         """
@@ -54,59 +62,62 @@ class SurveyCalcsGroup:
             list[dict]: List of areas and their averages, e.g.:
                 [{"area": <instance>, "average": 85.5}, ...]
         """
-        if not self.reports.exists():
-            return []
-
-        if use_summary:
-            # Aggregate by summary category (paragraph_type)
-            results = (
-                ReportSummaryScore.objects.filter(report__in=self.reports)
-                .values("paragraph_type")
-                .annotate(average=Avg("score"))
-                .order_by("-average")
-            )
-
-            # Map results to include descriptive info (using one match for paragraph_type)
-            final_results = []
-            for item in results:
-                p_type = item["paragraph_type"]
-                # We can't return a single 'instance' for paragraph_type as it's a choice field,
-                # but we can return the display name and perhaps a representative TextPDFSummary
-                display_name = dict(TextPDFSummary.TEXT_TYPE_CHOICES).get(
-                    p_type, p_type
-                )
-                final_results.append(
-                    {
-                        "area": p_type,
-                        "display_name": display_name,
-                        "average": round(item["average"], 2),
-                    }
-                )
-            return final_results
-        else:
-            # Aggregate by QuestionGroup
-            results = (
-                ReportQuestionGroupTotal.objects.filter(report__in=self.reports)
-                .values("question_group")
-                .annotate(average=Avg("total"))
-                .order_by("-average")
-            )
-
-            # Map IDs back to QuestionGroup instances
-            qg_ids = [item["question_group"] for item in results]
-            qgs = {qg.id: qg for qg in QuestionGroup.objects.filter(id__in=qg_ids)}
-
-            final_results = []
-            for item in results:
-                qg = qgs.get(item["question_group"])
-                if qg:
-                    final_results.append(
-                        {
-                            "area": qg,
-                            "average": round(item["average"], 2),
-                        }
+        if use_summary not in self._average_areas_ordered:
+            if not self.reports.exists():
+                self._average_areas_ordered[use_summary] = []
+            else:
+                if use_summary:
+                    # Aggregate by summary category (paragraph_type)
+                    results = (
+                        ReportSummaryScore.objects.filter(report__in=self.reports)
+                        .values("paragraph_type")
+                        .annotate(average=Avg("score"))
+                        .order_by("-average")
                     )
-            return final_results
+
+                    # Map results to include descriptive info (using one match for paragraph_type)
+                    final_results = []
+                    for item in results:
+                        p_type = item["paragraph_type"]
+                        # We can't return a single 'instance' for paragraph_type as it's a choice field,
+                        # but we can return the display name and perhaps a representative TextPDFSummary
+                        display_name = dict(TextPDFSummary.TEXT_TYPE_CHOICES).get(
+                            p_type, p_type
+                        )
+                        final_results.append(
+                            {
+                                "area": p_type,
+                                "display_name": display_name,
+                                "average": round(item["average"], 2),
+                            }
+                        )
+                    self._average_areas_ordered[use_summary] = final_results
+                else:
+                    # Aggregate by QuestionGroup
+                    results = (
+                        ReportQuestionGroupTotal.objects.filter(report__in=self.reports)
+                        .values("question_group")
+                        .annotate(average=Avg("total"))
+                        .order_by("-average")
+                    )
+
+                    # Map IDs back to QuestionGroup instances
+                    qg_ids = [item["question_group"] for item in results]
+                    qgs = {qg.id: qg for qg in QuestionGroup.objects.filter(id__in=qg_ids)}
+
+                    final_results = []
+                    for item in results:
+                        qg = qgs.get(item["question_group"])
+                        if qg:
+                            final_results.append(
+                                {
+                                    "area": qg,
+                                    "average": round(item["average"], 2),
+                                }
+                            )
+                    self._average_areas_ordered[use_summary] = final_results
+
+        return self._average_areas_ordered[use_summary]
 
     def get_average_question_groups_ordered(self) -> dict[str, float]:
         """
@@ -115,25 +126,28 @@ class SurveyCalcsGroup:
         Returns:
             dict[str, float]: Average of each area ordered by average
         """
-        # Initialize dictionary to store average areas
-        area_averages = {}
+        if self._average_question_groups_ordered is None:
+            # Initialize dictionary to store average areas
+            area_averages = {}
 
-        # Get all areas
-        question_groups = models.QuestionGroup.objects.all()
+            # Get all areas
+            question_groups = models.QuestionGroup.objects.all()
 
-        # Calculate average for each question group
-        for question_group in question_groups:
-            question_group_totals = models.ReportQuestionGroupTotal.objects.filter(
-                question_group=question_group,
-                report__in=self.reports,
-            )
-            question_group_total_avg = question_group_totals.aggregate(Avg("total"))[
-                "total__avg"
-            ]
-            area_averages[question_group.name] = question_group_total_avg
+            # Calculate average for each question group
+            for question_group in question_groups:
+                question_group_totals = models.ReportQuestionGroupTotal.objects.filter(
+                    question_group=question_group,
+                    report__in=self.reports,
+                )
+                question_group_total_avg = question_group_totals.aggregate(Avg("total"))[
+                    "total__avg"
+                ]
+                area_averages[question_group.name] = question_group_total_avg
 
-        # Order by average
-        return dict(reversed(sorted(area_averages.items(), key=lambda item: item[1])))
+            # Order by average
+            self._average_question_groups_ordered = dict(reversed(sorted(area_averages.items(), key=lambda item: item[1])))
+
+        return self._average_question_groups_ordered
 
     def get_standard_deviation_total(self) -> float:
         """
@@ -142,12 +156,38 @@ class SurveyCalcsGroup:
         Returns:
             float: Standard deviation of the total of the reports
         """
-        # Naming it 'std_dev' explicitly makes the dictionary lookup cleaner
-        result = self.reports.aggregate(std_dev=StdDev("total"))
-        return result["std_dev"] or 0.0
+        if self._standard_deviation_total is None:
+            # Naming it 'std_dev' explicitly makes the dictionary lookup cleaner
+            result = self.reports.aggregate(std_dev=StdDev("total"))
+            self._standard_deviation_total = result["std_dev"] or 0.0
+        return self._standard_deviation_total
 
 
 class SurveyCalcsGroupTexts(SurveyCalcsGroup):
+
+    def __init__(self, reports: QuerySet[models.Report]):
+        super().__init__(reports)
+        self._average_range = None
+        self._general_summary = None
+        self._strength_areas = None
+        self._weakness_areas = None
+        self._standard_deviation_total_range = None
+        self._dispersion_summary = None
+
+    def _get_extreme_areas(self, indices: list[int]) -> list[str]:
+        """
+        Helper method to get display names of areas at specific indices of the ordered list.
+        """
+        ordered_areas = self.get_average_areas_ordered(use_summary=True)
+        if len(ordered_areas) < 2:
+            return []
+
+        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
+        names = []
+        for idx in indices:
+            code = ordered_areas[idx]["area"]
+            names.append(choices_dict.get(code, code))
+        return names
 
     def get_average_range(self) -> str:
         """
@@ -156,15 +196,16 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         Returns:
             str: Average range label
         """
+        if self._average_range is None:
+            average = self.get_average()
 
-        average = self.get_average()
-
-        if average <= 59:
-            return "low"
-        elif average <= 79:
-            return "medium"
-        else:
-            return "high"
+            if average <= 59:
+                self._average_range = "low"
+            elif average <= 79:
+                self._average_range = "medium"
+            else:
+                self._average_range = "high"
+        return self._average_range
 
     def get_general_summary(self) -> str:
         """
@@ -173,13 +214,15 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         Returns:
             str: General summary paragraph.
         """
-        summaries = {
-            "low": "Este resultado sugiere que el grupo presenta una base tecnológica limitada, lo que puede dificultar la interacción cotidiana con herramientas digitales. También puede afectar la participación informada en iniciativas tecnológicas dentro de la organización.",
-            "medium": "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos.",
-            "high": "Este resultado indica que el grupo cuenta con una base tecnológica sólida que facilita la adopción de herramientas digitales. Esto permite a los participantes participar con mayor criterio en iniciativas tecnológicas y decisiones relacionadas con innovación.",
-        }
+        if self._general_summary is None:
+            summaries = {
+                "low": "Este resultado sugiere que el grupo presenta una base tecnológica limitada, lo que puede dificultar la interacción cotidiana con herramientas digitales. También puede afectar la participación informada en iniciativas tecnológicas dentro de la organización.",
+                "medium": "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos.",
+                "high": "Este resultado indica que el grupo cuenta con una base tecnológica sólida que facilita la adopción de herramientas digitales. Esto permite a los participantes participar con mayor criterio en iniciativas tecnológicas y decisiones relacionadas con innovación.",
+            }
 
-        return summaries.get(self.get_average_range(), "")
+            self._general_summary = summaries.get(self.get_average_range(), "")
+        return self._general_summary
 
     def get_strength_areas(self) -> list[str]:
         """
@@ -188,20 +231,9 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         Returns:
             list[str]: A list of area names.
         """
-        ordered_areas = self.get_average_areas_ordered(use_summary=True)
-
-        if len(ordered_areas) < 2:
-            return []
-
-        top_1_code = ordered_areas[0]["area"]
-        top_2_code = ordered_areas[1]["area"]
-
-        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
-
-        top_1_name = choices_dict.get(top_1_code, top_1_code)
-        top_2_name = choices_dict.get(top_2_code, top_2_code)
-
-        return [top_1_name, top_2_name]
+        if self._strength_areas is None:
+            self._strength_areas = self._get_extreme_areas([0, 1])
+        return self._strength_areas
 
     def get_weakness_areas(self) -> list[str]:
         """
@@ -210,20 +242,9 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         Returns:
             list[str]: A list of area names.
         """
-        ordered_areas = self.get_average_areas_ordered(use_summary=True)
-
-        if len(ordered_areas) < 2:
-            return []
-
-        bottom_1_code = ordered_areas[-1]["area"]
-        bottom_2_code = ordered_areas[-2]["area"]
-
-        choices_dict = dict(TextPDFSummary.TEXT_TYPE_CHOICES)
-
-        bottom_1_name = choices_dict.get(bottom_1_code, bottom_1_code)
-        bottom_2_name = choices_dict.get(bottom_2_code, bottom_2_code)
-
-        return [bottom_1_name, bottom_2_name]
+        if self._weakness_areas is None:
+            self._weakness_areas = self._get_extreme_areas([-1, -2])
+        return self._weakness_areas
 
     def get_standard_deviation_total_range(self) -> str:
         """
@@ -232,15 +253,16 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         Returns:
             str: Standard deviation range label
         """
+        if self._standard_deviation_total_range is None:
+            standard_deviation = round(self.get_standard_deviation_total(), 1)
 
-        standard_deviation = round(self.get_standard_deviation_total(), 1)
-
-        if standard_deviation <= 8:
-            return "low"
-        elif standard_deviation <= 15:
-            return "medium"
-        else:
-            return "high"
+            if standard_deviation <= 8:
+                self._standard_deviation_total_range = "low"
+            elif standard_deviation <= 15:
+                self._standard_deviation_total_range = "medium"
+            else:
+                self._standard_deviation_total_range = "high"
+        return self._standard_deviation_total_range
 
     def get_dispersion_summary(self) -> str:
         """
@@ -249,10 +271,12 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         Returns:
             str: Dispersion summary paragraph.
         """
-        summaries = {
-            "low": "Los resultados muestran un nivel relativamente homogéneo de alfabetización tecnológica entre los participantes evaluados. Esto sugiere que el grupo comparte una base de conocimiento similar en temas tecnológicos.",
-            "medium": "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo. Esto puede generar distintas velocidades de adopción tecnológica dentro de la organización.",
-            "high": "Los resultados muestran diferencias importantes entre participantes en su nivel de alfabetización tecnológica. Esta variabilidad puede generar distintos niveles de comprensión tecnológica, riesgos  y decisiones no homogéneas dentro de la organización.",
-        }
+        if self._dispersion_summary is None:
+            summaries = {
+                "low": "Los resultados muestran un nivel relativamente homogéneo de alfabetización tecnológica entre los participantes evaluados. Esto sugiere que el grupo comparte una base de conocimiento similar en temas tecnológicos.",
+                "medium": "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo. Esto puede generar distintas velocidades de adopción tecnológica dentro de la organización.",
+                "high": "Los resultados muestran diferencias importantes entre participantes en su nivel de alfabetización tecnológica. Esta variabilidad puede generar distintos niveles de comprensión tecnológica, riesgos  y decisiones no homogéneas dentro de la organización.",
+            }
 
-        return summaries.get(self.get_standard_deviation_total_range(), "")
+            self._dispersion_summary = summaries.get(self.get_standard_deviation_total_range(), "")
+        return self._dispersion_summary
