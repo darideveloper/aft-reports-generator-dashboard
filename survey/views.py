@@ -19,6 +19,17 @@ from utils.survey_calcs_group import SurveyCalcsGroupTexts
 
 
 class GroupReportPDFView(View):
+    NOMINAL_RANKING_CHUNK_SIZE = 16
+    HEATMAP_CHUNK_SIZE = 12
+
+    def chunk_list(self, lst: list, chunk_size: int) -> list[list]:
+        """
+        Split a list into chunks of a specified size.
+        """
+        if not lst:
+            return []
+        return [lst[i : i + chunk_size] for i in range(0, len(lst), chunk_size)]
+
 
     def get_range_es(self, range_val: str) -> str:
         """
@@ -93,11 +104,12 @@ class GroupReportPDFView(View):
             for idx, report in enumerate(reports.order_by("-total"))
         ]
 
-        chunk_size = 16
-        nominal_ranking_chunks = [
-            nominal_ranking_raw[i : i + chunk_size]
-            for i in range(0, len(nominal_ranking_raw), chunk_size)
-        ]
+        nominal_ranking_chunks = self.chunk_list(
+            nominal_ranking_raw, self.NOMINAL_RANKING_CHUNK_SIZE
+        )
+        heatmap_chunks = self.chunk_list(
+            calcs.get_heatmap_data(), self.HEATMAP_CHUNK_SIZE
+        )
 
         # Mock data for all dynamic sections
         context = {
@@ -172,7 +184,7 @@ class GroupReportPDFView(View):
             # Data page 9
             # --------------------------
             "heatmap_themes": calcs.get_heatmap_themes(),
-            "heatmap_data": calcs.get_heatmap_data(),
+            "heatmap_chunks": heatmap_chunks,
             "strategic_profiles": {
                 "ambassadors": [],
                 "champions": [

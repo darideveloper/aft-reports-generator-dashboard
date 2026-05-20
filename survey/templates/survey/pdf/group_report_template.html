@@ -366,12 +366,15 @@
     {% endfor %}
 
     <!-- Page 8 -->
+    {% for chunk in heatmap_chunks %}
     <section
       class="page"
-      id="page-8"
+      id="page-8-chunk-{{ forloop.counter }}"
     >
       <main>
+        {% if forloop.first %}
         <h2 class="section-title">7. Heatmap nominal por los 13 temas</h2>
+        {% endif %}
 
         <div class="heatmap-container">
           <table class="heatmap-table dark-header">
@@ -386,7 +389,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for row in heatmap_data %}
+              {% for row in chunk %}
               <tr>
                 <td class="text-center">{{ row.name }}</td>
                 {% for dot_color in row.dots %}
@@ -401,6 +404,7 @@
         </div>
       </main>
     </section>
+    {% endfor %}
 
     <!-- Page 9 -->
     <section
