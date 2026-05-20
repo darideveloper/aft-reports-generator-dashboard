@@ -575,3 +575,41 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                         f"las áreas de '{weaknesses[0]}' y '{weaknesses[1]}'.",
                     )
         return self._priority_summary
+
+    def get_strategic_profiles(self) -> dict:
+        """
+        Compute and return the strategic profiles (ambassadors, champions, risks)
+        based on participant scores and position influence mapping.
+        """
+        from core.choices import (
+            POSITION_INFLUENCE_MAP,
+            INFLUENCE_HIGH,
+            INFLUENCE_MEDIUM,
+            INFLUENCE_LOW,
+        )
+
+        ambassadors = []
+        champions = []
+        risks = []
+
+        for report in self.reports.order_by("-total"):
+            tech_level = self._get_level_from_score(report.total)
+            influence_level = POSITION_INFLUENCE_MAP.get(
+                report.participant.position, INFLUENCE_LOW
+            )
+
+            if tech_level == "high" and influence_level == INFLUENCE_HIGH:
+                ambassadors.append(report.participant.name)
+            elif tech_level == "high" and influence_level in (
+                INFLUENCE_MEDIUM,
+                INFLUENCE_LOW,
+            ):
+                champions.append(report.participant.name)
+            elif tech_level == "low" and influence_level == INFLUENCE_HIGH:
+                risks.append(report.participant.name)
+
+        return {
+            "ambassadors": ambassadors,
+            "champions": champions,
+            "risks": risks,
+        }

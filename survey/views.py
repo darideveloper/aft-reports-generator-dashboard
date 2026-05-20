@@ -110,33 +110,6 @@ class GroupReportPDFView(View):
             calcs.get_heatmap_data(), self.HEATMAP_CHUNK_SIZE
         )
 
-        # Calculate dynamic strategic profiles
-        from core.choices import (
-            POSITION_INFLUENCE_MAP,
-            INFLUENCE_HIGH,
-            INFLUENCE_MEDIUM,
-            INFLUENCE_LOW,
-        )
-
-        ambassadors = []
-        champions = []
-        risks = []
-
-        for report in reports.order_by("-total"):
-            tech_level = calcs._get_level_from_score(report.total)
-            influence_level = POSITION_INFLUENCE_MAP.get(
-                report.participant.position, INFLUENCE_LOW
-            )
-
-            if tech_level == "high" and influence_level == INFLUENCE_HIGH:
-                ambassadors.append(report.participant.name)
-            elif tech_level == "high" and influence_level in (
-                INFLUENCE_MEDIUM,
-                INFLUENCE_LOW,
-            ):
-                champions.append(report.participant.name)
-            elif tech_level == "low" and influence_level == INFLUENCE_HIGH:
-                risks.append(report.participant.name)
 
         # Mock data for all dynamic sections
         context = {
@@ -215,11 +188,7 @@ class GroupReportPDFView(View):
             # --------------------------
             # Data page 10
             # --------------------------
-            "strategic_profiles": {
-                "ambassadors": ambassadors,
-                "champions": champions,
-                "risks": risks,
-            },
+            "strategic_profiles": calcs.get_strategic_profiles(),
             "strategic_labels": {
                 "high_tech": self._get_range_es("high").capitalize(),
                 "low_tech": self._get_range_es("low").capitalize(),
