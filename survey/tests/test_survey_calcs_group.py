@@ -199,6 +199,21 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         with patch.object(calcs, "get_average_range", return_value="high"):
             self.assertIn("base tecnológica sólida", calcs.get_general_summary())
 
+    def test_get_dispersion_summary(self):
+        """Validate the returned text for each dispersion summary range"""
+        calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
+
+        from unittest.mock import patch
+        
+        with patch.object(calcs, "get_standard_deviation_total_range", return_value="low"):
+            self.assertIn("nivel relativamente homogéneo", calcs.get_dispersion_summary())
+
+        with patch.object(calcs, "get_standard_deviation_total_range", return_value="medium"):
+            self.assertIn("diferencias moderadas entre participantes", calcs.get_dispersion_summary())
+
+        with patch.object(calcs, "get_standard_deviation_total_range", return_value="high"):
+            self.assertIn("diferencias importantes entre participantes", calcs.get_dispersion_summary())
+
     def test_get_strength_areas(self):
         """Validate the returned list for strength areas based on top 2 areas"""
         calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.all())

@@ -241,3 +241,18 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
             return "medium"
         else:
             return "high"
+
+    def get_dispersion_summary(self) -> str:
+        """
+        Get a dispersion summary description based on the standard deviation range.
+
+        Returns:
+            str: Dispersion summary paragraph.
+        """
+        summaries = {
+            "low": "Los resultados muestran un nivel relativamente homogéneo de alfabetización tecnológica entre los participantes evaluados. Esto sugiere que el grupo comparte una base de conocimiento similar en temas tecnológicos.",
+            "medium": "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo. Esto puede generar distintas velocidades de adopción tecnológica dentro de la organización.",
+            "high": "Los resultados muestran diferencias importantes entre participantes en su nivel de alfabetización tecnológica. Esta variabilidad puede generar distintos niveles de comprensión tecnológica, riesgos  y decisiones no homogéneas dentro de la organización.",
+        }
+
+        return summaries.get(self.get_standard_deviation_total_range(), "")

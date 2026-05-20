@@ -87,10 +87,13 @@ class GroupReportPDFView(View):
             "general_summary": calcs.get_general_summary(),
             # Paragraph 3
             "strength_areas": calcs.get_strength_areas(),
+            # Paragraph 4
             "weakness_areas": calcs.get_weakness_areas(),
+            # Paragraph 5
+            "dispersion_summary": calcs.get_dispersion_summary(),
             "max_score": "",
             "min_score": "",
-            "global_index_interpretation": "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo. Esto puede generar distintas velocidades de adopción tecnológica dentro de la organización.",
+            "global_index_interpretation": calcs.get_dispersion_summary(),
             "participant_distribution": [
                 {
                     "level": "Avanzado",
