@@ -357,9 +357,14 @@ td {
   table-layout: fixed;
 }
 
-.heatmap-table th,
-.heatmap-table td {
+.heatmap-table th {
   padding: 5px 0;
+  border: 1px solid #000;
+  overflow: hidden;
+}
+
+.heatmap-table td {
+  padding: 11px 0;
   border: 1px solid #000;
   overflow: hidden;
 }
