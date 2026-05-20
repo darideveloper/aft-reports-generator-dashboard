@@ -183,24 +183,14 @@
             </tr>
           </thead>
           <tbody>
+            {% for key, val in levels_config.items %}
             <tr>
-              <td>Básico</td>
-              <td>0 – 59</td>
-              <td><span class="dot dot-red"></span></td>
-              <td>Conocimiento limitado</td>
+              <td>{{ val.name_es }}</td>
+              <td>{{ val.score_min }} – {{ val.score_max_display }}</td>
+              <td><span class="dot dot-{{ val.dot_color }}"></span></td>
+              <td>{{ val.description }}</td>
             </tr>
-            <tr>
-              <td>Intermedio</td>
-              <td>60 – 79</td>
-              <td><span class="dot dot-yellow"></span></td>
-              <td>Conocimiento funcional</td>
-            </tr>
-            <tr>
-              <td>Avanzado</td>
-              <td>80 – 100</td>
-              <td><span class="dot dot-green"></span></td>
-              <td>Dominio sólido</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
 
@@ -335,12 +325,15 @@
     </section>
 
     <!-- Page 7 -->
+    {% for chunk in nominal_ranking_chunks %}
     <section
       class="page"
-      id="page-7"
+      id="page-7-chunk-{{ forloop.counter }}"
     >
       <main>
+        {% if forloop.first %}
         <h2 class="section-title">6. Ranking nominal</h2>
+        {% endif %}
 
         <table class="nominal-ranking-table dark-header">
           <thead>
@@ -354,9 +347,9 @@
             </tr>
           </thead>
           <tbody>
-            {% for participant in nominal_ranking %}
+            {% for participant in chunk %}
             <tr>
-              <td>{{ forloop.counter }}</td>
+              <td>{{ participant.counter }}</td>
               <td class="text-left">{{ participant.name }}</td>
               <td>{{ participant.position }}</td>
               <td>{{ participant.score }}</td>
@@ -370,6 +363,7 @@
         </table>
       </main>
     </section>
+    {% endfor %}
 
     <!-- Page 8 -->
     <section

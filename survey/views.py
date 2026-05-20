@@ -76,6 +76,29 @@ class GroupReportPDFView(View):
         # Calculate group calcs
         calcs = SurveyCalcsGroupTexts(reports=reports)
 
+        # Prepare nominal ranking raw list and chunks to handle WeasyPrint pagination bug gracefully
+        nominal_ranking_raw = [
+            {
+                "counter": idx + 1,
+                "name": report.participant.name,
+                "position": report.participant.get_position_display(),
+                "score": round(report.total),
+                "level": calcs.LEVELS_CONFIG[calcs._get_level_from_score(report.total)][
+                    "name_es"
+                ],
+                "dot_color": calcs.LEVELS_CONFIG[
+                    calcs._get_level_from_score(report.total)
+                ]["dot_color"],
+            }
+            for idx, report in enumerate(reports.order_by("-total"))
+        ]
+
+        chunk_size = 16
+        nominal_ranking_chunks = [
+            nominal_ranking_raw[i : i + chunk_size]
+            for i in range(0, len(nominal_ranking_raw), chunk_size)
+        ]
+
         # Mock data for all dynamic sections
         context = {
             # Global data
@@ -83,6 +106,7 @@ class GroupReportPDFView(View):
             "company_name": company.name,
             "total_participants": calcs.get_employees_number(),
             "dispersion_summary": calcs.get_dispersion_summary(),
+            "levels_config": calcs.LEVELS_CONFIG,
             # --------------------------
             # Data page 1
             # --------------------------
@@ -142,135 +166,13 @@ class GroupReportPDFView(View):
             # --------------------------
             # Data page 8
             # --------------------------
-            "nominal_ranking": [
-                {
-                    "name": "Laura Isabel Martínez Hinojosa",
-                    "position": "Director",
-                    "score": 89,
-                    "level": "Avanzado",
-                    "dot_color": "green",
-                },
-                {
-                    "name": "Carlos Enrique Gómez Martínez",
-                    "position": "Gerente",
-                    "score": 85,
-                    "level": "Avanzado",
-                    "dot_color": "green",
-                },
-                {
-                    "name": "Ana María Torres de la Garza",
-                    "position": "Jefe de Departamento",
-                    "score": 77,
-                    "level": "Intermedio",
-                    "dot_color": "yellow",
-                },
-                {
-                    "name": "Luis Alfonso Herrera Barrera",
-                    "position": "Gerente",
-                    "score": 72,
-                    "level": "Intermedio",
-                    "dot_color": "yellow",
-                },
-                {
-                    "name": "Mariana de Jesús Ríos González",
-                    "position": "Coordinadora",
-                    "score": 68,
-                    "level": "Intermedio",
-                    "dot_color": "yellow",
-                },
-                {
-                    "name": "Javier Ignacio López García",
-                    "position": "Supervisor",
-                    "score": 59,
-                    "level": "Básico",
-                    "dot_color": "red",
-                },
-                {
-                    "name": "Patricia del Rocío Núñez Jimenez",
-                    "position": "Gerente",
-                    "score": 54,
-                    "level": "Básico",
-                    "dot_color": "red",
-                },
-                {
-                    "name": "Ricardo Díaz Sánchez-Cordero",
-                    "position": "Director",
-                    "score": 51,
-                    "level": "Básico",
-                    "dot_color": "red",
-                },
-            ],
-            "heatmap_themes": [
-                "Antecedentes tecnológicos",
-                "Evolución de la tecnología",
-                "Internet y conectividad",
-                "Dispositivos digitales",
-                "Ciberseguridad",
-                "Huella digital",
-                "Uso de la tecnología",
-                "Herramientas de colaboración",
-                "Tecnologías emergentes",
-                "Tecnologías de asistencia",
-                "Rol del líder y la tecnología",
-                "Tecnología y medio ambiente",
-                "Etiqueta digital",
-            ],
-            "heatmap_data": [
-                {
-                    "name": "Laura Isabel Martínez Hinojosa",
-                    "dots": [
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "green",
-                        "yellow",
-                        "green",
-                    ],
-                },
-                {
-                    "name": "Carlos Enrique Gómez Martínez",
-                    "dots": [
-                        "yellow",
-                        "yellow",
-                        "green",
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "green",
-                        "green",
-                        "yellow",
-                        "yellow",
-                        "green",
-                        "yellow",
-                        "green",
-                    ],
-                },
-                {
-                    "name": "Ana María Torres de la Garza",
-                    "dots": [
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "green",
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "yellow",
-                        "green",
-                    ],
-                },
-            ],
+            "nominal_ranking": nominal_ranking_raw,
+            "nominal_ranking_chunks": nominal_ranking_chunks,
+            # --------------------------
+            # Data page 9
+            # --------------------------
+            "heatmap_themes": calcs.get_heatmap_themes(),
+            "heatmap_data": calcs.get_heatmap_data(),
             "strategic_profiles": {
                 "ambassadors": [],
                 "champions": [

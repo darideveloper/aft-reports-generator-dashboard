@@ -57,16 +57,18 @@ body {
 }
 
 /* Browser Preview Styling */
-.page {
-  width: var(--page-width);
-  min-height: var(--page-height);
-  background: #fff;
-  margin: 10mm auto;
-  padding: var(--margin);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+@media screen {
+  .page {
+    width: var(--page-width);
+    min-height: var(--page-height);
+    background: #fff;
+    margin: 10mm auto;
+    padding: var(--margin);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* PDF Rendering Overrides */
@@ -75,13 +77,41 @@ body {
     background: none;
   }
   .page {
+    display: block;
+    position: static !important;
     margin: 0;
     width: 100%;
     height: auto;
-    min-height: 100%;
+    min-height: 0 !important;
     padding: 0;
     box-shadow: none;
-    page-break-after: always;
+    page-break-before: always;
+    page-break-inside: auto;
+  }
+  main {
+    display: block;
+    position: static !important;
+    height: auto;
+    min-height: 0 !important;
+    flex: none;
+  }
+  main.content-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 100%;
+  }
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+  }
+  .page-break-before {
+    page-break-before: always !important;
+    break-before: page !important;
   }
 }
 

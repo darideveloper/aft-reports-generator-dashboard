@@ -10,6 +10,33 @@ from survey.models import (
 
 
 class SurveyCalcsGroup:
+    # Centralized definition of assessment levels, scores, colors, and descriptions
+    LEVELS_CONFIG = {
+        "low": {
+            "name_es": "Básico",
+            "dot_color": "red",
+            "score_min": 0,
+            "score_max": 59.99,
+            "score_max_display": 59,
+            "description": "Conocimiento limitado"
+        },
+        "medium": {
+            "name_es": "Intermedio",
+            "dot_color": "yellow",
+            "score_min": 60,
+            "score_max": 79.99,
+            "score_max_display": 79,
+            "description": "Conocimiento funcional"
+        },
+        "high": {
+            "name_es": "Avanzado",
+            "dot_color": "green",
+            "score_min": 80,
+            "score_max": 100,
+            "score_max_display": 100,
+            "description": "Dominio sólido"
+        }
+    }
 
     def __init__(
         self,
@@ -24,6 +51,8 @@ class SurveyCalcsGroup:
         self._max_score = None
         self._min_score = None
         self._participant_distribution = None
+        self._heatmap_themes = None
+        self._heatmap_data = None
 
     def get_employees_number(self) -> int:
         """
@@ -204,11 +233,10 @@ class SurveyCalcsGroup:
         """
         Helper method to map a score to low, medium, or high range.
         """
-        if score < 60:
-            return "low"
-        elif score < 80:
-            return "medium"
-        return "high"
+        for level_key, config in self.LEVELS_CONFIG.items():
+            if config["score_min"] <= score <= config["score_max"]:
+                return level_key
+        return "low"
 
     def get_participant_distribution(self) -> list[dict]:
         """
@@ -259,6 +287,56 @@ class SurveyCalcsGroup:
                 },
             ]
         return self._participant_distribution
+
+    def clean_theme_name(self, name: str) -> str:
+        """
+        Strip prefix from theme name
+        """
+        if " - " in name:
+            return name.split(" - ", 1)[1].strip()
+        return name
+
+    def get_heatmap_themes(self) -> list[str]:
+        """
+        Get the list of cleaned theme names for the survey.
+        """
+        if self._heatmap_themes is None:
+            survey = self.reports.first().survey if self.reports.exists() else None
+            if survey:
+                question_groups = QuestionGroup.objects.filter(survey=survey).order_by("survey_index")
+            else:
+                question_groups = QuestionGroup.objects.none()
+            self._heatmap_themes = [self.clean_theme_name(qg.name) for qg in question_groups]
+        return self._heatmap_themes
+
+    def get_heatmap_data(self) -> list[dict]:
+        """
+        Get the heatmap data (dots and names) for the participants.
+        """
+        if self._heatmap_data is None:
+            survey = self.reports.first().survey if self.reports.exists() else None
+            if survey:
+                question_groups = QuestionGroup.objects.filter(survey=survey).order_by("survey_index")
+            else:
+                question_groups = QuestionGroup.objects.none()
+
+            self._heatmap_data = []
+            for report in self.reports.order_by("-total"):
+                group_totals = ReportQuestionGroupTotal.objects.filter(report=report)
+                scores_by_group = {gt.question_group_id: gt.total for gt in group_totals}
+                
+                dots = []
+                for qg in question_groups:
+                    score = scores_by_group.get(qg.id, 0.0)
+                    level_key = self._get_level_from_score(score)
+                    dot_color = self.LEVELS_CONFIG[level_key]["dot_color"]
+                    dots.append(dot_color)
+                    
+                self._heatmap_data.append({
+                    "name": report.participant.name,
+                    "dots": dots,
+                })
+        return self._heatmap_data
 
 
 class SurveyCalcsGroupTexts(SurveyCalcsGroup):
