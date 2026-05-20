@@ -21,7 +21,7 @@ from utils.survey_calcs_group import SurveyCalcsGroupTexts
 class GroupReportPDFView(View):
     NOMINAL_RANKING_CHUNK_SIZE = 16
     HEATMAP_CHUNK_SIZE = 15
-    STRATEGIC_CHUNK_SIZE = 20
+    STRATEGIC_CHUNK_SIZE = 40  # 2 columns × ~20 names per column
 
     def _chunk_list(self, lst: list, chunk_size: int) -> list[list]:
         """

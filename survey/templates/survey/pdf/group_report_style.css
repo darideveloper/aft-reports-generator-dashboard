@@ -428,12 +428,15 @@ td {
   list-style: disc;
   margin-top: 15px;
   padding-left: 20px;
+  columns: 2;
+  column-gap: 40px;
 }
 
 .name-list li {
   margin-bottom: 8px;
   font-size: var(--font-size-normal);
   position: relative;
+  break-inside: avoid;
 }
 
 .placeholders-text {
