@@ -19,6 +19,7 @@ from utils.survey_calcs_group import SurveyCalcsGroup
 
 
 class GroupReportPDFView(View):
+
     def get(self, request, company_id):
         """
         View to preview the WeasyPrint PDF report using the html-pdf template.
@@ -82,7 +83,12 @@ class GroupReportPDFView(View):
             ],
             "global_index_interpretation": "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo. Esto puede generar distintas velocidades de adopción tecnológica dentro de la organización.",
             "participant_distribution": [
-                {"level": "Avanzado", "count": 5, "percentage": 12, "dot_color": "green"},
+                {
+                    "level": "Avanzado",
+                    "count": 5,
+                    "percentage": 12,
+                    "dot_color": "green",
+                },
                 {
                     "level": "Intermedio",
                     "count": 26,
@@ -280,7 +286,9 @@ class GroupReportPDFView(View):
         html_string = render_to_string("survey/pdf/group_report_template.html", context)
 
         # Base URL for assets resolution
-        base_url = os.path.join(settings.BASE_DIR, "survey", "templates", "survey", "pdf")
+        base_url = os.path.join(
+            settings.BASE_DIR, "survey", "templates", "survey", "pdf"
+        )
 
         # Generate PDF via WeasyPrint
         pdf_bytes = HTML(string=html_string, base_url=base_url).write_pdf()
