@@ -428,8 +428,10 @@ td {
   list-style: disc;
   margin-top: 15px;
   padding-left: 20px;
-  columns: 2;
-  column-gap: 40px;
+}
+
+.classification-detail p + .name-list {
+  margin-top: 30px;
 }
 
 .name-list li {

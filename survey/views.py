@@ -120,6 +120,8 @@ class GroupReportPDFView(View):
             "total_participants": calcs.get_employees_number(),
             "dispersion_summary": calcs.get_dispersion_summary(),
             "levels_config": calcs.LEVELS_CONFIG,
+            "strength_areas": calcs.get_strength_areas(),
+            "weakness_areas": calcs.get_weakness_areas(),
             # --------------------------
             # Data page 1
             # --------------------------
@@ -132,16 +134,8 @@ class GroupReportPDFView(View):
             # Paragraph 1
             "average_score": calcs.get_average(),
             "level": self._get_range_es(calcs.get_average_range()),
-            # Paragraph 2
             "general_summary": calcs.get_general_summary(),
-            # Paragraph 3
-            "strength_areas": calcs.get_strength_areas(),
-            # Paragraph 4
-            "weakness_areas": calcs.get_weakness_areas(),
-            # Paragraph 5
-            # Paragraph 6
             "priority_summary": calcs.get_priority_summary(),
-            # Paragraph 7
             # --------------------------
             # Data page 5
             # --------------------------
