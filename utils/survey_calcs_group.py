@@ -50,11 +50,11 @@ class SurveyCalcsGroup:
         average = self.get_average_num()
 
         if average <= 59:
-            return "bajo"
+            return "low"
         elif average <= 79:
-            return "medio"
+            return "medium"
         else:
-            return "alto"
+            return "high"
 
     def get_general_summary(self) -> str:
         """
@@ -64,9 +64,9 @@ class SurveyCalcsGroup:
             str: General summary paragraph.
         """
         summaries = {
-            "bajo": "Este resultado sugiere que el grupo se encuentra en una fase inicial de adopción tecnológica. Existen importantes oportunidades para desarrollar las habilidades digitales fundamentales y fomentar una cultura de innovación.",
-            "medio": "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos.",
-            "alto": "Este resultado sugiere que el grupo posee un dominio avanzado de las herramientas tecnológicas y una sólida comprensión de las tendencias digitales. Están bien posicionados para liderar iniciativas de transformación digital dentro de la organización.",
+            "low": "Este resultado sugiere que el grupo presenta una base tecnológica limitada, lo que puede dificultar la interacción cotidiana con herramientas digitales. También puede afectar la participación informada en iniciativas tecnológicas dentro de la organización.",
+            "medium": "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos.",
+            "high": "Este resultado indica que el grupo cuenta con una base tecnológica sólida que facilita la adopción de herramientas digitales. Esto permite a los participantes participar con mayor criterio en iniciativas tecnológicas y decisiones relacionadas con innovación.",
         }
 
         return summaries.get(self.get_average_range(), "")
@@ -194,10 +194,8 @@ class SurveyCalcsGroup:
         standard_deviation = round(self.get_standard_deviation_total(), 1)
 
         if standard_deviation <= 8:
-            return "baja"
+            return "low"
         elif standard_deviation <= 15:
-            return "media"
+            return "medium"
         else:
-            return "alta"
-
-
+            return "high"

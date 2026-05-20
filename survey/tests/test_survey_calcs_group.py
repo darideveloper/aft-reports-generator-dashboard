@@ -132,7 +132,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "bajo")
+        self.assertEqual(calcs.get_average_range(), "low")
 
     def test_get_average_range_59(self):
         """Validate average range when all reports have 59 total (low range)"""
@@ -142,7 +142,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "bajo")
+        self.assertEqual(calcs.get_average_range(), "low")
 
     def test_get_average_range_60(self):
         """Validate average range when all reports have 60 total (medium range)"""
@@ -152,7 +152,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "medio")
+        self.assertEqual(calcs.get_average_range(), "medium")
 
     def test_get_average_range_79(self):
         """Validate average range when all reports have 79 total (medium range)"""
@@ -162,7 +162,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "medio")
+        self.assertEqual(calcs.get_average_range(), "medium")
 
     def test_get_average_range_80(self):
         """Validate average range when all reports have 80 total (high range)"""
@@ -172,7 +172,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "alto")
+        self.assertEqual(calcs.get_average_range(), "high")
 
     def test_get_average_range_100(self):
         """Validate average range when all reports have 100 total (high range)"""
@@ -182,7 +182,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
 
         # validate average range
-        self.assertEqual(calcs.get_average_range(), "alto")
+        self.assertEqual(calcs.get_average_range(), "high")
 
     def test_get_general_summary(self):
         """Validate the returned text for each general summary range"""
@@ -190,14 +190,14 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
 
         from unittest.mock import patch
         
-        with patch.object(calcs, "get_average_range", return_value="bajo"):
-            self.assertIn("fase inicial", calcs.get_general_summary())
+        with patch.object(calcs, "get_average_range", return_value="low"):
+            self.assertIn("base tecnológica limitada", calcs.get_general_summary())
 
-        with patch.object(calcs, "get_average_range", return_value="medio"):
-            self.assertIn("base tecnológica", calcs.get_general_summary())
+        with patch.object(calcs, "get_average_range", return_value="medium"):
+            self.assertIn("base tecnológica funcional", calcs.get_general_summary())
 
-        with patch.object(calcs, "get_average_range", return_value="alto"):
-            self.assertIn("dominio avanzado", calcs.get_general_summary())
+        with patch.object(calcs, "get_average_range", return_value="high"):
+            self.assertIn("base tecnológica sólida", calcs.get_general_summary())
 
     def test_get_average_question_groups_ordered_random_options(self):
         """Validate average areas ordered by average (max to min)"""
@@ -296,13 +296,13 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
     def test_get_standard_deviation_total_range(self):
         """Validate standard deviation total range for all required values"""
         values = {
-            0.0: "baja",
-            7.9: "baja",
-            8.0: "baja",
-            8.1: "media",
-            14.9: "media",
-            15.0: "media",
-            15.1: "alta",
+            0.0: "low",
+            7.9: "low",
+            8.0: "low",
+            8.1: "medium",
+            14.9: "medium",
+            15.0: "medium",
+            15.1: "high",
         }
 
         for value, expected_range in values.items():
