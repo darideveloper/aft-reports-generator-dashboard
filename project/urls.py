@@ -38,8 +38,6 @@ urlpatterns = [
         name="participant-has-answer",
     ),
     path("api/progress/", survey_views.FormProgressView.as_view(), name="progress"),
-    # Preview PDF
-    path("preview-pdf/", survey_views.preview_pdf_sample, name="preview-pdf"),
     path("preview-report-pdf/", survey_views.preview_report_pdf, name="preview-report-pdf"),
 ]
 

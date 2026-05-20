@@ -14,54 +14,6 @@ from core import choices
 from survey import models, serializers
 
 
-def preview_pdf_sample(request):
-    """
-    View to preview the WeasyPrint PDF sample in the browser.
-    """
-    # Generate random data for the template
-    rows = []
-    statuses = ["Active", "Pending", "Completed", "Failed"]
-    for i in range(1, 150):
-        rows.append(
-            {
-                "id": i,
-                "name": f"Item {i}",
-                "value1": round(random.uniform(10.0, 999.9), 2),
-                "value2": random.randint(1, 100),
-                "status": random.choice(statuses),
-            }
-        )
-
-    # Pick a random primary color for the sample
-    primary_color = "#2c3e50"
-
-    # Resolve logo URL if exists
-    logo_url = None
-    if os.path.exists(os.path.join(settings.BASE_DIR, "media", "logo.png")):
-        logo_url = request.build_absolute_uri(settings.MEDIA_URL + "logo.png")
-
-    context = {
-        "title": "WeasyPrint Sample Report (Live Preview)",
-        "subtitle": "Demonstrating Paged Media CSS in Django",
-        "year": datetime.now().year,
-        "date": datetime.now().strftime("%B %d, %Y"),
-        "rows": rows,
-        "primary_color": primary_color,
-        "logo_url": logo_url,
-    }
-
-    # Render HTML string from template
-    html_string = render_to_string("survey/group_report.html", context)
-
-    # Generate PDF via WeasyPrint
-    base_url = request.build_absolute_uri("/")
-    pdf_bytes = HTML(string=html_string, base_url=base_url).write_pdf()
-
-    response = HttpResponse(pdf_bytes, content_type="application/pdf")
-    response["Content-Disposition"] = "inline; filename='preview.pdf'"
-    return response
-
-
 def preview_report_pdf(request):
     """
     View to preview the WeasyPrint PDF report using the html-pdf template.
