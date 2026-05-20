@@ -20,7 +20,7 @@ from utils.survey_calcs_group import SurveyCalcsGroupTexts
 
 class GroupReportPDFView(View):
     NOMINAL_RANKING_CHUNK_SIZE = 16
-    HEATMAP_CHUNK_SIZE = 12
+    HEATMAP_CHUNK_SIZE = 15
 
     def chunk_list(self, lst: list, chunk_size: int) -> list[list]:
         """
@@ -29,7 +29,6 @@ class GroupReportPDFView(View):
         if not lst:
             return []
         return [lst[i : i + chunk_size] for i in range(0, len(lst), chunk_size)]
-
 
     def get_range_es(self, range_val: str) -> str:
         """
