@@ -20,6 +20,17 @@ from utils.survey_calcs_group import SurveyCalcsGroup
 
 class GroupReportPDFView(View):
 
+    def get_average_range_es(self, range: str) -> str:
+        """
+        Convert average range to Spanish
+        """
+        ranges = {
+            "low": "básico",
+            "medium": "intermedio",
+            "high": "avanzado",
+        }
+        return ranges.get(range, "")
+
     def get(self, request, company_id):
         """
         View to preview the WeasyPrint PDF report using the html-pdf template.
@@ -71,7 +82,7 @@ class GroupReportPDFView(View):
             # --------------------------
             # Paragraph 1
             "average_score": calcs.get_average_num(),
-            "level": calcs.get_average_range(),
+            "level": self.get_average_range_es(calcs.get_average_range()),
             # Paragraph 2
             "general_summary": calcs.get_general_summary(),
             "max_score": "",
