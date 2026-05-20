@@ -1,12 +1,20 @@
+:root {
+    --page-size: Letter;
+    --font-size-normal: 11pt;
+    --font-size-heading: 12pt;
+    --font-size-sub-heading: 11pt;
+}
+
 body {
     font-family: Arial, sans-serif;
     color: #333;
+    font-size: var(--font-size-normal);
     margin: 0;
     padding: 0;
 }
 
 @page {
-    size: A4;
+    size: var(--page-size);
     margin: 3cm 2cm 2cm 2cm;
 
     @top-left {
@@ -56,6 +64,20 @@ body {
     margin-left: -2cm; /* Compensate for page margin to make it full width if needed, though running elements are in margin boxes */
 }
 
+main {
+    width: 100%;
+}
+
+h1, h2, h3, h5, h6 {
+    font-size: var(--font-size-heading);
+    font-weight: bold;
+}
+
+h4 {
+    font-size: var(--font-size-sub-heading);
+    font-weight: bold;
+}
+
 .cover-page {
     background-color: {{ primary_color }};
     color: white;
@@ -68,6 +90,7 @@ body {
     margin: 0;
     padding: 0;
     page-break-after: always;
+    font-size: 16px; /* Reset base for em-based titles */
 }
 
 .cover-page h1 {
@@ -79,14 +102,6 @@ body {
     font-size: 1.5em;
     opacity: 0.9;
     font-weight: normal;
-}
-
-.cover-content {
-    margin-top: 10cm;
-}
-
-main {
-    width: 100%;
 }
 
 h1 {

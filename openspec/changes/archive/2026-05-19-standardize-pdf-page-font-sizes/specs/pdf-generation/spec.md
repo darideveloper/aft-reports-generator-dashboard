@@ -1,8 +1,5 @@
-# pdf-generation Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change add-sample-weasyprint-pdf. Update Purpose after archive.
-## Requirements
 ### Requirement: Group Report Generation
 The system SHALL provide the capability to generate group reports from HTML templates using WeasyPrint, demonstrating advanced CSS features like headers, footers, and page-breaking tables. The reports SHALL adhere to the standardized Letter page size and font styling (11pt body, 12pt bold headings).
 
@@ -12,12 +9,3 @@ The system SHALL provide the capability to generate group reports from HTML temp
 - **THEN** the PDF contains a table with dynamic rows that spans multiple pages without breaking individual rows
 - **THEN** the PDF utilizes CSS-driven colors and embedded images (logos) correctly
 - **THEN** the PDF page size is Letter and font sizes follow the 11pt/12pt standard
-
-### Requirement: Live Group Report Preview
-The system SHALL provide an HTTP endpoint to preview the WeasyPrint group report in real-time, facilitating template development.
-
-#### Scenario: View the group report preview in the browser
-- **WHEN** a user navigates to the `/preview-pdf/` URL
-- **THEN** the server compiles the `group_report.html` using WeasyPrint
-- **THEN** the server returns an inline PDF response that the browser renders natively
-

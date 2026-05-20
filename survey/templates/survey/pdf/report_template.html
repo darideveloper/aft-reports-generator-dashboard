@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Reporte Organizacional - AFT-I</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <!-- Global Footer for Paged Media -->
+        <footer id="page-footer">
+            <div class="footer-container">
+                <div class="footer-left">
+                    <img
+                        src="assets/images/aft-logo.png"
+                        alt="AFT-I Logo Small"
+                    />
+                </div>
+                <div class="footer-center">
+                    <div>
+                        &copy; 2026 LeadForward Global Solutions MJ. Todos los
+                        derechos reservados
+                    </div>
+                    <div>Reporte Organizacional de {{ company_name }}.</div>
+                </div>
+                <div class="footer-right"></div>
+            </div>
+        </footer>
+
+        <!-- Page 1 -->
+        <section class="page" id="page-1">
+            <header>
+                <div class="header-left" style="font-weight: bold">
+                    LeadForward Global Solutions MJ
+                </div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main class="content-center">
+                <h1 class="report-title">Reporte Organizacional</h1>
+
+                <div class="aft-logo-container">
+                    <img
+                        src="assets/images/aft-logo.png"
+                        alt="AFT-I Logo"
+                        class="aft-logo-main"
+                    />
+                </div>
+
+                <h2 class="report-subtitle" style="margin: 40px 0">
+                    Alfabetización Tecnológica
+                </h2>
+
+                <div class="report-info">
+                    <p><strong>Empresa:</strong> {{ company_name }}</p>
+                    <p>
+                        <strong>Participantes:</strong> {{ total_participants }}
+                    </p>
+                    <p><strong>Fecha:</strong> {{ report_date }}</p>
+                    <p>
+                        <strong>Elaborado por:</strong> LeadForward Global
+                        Solutions MJ
+                    </p>
+                </div>
+            </main>
+        </section>
+
+        <!-- Page 2 -->
+        <section class="page" id="page-2">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title" style="margin-bottom: 10px">
+                    Contenido
+                </h2>
+                <ol class="toc-list" style="margin-left: 20px">
+                    <li>Resumen ejecutivo</li>
+                    <li>Índice global del grupo</li>
+                    <li>Distribución de participantes</li>
+                    <li>Resultados por área de gestión</li>
+                    <li>Ranking general de los 13 temas</li>
+                    <li>Ranking nominal</li>
+                    <li>Heatmap nominal por los 13 temas</li>
+                    <li>Lectura estratégica</li>
+                    <li>Señal prioritaria</li>
+                    <li>Recomendaciones adicionales</li>
+                    <li>
+                        Anexo - Marco conceptual y descripción del diagnóstico
+                    </li>
+                </ol>
+            </main>
+        </section>
+
+        <!-- Page 3 -->
+        <section class="page" id="page-3">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">1. Resumen ejecutivo</h2>
+                <div class="text-content">
+                    <p>
+                        El grupo evaluado obtuvo un Índice de Alfabetización
+                        Tecnológica de
+                        <strong>{{ average_score }} puntos</strong>, lo que
+                        indica un nivel <strong>{{ level }}</strong> de dominio
+                        tecnológico.
+                    </p>
+
+                    {% for paragraph in summary_paragraphs %}
+                    <p>{{ paragraph|safe }}</p>
+                    {% endfor %}
+                </div>
+            </main>
+        </section>
+
+        <!-- Page 4 -->
+        <section class="page" id="page-4">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">2. Índice global del grupo</h2>
+
+                <p class="simple-text">Muestra Evaluada</p>
+                <p class="simple-text">
+                    Participaron
+                    <strong>{{ total_participants }}</strong> personas
+                    pertenecientes a distintas áreas de la organización.
+                </p>
+
+                <div class="simple-text">Escala de Interpretación.</div>
+                <table class="interpretation-table">
+                    <thead>
+                        <tr>
+                            <th>Nivel</th>
+                            <th>Rango</th>
+                            <th>Nivel visual</th>
+                            <th>Interpretación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Básico</td>
+                            <td>0 – 59</td>
+                            <td><span class="dot dot-red"></span></td>
+                            <td>Conocimiento limitado</td>
+                        </tr>
+                        <tr>
+                            <td>Intermedio</td>
+                            <td>60 – 79</td>
+                            <td><span class="dot dot-yellow"></span></td>
+                            <td>Conocimiento funcional</td>
+                        </tr>
+                        <tr>
+                            <td>Avanzado</td>
+                            <td>80 – 100</td>
+                            <td><span class="dot dot-green"></span></td>
+                            <td>Dominio sólido</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="simple-text margin-top-30">
+                    Como ya se mencionó anteriormente, el grupo obtuvo un Índice
+                    de Alfabetización Tecnológica de
+                    <strong>{{ average_score }} puntos</strong>, lo que
+                    corresponde a un <strong>nivel {{ level|lower }}</strong> de
+                    alfabetización tecnológica.
+                </p>
+
+                <table class="indicators-table">
+                    <thead>
+                        <tr>
+                            <th>Indicador</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Promedio grupo</td>
+                            <td class="result-value">{{ average_score }}</td>
+                        </tr>
+                        <tr>
+                            <td>Resultado máximo</td>
+                            <td class="result-value">{{ max_score }}</td>
+                        </tr>
+                        <tr>
+                            <td>Resultado mínimo</td>
+                            <td class="result-value">{{ min_score }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="simple-text margin-top-30">
+                    {{ global_index_interpretation }}
+                </p>
+            </main>
+        </section>
+
+        <!-- Page 5 -->
+        <section class="page" id="page-5">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">3.- Distribución de participantes</h2>
+
+                <table class="distribution-table dark-header">
+                    <thead>
+                        <tr>
+                            <th>Nivel</th>
+                            <th>Personas</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in participant_distribution %}
+                        <tr>
+                            <td class="text-left">
+                                <span
+                                    class="dot dot-{{ item.dot_color }} margin-right-10"
+                                ></span>
+                                {{ item.level }}
+                            </td>
+                            <td>{{ item.count }}</td>
+                            <td>{{ item.percentage }} %</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h2 class="section-title">4. Resultados por área de gestión</h2>
+                <p class="simple-text">
+                    El análisis por área permite identificar los ámbitos
+                    tecnológicos donde el grupo presenta mayor desarrollo y
+                    aquellos que requieren fortalecimiento para apoyar la
+                    ejecución de la estrategia digital de la organización.
+                </p>
+
+                <table class="area-results-table dark-header">
+                    <thead>
+                        <tr>
+                            <th>Área</th>
+                            <th>Índice</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for area in area_results %}
+                        <tr>
+                            <td class="text-left">{{ area.name }}</td>
+                            <td>{{ area.score }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </main>
+        </section>
+
+        <!-- Page 6 -->
+        <section class="page" id="page-6">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">5. Ranking de los 13 temas</h2>
+                <p class="simple-text">
+                    El ranking de los 13 temas permite identificar con mayor
+                    precisión las prioridades de desarrollo del grupo en la
+                    competencia crítica de alfabetización tecnológica, al
+                    evidenciar los ámbitos en los que existe mayor dominio y
+                    aquellos que requieren fortalecimiento para mejorar la toma
+                    de decisiones y el uso estratégico de la tecnología.
+                </p>
+
+                <table class="ranking-table dark-header">
+                    <thead>
+                        <tr>
+                            <th>Ranking</th>
+                            <th>Tema</th>
+                            <th>Índice</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for theme in theme_ranking %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="text-left">{{ theme.name }}</td>
+                            <td>{{ theme.score }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </main>
+        </section>
+
+        <!-- Page 7 -->
+        <section class="page" id="page-7">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">6. Ranking nominal</h2>
+
+                <table class="nominal-ranking-table dark-header">
+                    <thead>
+                        <tr>
+                            <th>Ranking</th>
+                            <th>Nombre</th>
+                            <th>Posición</th>
+                            <th>Índice</th>
+                            <th>Nivel</th>
+                            <th>Semáforo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participant in nominal_ranking %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="text-left">{{ participant.name }}</td>
+                            <td>{{ participant.position }}</td>
+                            <td>{{ participant.score }}</td>
+                            <td>{{ participant.level }}</td>
+                            <td>
+                                <span
+                                    class="dot dot-{{ participant.dot_color }}"
+                                ></span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </main>
+        </section>
+
+        <!-- Page 8 -->
+        <section class="page" id="page-8">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">
+                    7. Heatmap nominal por los 13 temas
+                </h2>
+
+                <div class="heatmap-container">
+                    <table class="heatmap-table dark-header">
+                        <thead>
+                            <tr>
+                                <th class="name-col"><div>Nombre</div></th>
+                                {% for theme_name in heatmap_themes %}
+                                <th class="vertical-col">
+                                    <div>{{ theme_name }}</div>
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in heatmap_data %}
+                            <tr>
+                                <td class="text-center">{{ row.name }}</td>
+                                {% for dot_color in row.dots %}
+                                <td>
+                                    <span
+                                        class="dot dot-{{ dot_color }}"
+                                    ></span>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </section>
+
+        <!-- Page 9 -->
+        <section class="page" id="page-9">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">8. Lectura estratégica</h2>
+
+                <table class="classification-table dark-header">
+                    <thead>
+                        <tr>
+                            <th>Nivel Tecnológico</th>
+                            <th>Influencia</th>
+                            <th>Clasificación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alto</td>
+                            <td>Alto</td>
+                            <td class="text-left">
+                                <span
+                                    class="dot dot-green margin-right-10"
+                                ></span>
+                                Embajador Estratégico
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Alto</td>
+                            <td>Media/Baja</td>
+                            <td class="text-left">
+                                <span
+                                    class="dot dot-green margin-right-10"
+                                ></span>
+                                Champion de Transformación
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Bajo</td>
+                            <td>Alto</td>
+                            <td class="text-left">
+                                <span
+                                    class="dot dot-red margin-right-10"
+                                ></span>
+                                Riesgo Crítico
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="classification-detail">
+                    <div class="classification-header">
+                        <span class="dot dot-green margin-right-10"></span>
+                        Embajador Estratégico
+                    </div>
+                    <p class="simple-text">
+                        Cuenta con el nivel y la influencia necesarios para
+                        liderar iniciativas digitales, actuar como patrocinador
+                        de proyectos tecnológicos y facilitar la adopción
+                        transversal en la organización.
+                    </p>
+                    <ul class="name-list">
+                        {% for name in strategic_profiles.ambassadors %}
+                        <li>{{ name }}</li>
+                        {% empty %}
+                        <li>
+                            En este grupo no se encontraron Embajadores
+                            Estratégicos
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="classification-detail margin-top-30">
+                    <div class="classification-header">
+                        <span class="dot dot-green margin-right-10"></span>
+                        Champion de Transformación
+                    </div>
+                    <p class="simple-text">
+                        Perfil con alto dominio que puede apoyar la
+                        implementación de iniciativas digitales y actuar como
+                        mentor interno en el desarrollo de capacidades
+                        tecnológicas.
+                    </p>
+                    <ul class="name-list">
+                        {% for name in strategic_profiles.champions %}
+                        <li>{{ name }}</li>
+                        {% empty %}
+                        <li>
+                            En este grupo no se encontraron Champions de
+                            Transformación
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </main>
+        </section>
+
+        <!-- Page 10 -->
+        <section class="page" id="page-10">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <div class="classification-detail">
+                    <div class="classification-header">
+                        <span class="dot dot-red margin-right-10"></span> Riesgo
+                        Crítico
+                    </div>
+                    <p class="simple-text">
+                        Este perfil puede desacelerar la transformación, afectar
+                        la calidad del juicio estratégico y aumentar la
+                        exposición a riesgos tecnológicos. Se considera una
+                        prioridad de intervención individual.
+                    </p>
+                    <ul class="name-list">
+                        {% for name in strategic_profiles.risks %}
+                        <li>{{ name }}</li>
+                        {% empty %}
+                        <li>
+                            En este grupo no se encontraron perfiles de Riesgo
+                            Crítico
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <p class="simple-text margin-top-30">
+                    Esta clasificación permite enfocar los esfuerzos de
+                    desarrollo y acelerar la adopción tecnológica, alineando las
+                    acciones de intervención con los perfiles clave dentro de la
+                    organización.
+                </p>
+            </main>
+        </section>
+
+        <!-- Page 11 -->
+        <section class="page" id="page-11">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">9. Señal Prioritaria</h2>
+                <p class="simple-text">
+                    Las siguientes líneas de acción se derivan directamente de
+                    los hallazgos del diagnóstico y permiten traducir los
+                    resultados en decisiones concretas para fortalecer la
+                    alfabetización tecnológica y su impacto en el negocio.
+                </p>
+
+                <p class="simple-text margin-top-30">
+                    Fortalecer el desarrollo de capacidades en las áreas de
+                    <strong>Ciberseguridad</strong> y
+                    <strong>Tecnología y negocios</strong>, priorizando los
+                    temas específicos con menor nivel identificados en el
+                    diagnóstico.
+                </p>
+
+                <p class="simple-text">
+                    Esto permitirá elevar la calidad del análisis tecnológico,
+                    mejorar la toma de decisiones y reducir brechas que pueden
+                    impactar la ejecución de iniciativas digitales.
+                </p>
+
+                <h3 class="subset-title">
+                    Acciones específicas para las prioridades en temas urgentes
+                    para atender.
+                </h3>
+
+                {% for action_block in priority_actions %}
+                <div
+                    class="action-block {% if not forloop.first %}margin-top-30{% endif %}"
+                >
+                    <div class="subset-title">{{ action_block.title }}</div>
+                    <ul class="name-list">
+                        {% for item in action_block.items %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </main>
+        </section>
+
+        <!-- Page 12 -->
+        <section class="page" id="page-12">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">10. Recomendaciones adicionales</h2>
+
+                <div class="text-content">
+                    {% for rec in additional_recommendations %}
+                    <p>{{ rec|safe }}</p>
+                    {% empty %}
+                    <p>No hay recomendaciones adicionales.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="lf-message">
+                    <h3 class="subset-title">
+                        Mensaje de LeadForward Global Solutions MJ
+                    </h3>
+                    <p class="simple-text">
+                        El principal reto no es la adopción de herramientas,
+                        sino el desarrollo de la alfabetización tecnológica del
+                        equipo de liderazgo como condición para adecuar su
+                        gestión a los tiempos actuales.
+                    </p>
+
+                    <p class="simple-text margin-top-20">
+                        La alfabetización tecnológica no es un programa de
+                        capacitación; es una condición estratégica para dirigir
+                        el futuro del negocio.
+                    </p>
+
+                    <p class="simple-text margin-top-20">
+                        Como señala el World Economic Forum, las organizaciones
+                        que desarrollan esta capacidad están mejor preparadas
+                        para anticipar los cambios que transforman la
+                        competitividad y el entorno empresarial.
+                    </p>
+                </div>
+            </main>
+        </section>
+
+        <!-- Page 13 -->
+        <section class="page" id="page-13">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <h2 class="section-title">
+                    11. Anexo - Marco conceptual y descripción del diagnóstico
+                </h2>
+                <h3 class="subset-title">
+                    Índice de Alfabetización Tecnológica LeadForward Global
+                    Solutions MJ
+                </h3>
+
+                <div class="annex-section">
+                    <h4 class="subset-title">A. Naturaleza del Modelo</h4>
+                    <p class="simple-text">
+                        El Índice de Alfabetización Tecnológica de LeadForward
+                        Global Solutions MJ:
+                    </p>
+                    <ul class="name-list">
+                        <li>No evalúa competencia técnica especializada.</li>
+                        <li>
+                            No mide habilidades propias de profesionales de TI,
+                            ingeniería o desarrollo.
+                        </li>
+                        <li>
+                            Evalúa algo estratégicamente más relevante para el
+                            negocio:
+                        </li>
+                    </ul>
+                    <p
+                        class="simple-text text-center italic bold margin-top-20"
+                    >
+                        La capacidad organizacional para interactuar
+                        inteligentemente con la tecnología.
+                    </p>
+                </div>
+
+                <div class="annex-section margin-top-30">
+                    <h4 class="subset-title">
+                        B. ¿Qué entendemos por Alfabetización Tecnológica?
+                    </h4>
+                    <p class="simple-text">
+                        Así como una persona se considera alfabetizada cuando
+                        sabe leer y escribir, una organización puede
+                        considerarse tecnológicamente alfabetizada cuando sus
+                        líderes y colaboradores cuentan con el conocimiento
+                        mínimo indispensable para:
+                    </p>
+                    <ul class="name-list">
+                        <li>
+                            Comprender el impacto de la tecnología en el
+                            negocio.
+                        </li>
+                        <li>
+                            Participar informadamente en iniciativas digitales.
+                        </li>
+                        <li>Formular requerimientos con mayor claridad.</li>
+                        <li>Evaluar riesgos tecnológicos básicos.</li>
+                        <li>
+                            Facilitar la adopción de herramientas digitales.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="annex-section margin-top-30">
+                    <h4 class="subset-title">C. Alcance del Diagnóstico</h4>
+                    <p class="simple-text">
+                        El Índice de Alfabetización Tecnológica de LeadForward
+                        Global Solutions MJ evalúa 13 temas tecnológicos
+                        agrupados en 6 áreas de gestión laboral:
+                    </p>
+                    <ul class="name-list">
+                        <li>Cultura Digital.</li>
+                        <li>Tecnología y Negocio.</li>
+                        <li>Ciberseguridad.</li>
+                    </ul>
+                </div>
+            </main>
+        </section>
+
+        <!-- Page 14 -->
+        <section class="page" id="page-14">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main>
+                <div class="annex-section">
+                    <ul class="name-list">
+                        <li>Impacto Personal.</li>
+                        <li>Futuro Sustentable e Inclusivo.</li>
+                        <li>Ecosistema Digital de Colaboración.</li>
+                    </ul>
+                    <p class="simple-text margin-top-20">
+                        El objetivo es identificar fortalezas y brechas que
+                        influyen directamente en la capacidad de la organización
+                        para ejecutar su estrategia digital.
+                    </p>
+                </div>
+
+                <div class="annex-section margin-top-30">
+                    <h4 class="subset-title">D. Implicación Estratégica</h4>
+                    <p class="simple-text">
+                        Un mayor nivel de alfabetización tecnológica:
+                    </p>
+                    <ul class="name-list">
+                        <li>
+                            Facilita la priorización de inversiones digitales
+                            con mayor criterio.
+                        </li>
+                        <li>
+                            Reduce fricciones entre negocio y TI al mejorar la
+                            calidad de la conversación tecnológica.
+                        </li>
+                        <li>
+                            Fortalece la participación de líderes y equipos en
+                            proyectos digitales y decisiones relacionadas con
+                            tecnología.
+                        </li>
+                        <li>
+                            Aumenta la probabilidad de adopción exitosa al
+                            generar mayor comprensión, alineación y compromiso
+                            frente al cambio tecnológico.
+                        </li>
+                        <li>
+                            Mejora la capacidad de la organización para
+                            anticipar riesgos, evaluar oportunidades y responder
+                            con mayor agilidad al entorno digital.
+                        </li>
+                    </ul>
+
+                    <p class="simple-text margin-top-20">
+                        En contraste, niveles heterogéneos o insuficientes
+                        pueden generar:
+                    </p>
+                    <ul class="name-list">
+                        <li>
+                            Expectativas poco realistas frente al alcance de la
+                            tecnología.
+                        </li>
+                        <li>
+                            Incidentes recurrentes de ciberseguridad derivados
+                            de prácticas débiles o inconsistentes.
+                        </li>
+                        <li>
+                            Decisiones desalineadas con las necesidades del
+                            negocio y con la evolución del entorno digital.
+                        </li>
+                        <li>
+                            Normatividad interna desactualizada frente al uso de
+                            nuevas herramientas tecnológicas.
+                        </li>
+                        <li>
+                            Resistencia al cambio y velocidades distintas de
+                            adopción dentro de la organización.
+                        </li>
+                    </ul>
+                </div>
+
+                <p class="simple-text margin-top-30 text-center bold">
+                    El Índice de LeadForward Global Solutions MJ no es un test
+                    técnico. Es un indicador de madurez organizacional frente a
+                    la tecnología.
+                </p>
+            </main>
+        </section>
+
+        <!-- Page 15 -->
+        <section class="page" id="page-15">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main class="content-center">
+                <div class="large-logo-container">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="LeadForward Large Logo"
+                        class="large-logo"
+                    />
+                </div>
+
+                <p class="simple-text text-center margin-top-60">
+                    Somos un grupo de profesionales con amplia experiencia
+                    global. Nos dedicamos a impulsar en las organizaciones las
+                    mejores prácticas de liderazgo porque creemos y hemos
+                    comprobado que son el cimiento para el éxito.
+                </p>
+            </main>
+        </section>
+
+        <!-- Page 16 -->
+        <section class="page" id="page-16">
+            <header>
+                <div class="header-left">LeadForward Global Solutions MJ</div>
+                <div class="header-right">
+                    <img
+                        src="assets/images/lead-forward-logo.png"
+                        alt="Logo LF"
+                        class="logo-lf"
+                    />
+                </div>
+            </header>
+
+            <main class="contact-main">
+                <div class="contact-grid">
+                    <!-- Social Column -->
+                    <div class="contact-col social-col">
+                        <div class="contact-item">
+                            <i class="fab fa-linkedin social-icon-fa"></i>
+                            <span class="contact-text-inline"
+                                >LeadForward Global Solutions MJ</span
+                            >
+                        </div>
+                        <div class="contact-item">
+                            <i class="fab fa-instagram social-icon-fa"></i>
+                            <span class="contact-text-inline"
+                                >leadforward_globalsolutions</span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Direct Contact Column -->
+                    <div class="contact-col center-col">
+                        <p class="contact-link">leadforward.mx</p>
+                        <p class="contact-link">ventas@leadforward.mx</p>
+                        <p class="contact-phone">+52 81.2098.0000</p>
+                    </div>
+
+                    <!-- QR Column -->
+                    <div class="contact-col qr-col">
+                        <div class="qr-wrapper">
+                            <img
+                                src="assets/images/qr.png"
+                                alt="QR Code"
+                                class="qr-code"
+                            />
+                            <p class="qr-hint">Escanea para más información</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+    </body>
+</html>

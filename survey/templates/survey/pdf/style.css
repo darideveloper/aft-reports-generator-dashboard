@@ -1,0 +1,493 @@
+:root {
+    --page-size: Letter;
+    --font-size-normal: 11pt;
+    --font-size-heading: 13pt;
+    --font-size-sub-heading: 11pt;
+    --page-width: 8.5in;
+
+    --page-height: 11in;
+    --margin: 20mm;
+    --font-main: "Arial", sans-serif;
+    --color-text: #000;
+    --color-footer-gray: #666;
+
+    --aft-a-bg: #d8e6f1;
+    --aft-f-bg: #f8e7a8;
+    --aft-t-bg: #e6d3ba;
+
+    --aft-a-text: #2c77a3;
+    --aft-f-text: #419688;
+    --aft-t-text: #4a4a4a;
+}
+
+/* Page Definition - Perfect Paged Media Header/Footer */
+@page {
+    size: var(--page-size) portrait;
+    margin: var(--margin);
+    margin-bottom: 25mm; /* Space for footer */
+    font-size: var(--font-size-normal);
+    @bottom-center {
+        content: element(footer);
+        width: 100%;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #f0f0f0;
+    font-family: var(--font-main);
+    color: var(--color-text);
+    font-size: var(--font-size-normal);
+}
+
+/* Browser Preview Styling */
+.page {
+    width: var(--page-width);
+    min-height: var(--page-height);
+    background: #fff;
+    margin: 10mm auto;
+    padding: var(--margin);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* PDF Rendering Overrides */
+@media print {
+    body {
+        background: none;
+    }
+    .page {
+        margin: 0;
+        width: 100%;
+        height: auto;
+        min-height: 100%;
+        padding: 0;
+        box-shadow: none;
+        page-break-after: always;
+    }
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 20px;
+}
+
+.logo-lf {
+    height: 50px;
+    width: auto;
+}
+
+.content-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+h1,
+h2,
+h3,
+h5,
+h6 {
+    font-size: var(--font-size-heading);
+    font-weight: bold;
+}
+
+h4,
+.subset-title {
+    font-size: var(--font-size-sub-heading);
+    font-weight: bold;
+}
+
+.report-title {
+    font-size: 37px;
+    margin-top: 85px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.aft-logo-container {
+    margin-bottom: 30px;
+}
+
+.aft-logo-main {
+    width: 450px;
+    height: auto;
+}
+
+.report-subtitle {
+    font-size: 37px;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.report-info {
+    text-align: left;
+    font-size: 22px;
+    line-height: 1.5;
+    align-self: flex-start;
+    margin-left: 15%;
+}
+
+.report-info p {
+    margin-bottom: 6px;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Paged Media Footer */
+footer {
+    position: running(footer);
+    width: 100%;
+    font-size: 11px;
+    color: #000;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #eee;
+    padding-top: 5px;
+}
+
+.footer-left {
+    width: 60px;
+}
+
+.footer-left img {
+    height: 18px;
+    width: auto;
+}
+
+.footer-center {
+    flex: 1;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.footer-right {
+    width: 60px;
+    text-align: right;
+}
+
+/* Automatic Page Numbering */
+.footer-right::after {
+    content: counter(page);
+}
+
+.section-title {
+    font-size: var(--font-size-heading);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.toc-list {
+    list-style-position: inside;
+    line-height: 2.2;
+    font-size: var(--font-size-normal);
+}
+
+.text-content {
+    line-height: 1.6;
+    font-size: var(--font-size-normal);
+    text-align: justify;
+}
+
+.text-content p {
+    margin-bottom: 20px;
+}
+
+.subset-title {
+    font-size: var(--font-size-sub-heading);
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.simple-text {
+    font-size: var(--font-size-normal);
+    line-height: 1.6;
+}
+
+.margin-top-30 {
+    margin-top: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    background-color: #d9e2f3;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #000;
+    font-weight: bold;
+}
+
+td {
+    padding: 12px;
+    border: 1px solid #000;
+    text-align: center;
+}
+
+.interpretation-table td:nth-child(4) {
+    text-align: left;
+}
+
+.dot {
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-red {
+    background-color: #e31e24;
+}
+.dot-yellow {
+    background-color: #fdb913;
+}
+.dot-green {
+    background-color: #39b54a;
+}
+
+.indicators-table th,
+.indicators-table td {
+    padding: 10px;
+}
+
+.indicators-table th:nth-child(1),
+.indicators-table th:nth-child(2) {
+    background-color: #f9cb9c;
+}
+
+.indicators-table td:nth-child(2) {
+    font-weight: bold;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.margin-right-10 {
+    margin-right: 10px;
+}
+
+.dark-header th {
+    background-color: #003366;
+    color: #fff;
+    border: 1px solid #000;
+}
+
+.distribution-table td,
+.area-results-table td {
+    padding: 8px 15px;
+}
+
+.heatmap-container {
+    width: 100%;
+    overflow-x: hidden;
+    margin-top: 20px;
+}
+
+.heatmap-table {
+    font-size: 10px;
+    table-layout: fixed;
+}
+
+.heatmap-table th,
+.heatmap-table td {
+    padding: 5px 0;
+    border: 1px solid #000;
+    overflow: hidden;
+}
+
+.vertical-col {
+    height: 150px;
+    white-space: nowrap;
+    position: relative;
+    vertical-align: bottom;
+    padding-bottom: 10px !important;
+}
+
+.vertical-col div {
+    transform: rotate(-90deg);
+    transform-origin: center;
+    width: 20px;
+    margin: 0 auto;
+    text-align: left;
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.name-col {
+    width: 180px;
+    text-align: center !important;
+    vertical-align: middle;
+}
+
+.name-col div {
+    display: inline-block;
+    width: auto;
+    transform: rotate(45deg);
+    transform-origin: center;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.classification-table th {
+    text-align: center;
+}
+
+.classification-table td {
+    text-align: center;
+    font-size: var(--font-size-normal);
+}
+
+.classification-detail {
+    margin-top: 40px;
+}
+
+.classification-header {
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.name-list {
+    list-style: disc;
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.name-list li {
+    margin-bottom: 8px;
+    font-size: var(--font-size-normal);
+    position: relative;
+}
+
+.placeholders-text {
+    color: #ccc;
+    font-family: monospace;
+    line-height: 1.2;
+    margin-bottom: 40px;
+}
+
+.lf-message {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.large-logo {
+    width: 300px;
+}
+
+.contact-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 0.8fr;
+    gap: 20px;
+    width: 100%;
+    align-items: center;
+}
+
+.social-col {
+    gap: 10px;
+}
+
+.social-icon-fa {
+    font-size: 24px;
+    width: 30px;
+}
+
+.fa-linkedin {
+    color: #0077b5;
+}
+.fa-instagram {
+    color: #e4405f;
+}
+
+.contact-text-inline {
+    font-size: 13px;
+    color: #333;
+}
+
+.center-col {
+    text-align: center;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 0 10px;
+}
+
+.contact-link {
+    font-size: 14px;
+    color: #2c77a3;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.contact-phone {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.qr-code {
+    width: 110px;
+    height: auto;
+    border: 1px solid #eee;
+    padding: 5px;
+    background: #fff;
+}
+
+.qr-hint {
+    font-size: 10px;
+    color: #666;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
