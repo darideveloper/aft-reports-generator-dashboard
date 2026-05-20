@@ -24,8 +24,13 @@
 @page {
     size: var(--page-size) portrait;
     margin: var(--margin);
+    margin-top: 25mm; /* Space for header */
     margin-bottom: 25mm; /* Space for footer */
     font-size: var(--font-size-normal);
+    @top-center {
+        content: element(header);
+        width: 100%;
+    }
     @bottom-center {
         content: element(footer);
         width: 100%;
@@ -80,7 +85,10 @@ body {
     }
 }
 
-header {
+/* Paged Media Header */
+header#page-header {
+    position: running(header);
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
