@@ -56,6 +56,22 @@ class SurveyCalcsGroup:
         else:
             return "alto"
 
+    def get_general_summary(self) -> str:
+        """
+        Get a general summary description based on the average range.
+
+        Returns:
+            str: General summary paragraph.
+        """
+        range_label = self.get_average_range()
+
+        if range_label == "bajo":
+            return "Este resultado sugiere que el grupo se encuentra en una fase inicial de adopción tecnológica. Existen importantes oportunidades para desarrollar las habilidades digitales fundamentales y fomentar una cultura de innovación."
+        elif range_label == "medio":
+            return "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos."
+        else:
+            return "Este resultado sugiere que el grupo posee un dominio avanzado de las herramientas tecnológicas y una sólida comprensión de las tendencias digitales. Están bien posicionados para liderar iniciativas de transformación digital dentro de la organización."
+
     def get_average_areas_ordered(self, use_summary: bool = False) -> list[dict]:
         """
         Get the average for each area (QuestionGroup or Summary Category),

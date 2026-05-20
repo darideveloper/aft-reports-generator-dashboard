@@ -126,9 +126,7 @@
             <strong>{{ level }}</strong> de dominio tecnológico.
           </p>
 
-          {% for paragraph in summary_paragraphs %}
-          <p>{{ paragraph|safe }}</p>
-          {% endfor %}
+          <p>{{ general_summary|safe }}</p>
         </div>
       </main>
     </section>

@@ -184,6 +184,21 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         # validate average range
         self.assertEqual(calcs.get_average_range(), "alto")
 
+    def test_get_general_summary(self):
+        """Validate the returned text for each general summary range"""
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.none())
+
+        from unittest.mock import patch
+        
+        with patch.object(calcs, "get_average_range", return_value="bajo"):
+            self.assertIn("fase inicial", calcs.get_general_summary())
+
+        with patch.object(calcs, "get_average_range", return_value="medio"):
+            self.assertIn("base tecnológica", calcs.get_general_summary())
+
+        with patch.object(calcs, "get_average_range", return_value="alto"):
+            self.assertIn("dominio avanzado", calcs.get_general_summary())
+
     def test_get_average_question_groups_ordered_random_options(self):
         """Validate average areas ordered by average (max to min)"""
 

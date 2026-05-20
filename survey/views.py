@@ -69,18 +69,13 @@ class GroupReportPDFView(View):
             # --------------------------
             # Data page 3
             # --------------------------
+            # Paragraph 1
             "average_score": calcs.get_average_num(),
             "level": calcs.get_average_range(),
+            # Paragraph 2
+            "general_summary": calcs.get_general_summary(),
             "max_score": "",
             "min_score": "",
-            "summary_paragraphs": [
-                "Este resultado sugiere que los participantes cuentan con una base tecnológica funcional que les permite utilizar herramientas digitales en su trabajo diario. Sin embargo, aún existen oportunidades para fortalecer la comprensión de temas tecnológicos estratégicos.",
-                "Las principales fortalezas del grupo se observan en las áreas de <strong>Ecosistema digital de colaboración</strong> y <strong>Cultura digital</strong>, lo que indica que los líderes han desarrollado capacidades relevantes en estos ámbitos tecnológicos.",
-                "Las principales áreas de oportunidad se concentran en <strong>Ciberseguridad</strong> y <strong>Tecnología y negocios</strong>, lo que sugiere la necesidad de fortalecer la comprensión de riesgos y consolidar el dominio en estos temas.",
-                "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo. Esto puede generar distintas velocidades de adopción tecnológica dentro de la organización.",
-                "Observar la variabilidad entre los participantes permite identificar tanto posibles focos de riesgo como líderes que pueden actuar como aliados de la transformación digital.",
-                "Resulta prioritario fortalecer la comprensión de cómo las decisiones tecnológicas impactan en el negocio considerando también los riesgos asociados a la seguridad de la información. Esto permitirá evaluar con mayor criterio iniciativas y reducir vulnerabilidades operativas.",
-            ],
             "global_index_interpretation": "Los resultados muestran diferencias moderadas entre participantes, lo que indica que el nivel de alfabetización tecnológica no es completamente homogéneo dentro del grupo. Esto puede generar distintas velocidades de adopción tecnológica dentro de la organización.",
             "participant_distribution": [
                 {
