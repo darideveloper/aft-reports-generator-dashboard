@@ -54,7 +54,7 @@ class SurveyCalcsGroup:
 
     def get_average_question_groups_ordered(self) -> dict[str, float]:
         """
-        Get the average of each area in the company ordered by average
+        Get the average of each area in the company ordered by average (from highest to lowest)
 
         Returns:
             dict[str, float]: Average of each area ordered by average
@@ -106,3 +106,33 @@ class SurveyCalcsGroup:
             return "medium"
         else:
             return "high"
+
+    def get_average_areas_ordered(self) -> dict[str, float]:
+        """
+        Get the average of each area in the company ordered by average (from highest to lowest)
+
+        Returns:
+            dict[str, float]: Average of each area ordered by average
+        """
+        # Initialize dictionary to store average areas
+        area_averages = {}
+
+        # Get all areas
+        areas = models.TextPDFSummary.objects.all()
+        area_totals_all = models.ReportSummaryScore.objects.filter(
+            report__in=self.reports
+        )
+        print(area_totals_all[0].paragraph_type)
+        print(areas[0].paragraph_type)
+
+        # Calculate average for each question group
+        for area in areas:
+            area_totals = models.ReportSummaryScore.objects.filter(
+                paragraph_type=area.paragraph_type,
+                report__in=self.reports,
+            )
+            area_avg = area_totals.aggregate(Avg("score"))["score__avg"]
+            area_averages[area.paragraph_type] = area_avg
+
+        # Order by average
+        return dict(reversed(sorted(area_averages.items(), key=lambda item: item[1])))

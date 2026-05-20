@@ -65,7 +65,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         for _ in range(count):
             options = self.get_selected_options(score=total, random_score=total_random)
             report = self.create_report(options=options)
-            
+
             if not total_random:
                 report.total = total
                 report.save()
@@ -211,7 +211,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
         qg_lower = survey_models.QuestionGroup.objects.order_by("?").first()
         qg_upper = survey_models.QuestionGroup.objects.order_by("?").first()
         if qg_lower == qg_upper:
-            self.test_get_average_question_groups_ordered_random_options()
+            self.test_get_average_question_groups_ordered_specific_order()
             return
 
         qg_lower_all_results = survey_models.ReportQuestionGroupTotal.objects.filter(
@@ -305,3 +305,56 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
                 self.assertEqual(
                     calcs.get_standard_deviation_total_range(), expected_range
                 )
+
+    def test_get_average_areas_ordered_random_options(self):
+        """Validate average areas ordered by average (max to min)"""
+
+        # initialize data
+        self.create_final_reports(count=10, total_random=True)
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        data = calcs.get_average_areas_ordered()
+
+        # Validate if areas are in correct order
+        data_values = list(data.values())
+        data_values_max_to_min = sorted(data_values, reverse=True)
+        self.assertEqual(data_values, data_values_max_to_min)
+
+    def test_get_average_areas_ordered_specific_order(self):
+        """Validate average areas ordered by specific order:
+
+        Set specific question groups to be first and last in data,
+        then validate that they are in the correct order
+        """
+
+        # initialize data
+        self.create_final_reports(count=10, total_random=True)
+
+        # Update 2 random areas score, in each employee
+        area_lower = survey_models.TextPDFSummary.objects.order_by("?").first()
+        area_upper = survey_models.TextPDFSummary.objects.order_by("?").first()
+        if area_lower == area_upper:
+            self.test_get_average_areas_ordered_specific_order()
+            return
+
+        area_lower_all_results = survey_models.ReportSummaryScore.objects.filter(
+            paragraph_type=area_lower.paragraph_type,
+        )
+        area_lower_all_results.update(score=0)
+        area_upper_all_results = survey_models.ReportSummaryScore.objects.filter(
+            paragraph_type=area_upper.paragraph_type,
+        )
+        area_upper_all_results.update(score=100)
+
+        # Do calcs
+        calcs = SurveyCalcsGroup(survey_models.Report.objects.all())
+        data = calcs.get_average_areas_ordered()
+        print(data)
+
+        # Validate if options are in correct order
+        data_values = list(data.values())
+        data_values_max_to_min = sorted(data_values, reverse=True)
+        self.assertEqual(data_values, data_values_max_to_min)
+        self.assertEqual(data[area_lower.paragraph_type], 0)
+        self.assertEqual(data[area_upper.paragraph_type], 100)
+        self.assertNotEqual(area_lower.paragraph_type, list(data.keys())[0])
+        self.assertNotEqual(area_upper.paragraph_type, list(data.keys())[-1])
