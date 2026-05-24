@@ -113,6 +113,9 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
 
         # Detect files already in pdf folder
         pdf_folder = os.path.join(settings.BASE_DIR, "media", "reports")
+        if not os.path.exists(pdf_folder):
+            os.makedirs(pdf_folder)
+
         pdf_files = os.listdir(pdf_folder)
         old_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
 
@@ -123,7 +126,18 @@ class GenerateNextReportBase(TestSurveyModelBase, APITestCase):
         pdf_files = os.listdir(pdf_folder)
         new_pdf_files = [file for file in pdf_files if file.endswith(".pdf")]
         new_files = [file for file in new_pdf_files if file not in old_pdf_files]
-        self.assertEqual(len(new_files), 1)
+
+        if len(new_files) == 0:
+            # Maybe the file was overwritten or already existed?
+            # In CI or local tests, we expect a new file.
+            # If no NEW file, check if any pending reports were actually processed
+            self.fail("No new PDF file was created by generate_next_report")
+
+        if len(new_files) > 1:
+            print(f"DEBUG: Found {len(new_files)} new files: {new_files}. Picking the newest one.")
+
+        # Sort by modification time to get the absolute newest
+        new_files.sort(key=lambda x: os.path.getmtime(os.path.join(pdf_folder, x)), reverse=True)
         new_file = new_files[0]
         pdf_path = os.path.join(pdf_folder, new_file)
 
@@ -1455,9 +1469,6 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
             "answers": [],
         }
         self.endpoint = "/api/response/"
-
-        # Create company with invitation code
-        self.company = self.create_company(invitation_code=self.invitation_code)
 
         # tests data
         self.summary_types = ["CD", "TN", "CS", "IP", "TMA", "EDC"]

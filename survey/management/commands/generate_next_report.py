@@ -130,8 +130,8 @@ class Command(BaseCommand):
             # Open the file and save it to FileField
             with open(pdf_path, "rb") as f:
                 report.pdf_file.save(os.path.basename(pdf_path), File(f), save=True)
+
             report.status = "completed"
-            report.save()
             message = f"Report {report.id} completed"
             logs += f"{message}\n"
             print(message)
