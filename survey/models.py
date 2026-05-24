@@ -527,14 +527,15 @@ class ReportsDownload(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        # Generate zip file (api call to n8n) if it doesn't exist
         if not self.id:
-            print("Generating zip file with n8n webhook")
             self.status = "pending"
+        super().save(*args, **kwargs)
 
-            webhook_url = (
-                f"{settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file"
-            )
+    def trigger_webhook(self):
+        """Trigger n8n webhook to generate zip file"""
+        print("Generating zip file with n8n webhook")
+        webhook_url = f"{settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file"
+        try:
             res = requests.get(webhook_url)
             print(f"Webhook URL: {webhook_url}")
             print(f"Response from n8n webhook: {res.json()}")
@@ -545,15 +546,91 @@ class ReportsDownload(models.Model):
                 logs += f"Webhook URL: {webhook_url}\n"
                 logs += f"Response: {res.json()}\n"
                 self.logs = logs
-
-        super().save(*args, **kwargs)
+                self.save()
+        except Exception as e:
+            self.status = "error"
+            self.logs = f"Error triggering webhook: {str(e)}"
+            self.save()
 
     def __str__(self):
-        return f"ZIP file ({self.reports})"
+        return f"ReportsDownload {self.id} ({self.status})"
 
     class Meta:
         verbose_name = "Descarga de Reportes"
         verbose_name_plural = "Descargas de Reportes"
+
+
+class GroupReport(models.Model):
+    id = models.AutoField(primary_key=True)
+    reports = models.ManyToManyField(
+        Report,
+        verbose_name="Reportes",
+        related_name="group_reports",
+        help_text="Reportes seleccionados para el reporte grupal",
+    )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.SET_NULL,
+        verbose_name="Empresa",
+        null=True,
+        blank=True,
+        help_text="Empresa asociada (solo cuando se genera desde el botón de empresa)",
+    )
+    pdf_file = models.FileField(
+        upload_to="group_reports/",
+        verbose_name="Archivo PDF",
+        help_text="Archivo PDF del reporte grupal generado",
+        blank=True,
+        null=True,
+    )
+    status = models.CharField(
+        max_length=255,
+        choices=STATUS_CHOICES,
+        default="pending",
+        verbose_name="Estado",
+        help_text="Estado del reporte grupal",
+    )
+    logs = models.TextField(
+        verbose_name="Logs",
+        help_text="Logs de la generación del reporte grupal",
+        blank=True,
+        null=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.status = "pending"
+        super().save(*args, **kwargs)
+
+    def trigger_webhook(self):
+        """Trigger n8n webhook to generate group report PDF"""
+        print("Generating group report with n8n webhook")
+        webhook_url = f"{settings.N8N_BASE_WEBHOOKS}/aft-create-group-report-file"
+        try:
+            res = requests.get(webhook_url)
+            print(f"Webhook URL: {webhook_url}")
+            print(f"Response from n8n webhook: {res.json()}")
+
+            if res.status_code != 200:
+                self.status = "error"
+                logs = f"Failed to trigger group report webhook.\n"
+                logs += f"Webhook URL: {webhook_url}\n"
+                logs += f"Response: {res.json()}\n"
+                self.logs = logs
+                self.save()
+        except Exception as e:
+            self.status = "error"
+            self.logs = f"Error triggering webhook: {str(e)}"
+            self.save()
+
+    def __str__(self):
+        return f"GroupReport {self.id} - {self.get_status_display()}"
+
+    class Meta:
+        verbose_name = "Reporte Grupal"
+        verbose_name_plural = "Reportes Grupales"
 
 
 def get_default_expires_at():

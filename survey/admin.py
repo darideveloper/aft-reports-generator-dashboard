@@ -1,4 +1,7 @@
 from django.contrib import admin, messages
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.urls import re_path
 from django.utils.html import format_html
 
 from survey import models
@@ -74,10 +77,59 @@ class QuestionFilter(admin.SimpleListFilter):
 
 @admin.register(models.Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ("name", "invitation_code", "is_active", "created_at")
+    list_display = ("name", "invitation_code", "is_active", "created_at", "group_report_button")
     list_filter = ("is_active", "created_at", "updated_at")
     search_fields = ("name", "invitation_code")
     readonly_fields = ("created_at", "updated_at")
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            re_path(
+                r"^(?P<pk>\d+)/generate-group-report/$",
+                self.admin_site.admin_view(self.generate_group_report_view),
+                name="company-generate-group-report",
+            ),
+        ]
+        return custom_urls + urls
+
+    def group_report_button(self, obj):
+        return format_html(
+            '<a class="btn btn-primary my-1" href="{}">Generar reporte grupal</a>',
+            f"{obj.pk}/generate-group-report/",
+        )
+
+    group_report_button.short_description = "Reporte Grupal"
+    group_report_button.allow_tags = True
+
+    def generate_group_report_view(self, request, pk):
+        company = self.get_object(request, pk)
+        if not company:
+            self.message_user(request, "Empresa no encontrada.", messages.ERROR)
+            return redirect("..")
+
+        completed_reports = models.Report.objects.filter(
+            participant__company=company, status="completed"
+        )
+
+        if not completed_reports.exists():
+            self.message_user(
+                request,
+                "No hay reportes completados para esta empresa.",
+                messages.ERROR,
+            )
+            return redirect("..")
+
+        group_report = models.GroupReport.objects.create(company=company)
+        group_report.reports.set(completed_reports)
+        group_report.trigger_webhook()
+
+        self.message_user(
+            request,
+            "Reporte grupal creado correctamente. Consulta la tabla de reportes grupales para ver el estado.",
+            messages.SUCCESS,
+        )
+        return redirect("..")
 
 
 @admin.register(models.Survey)
@@ -181,7 +233,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 @admin.register(models.Report)
 class ReportAdmin(admin.ModelAdmin):
-    actions = ("set_to_pending", "create_reports_download")
+    actions = ("set_to_pending", "create_reports_download", "create_group_report")
     list_display = (
         "participant",
         "survey",
@@ -233,7 +285,7 @@ class ReportAdmin(admin.ModelAdmin):
             status="pending",
         )
         reports_download.reports.set(queryset)
-        reports_download.save()
+        reports_download.trigger_webhook()
 
         self.message_user(
             request,
@@ -241,8 +293,20 @@ class ReportAdmin(admin.ModelAdmin):
             messages.SUCCESS,
         )
 
+    def create_group_report(self, request, queryset):
+        group_report = models.GroupReport.objects.create()
+        group_report.reports.set(queryset)
+        group_report.trigger_webhook()
+
+        self.message_user(
+            request,
+            "Reporte grupal creado correctamente. Consulta la tabla de reportes grupales para ver el estado.",
+            messages.SUCCESS,
+        )
+
     set_to_pending.short_description = "Establecer a pendiente"
     create_reports_download.short_description = "Descargar reportes"
+    create_group_report.short_description = "Generar reporte grupal"
 
 
 @admin.register(models.Answer)
@@ -363,6 +427,63 @@ class ReportsDownloadAdmin(admin.ModelAdmin):
         )
 
     reports_num.short_description = "Número de reportes"
+    custom_links.short_description = "Acciones"
+
+
+@admin.register(models.GroupReport)
+class GroupReportAdmin(admin.ModelAdmin):
+    list_display = ("id", "status", "company_info", "reports_num", "created_at", "custom_links")
+    list_filter = ("status", "created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at")
+    ordering = ("-created_at",)
+    list_per_page = 30
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            re_path(
+                r"^(?P<pk>\d+)/download/$",
+                self.admin_site.admin_view(self.download_view),
+                name="group-report-download",
+            ),
+        ]
+        return custom_urls + urls
+
+    def reports_num(self, obj):
+        return obj.reports.count()
+
+    def company_info(self, obj):
+        if obj.company:
+            return obj.company.name
+        return "-"
+
+    def custom_links(self, obj):
+        if obj.status == "completed" and obj.pdf_file:
+            return format_html(
+                '<a class="btn btn-primary my-1" href="{}">Descargar PDF</a>',
+                f"download/",
+            )
+        return format_html(
+            '<a class="btn btn-secondary my-1 disabled" href="#" disabled>Descargar PDF</a>'
+        )
+
+    def download_view(self, request, pk):
+        group_report = self.get_object(request, pk)
+        if not group_report or not group_report.pdf_file:
+            self.message_user(request, "PDF no encontrado.", messages.ERROR)
+            return redirect("..")
+
+        pdf_file = group_report.pdf_file
+        try:
+            response = HttpResponse(pdf_file.read(), content_type="application/pdf")
+            response["Content-Disposition"] = f"inline; filename='group_report_{pk}.pdf'"
+            return response
+        except Exception:
+            self.message_user(request, "Error al leer el archivo PDF.", messages.ERROR)
+            return redirect("..")
+
+    reports_num.short_description = "Número de reportes"
+    company_info.short_description = "Empresa"
     custom_links.short_description = "Acciones"
 
 

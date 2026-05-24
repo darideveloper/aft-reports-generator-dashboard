@@ -1,225 +1,31 @@
-import os
-import random
-from datetime import datetime
-
-from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.shortcuts import get_object_or_404
-from django.template.loader import render_to_string
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from weasyprint import HTML
 
 from core import choices
 from survey import models, serializers
 
-from utils.survey_calcs_group import SurveyCalcsGroupTexts
+from utils.group_report_generator import generate_group_report_pdf
 
 
+@method_decorator(staff_member_required, name="dispatch")
 class GroupReportPDFView(View):
-    NOMINAL_RANKING_CHUNK_SIZE = 16
-    HEATMAP_CHUNK_SIZE = 15
-    STRATEGIC_CHUNK_SIZE = 40  # 2 columns × ~20 names per column
-
-    def _chunk_list(self, lst: list, chunk_size: int) -> list[list]:
-        """
-        Split a list into chunks of a specified size.
-        """
-        if not lst:
-            return []
-        return [lst[i : i + chunk_size] for i in range(0, len(lst), chunk_size)]
-
-    def _get_range_es(self, range_val: str) -> str:
-        """
-        Convert average range to Spanish
-        """
-        ranges = {
-            "low": "básico",
-            "medium": "intermedio",
-            "high": "avanzado",
-        }
-        return ranges.get(range_val, "")
-
-    def _get_dot_color(self, range_val: str) -> str:
-        """
-        Get dot color for a range
-        """
-        colors = {
-            "low": "red",
-            "medium": "yellow",
-            "high": "green",
-        }
-        return colors.get(range_val, "")
 
     def get(self, request, company_id):
-        """
-        View to preview the WeasyPrint PDF report using the html-pdf template.
-        """
-
-        # Get company and participants
         company = get_object_or_404(models.Company, id=company_id)
         participants = models.Participant.objects.filter(company=company)
         reports = models.Report.objects.filter(participant__in=participants)
-        print("reports", reports)
-        print("participants", participants)
-        print("company", company)
 
-        # Calculate current date in Spanish
-        MONTHS_ES = {
-            1: "enero",
-            2: "febrero",
-            3: "marzo",
-            4: "abril",
-            5: "mayo",
-            6: "junio",
-            7: "julio",
-            8: "agosto",
-            9: "septiembre",
-            10: "octubre",
-            11: "noviembre",
-            12: "diciembre",
-        }
-        now = datetime.now()
-        current_date_es = f"{now.day} de {MONTHS_ES[now.month]} {now.year}"
-
-        # Calculate group calcs
-        calcs = SurveyCalcsGroupTexts(reports=reports)
-
-        # Prepare nominal ranking raw list and chunks to handle WeasyPrint pagination bug gracefully
-        nominal_ranking_raw = [
-            {
-                "counter": idx + 1,
-                "name": report.participant.name,
-                "position": report.participant.get_position_display(),
-                "score": round(report.total),
-                "level": calcs.LEVELS_CONFIG[calcs._get_level_from_score(report.total)][
-                    "name_es"
-                ],
-                "dot_color": calcs.LEVELS_CONFIG[
-                    calcs._get_level_from_score(report.total)
-                ]["dot_color"],
-            }
-            for idx, report in enumerate(reports.order_by("-total"))
-        ]
-
-        nominal_ranking_chunks = self._chunk_list(
-            nominal_ranking_raw, self.NOMINAL_RANKING_CHUNK_SIZE
+        pdf_bytes = generate_group_report_pdf(
+            reports=reports,
+            company_name=company.name,
+            additional_recommendations=company.additional_recommendations,
         )
-        heatmap_chunks = self._chunk_list(
-            calcs.get_heatmap_data(), self.HEATMAP_CHUNK_SIZE
-        )
-        strategic_profiles = calcs.get_strategic_profiles()
-
-        # Mock data for all dynamic sections
-        context = {
-            # Global data
-            # --------------------------
-            "company_name": company.name,
-            "total_participants": calcs.get_employees_number(),
-            "dispersion_summary": calcs.get_dispersion_summary(),
-            "levels_config": calcs.LEVELS_CONFIG,
-            "strength_areas": calcs.get_strength_areas(),
-            "weakness_areas": calcs.get_weakness_areas(),
-            # --------------------------
-            # Data page 1
-            # --------------------------
-            "report_date": current_date_es,
-            # --------------------------
-            # Data page 2
-            # --------------------------
-            # Data page 3
-            # --------------------------
-            # Paragraph 1
-            "average_score": calcs.get_average(),
-            "level": self._get_range_es(calcs.get_average_range()),
-            "general_summary": calcs.get_general_summary(),
-            "priority_summary": calcs.get_priority_summary(),
-            # --------------------------
-            # Data page 5
-            # --------------------------
-            "max_score": calcs.get_max_score(),
-            "min_score": calcs.get_min_score(),
-            # --------------------------
-            # Data page 6
-            # --------------------------
-            "participant_distribution": [
-                {
-                    "level": self._get_range_es(item["level"]).capitalize(),
-                    "count": item["count"],
-                    "percentage": item["percentage"],
-                    "dot_color": self._get_dot_color(item["level"]),
-                }
-                for item in calcs.get_participant_distribution()
-            ],
-            "area_results": [
-                {
-                    "name": item["display_name"],
-                    "score": item["average"],
-                }
-                for item in calcs.get_average_areas_ordered(use_summary=True)
-            ],
-            # --------------------------
-            # Data page 7
-            # --------------------------
-            "theme_ranking": [
-                {
-                    "name": item["area"].name,
-                    "score": item["average"],
-                }
-                for item in calcs.get_average_areas_ordered(use_summary=False)
-            ],
-            # --------------------------
-            # Data page 8
-            # --------------------------
-            "nominal_ranking": nominal_ranking_raw,
-            "nominal_ranking_chunks": nominal_ranking_chunks,
-            # --------------------------
-            # Data page 9
-            # --------------------------
-            "heatmap_themes": calcs.get_heatmap_themes(),
-            "heatmap_chunks": heatmap_chunks,
-            # --------------------------
-            # Data page 10
-            # --------------------------
-            "strategic_profiles": strategic_profiles,
-            "strategic_ambassadors_chunks": self._chunk_list(
-                strategic_profiles["ambassadors"], self.STRATEGIC_CHUNK_SIZE
-            ),
-            "strategic_champions_chunks": self._chunk_list(
-                strategic_profiles["champions"], self.STRATEGIC_CHUNK_SIZE
-            ),
-            "strategic_risks_chunks": self._chunk_list(
-                strategic_profiles["risks"], self.STRATEGIC_CHUNK_SIZE
-            ),
-            "strategic_labels": {
-                "high_tech": self._get_range_es("high").capitalize(),
-                "low_tech": self._get_range_es("low").capitalize(),
-                "high_influence": "Alta",
-                "medium_low_influence": "Media/Baja",
-            },
-            # --------------------------
-            # Data page 11
-            # --------------------------
-            "priority_actions": calcs.get_priority_actions(),
-            "additional_recommendations": [
-                line.strip()
-                for line in (company.additional_recommendations or "").splitlines()
-                if line.strip()
-            ],
-        }
-
-        # Render HTML string from template
-        html_string = render_to_string("survey/pdf/group_report_template.html", context)
-
-        # Base URL for assets resolution
-        base_url = os.path.join(
-            settings.BASE_DIR, "survey", "templates", "survey", "pdf"
-        )
-
-        # Generate PDF via WeasyPrint
-        pdf_bytes = HTML(string=html_string, base_url=base_url).write_pdf()
 
         response = HttpResponse(pdf_bytes, content_type="application/pdf")
         response["Content-Disposition"] = "inline; filename='group_report.pdf'"

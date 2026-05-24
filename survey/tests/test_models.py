@@ -16,8 +16,8 @@ class ReportsDownloadModelTestCase(TestSurveyModelBase):
         mock_get.return_value = mock_response
 
         # Create a new ReportsDownload instance using helper
-        # This calls save() which should trigger the API call
         download = self.create_reports_download()
+        download.trigger_webhook()
 
         # Check if api call was made
         expected_url = f"{settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file"
@@ -36,6 +36,7 @@ class ReportsDownloadModelTestCase(TestSurveyModelBase):
 
         # Create a new ReportsDownload instance using helper
         download = self.create_reports_download()
+        download.trigger_webhook()
 
         # Check if api call was made
         expected_url = f"{settings.N8N_BASE_WEBHOOKS}/aft-create-reports-download-file"
@@ -43,6 +44,7 @@ class ReportsDownloadModelTestCase(TestSurveyModelBase):
 
         # Verify status update based on response
         self.assertEqual(download.status, "error")
+
 
 
 class ReportSummaryScoreModelTestCase(TestSurveyModelBase):
@@ -75,6 +77,174 @@ class ReportSummaryScoreModelTestCase(TestSurveyModelBase):
         self.assertIsNotNone(cd_score)
         # In a fresh test with no answers, score might be 0 or fallback to report.total
         self.assertEqual(cd_score.score, report.total)
+
+
+class GroupReportModelTestCase(TestSurveyModelBase):
+
+    @mock.patch("survey.models.requests.get")
+    def test_save_triggers_webhook(self, mock_get):
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"message": "Success"}
+        mock_get.return_value = mock_response
+
+        group_report = self.create_group_report()
+        group_report.trigger_webhook()
+
+        expected_url = f"{settings.N8N_BASE_WEBHOOKS}/aft-create-group-report-file"
+        mock_get.assert_called_once_with(expected_url)
+        self.assertEqual(group_report.status, "pending")
+
+    @mock.patch("survey.models.requests.get")
+    def test_save_webhook_failure(self, mock_get):
+        mock_response = mock.Mock()
+        mock_response.status_code = 500
+        mock_response.json.return_value = {"error": "Failed"}
+        mock_get.return_value = mock_response
+
+        group_report = self.create_group_report()
+        group_report.trigger_webhook()
+
+        expected_url = f"{settings.N8N_BASE_WEBHOOKS}/aft-create-group-report-file"
+        mock_get.assert_called_once_with(expected_url)
+        self.assertEqual(group_report.status, "error")
+        self.assertIn("Failed", group_report.logs)
+
+
+    @mock.patch("survey.models.requests.get")
+    def test_generate_group_report_pdf(self, mock_get):
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"message": "Success"}
+        mock_get.return_value = mock_response
+
+        from django.contrib.auth.models import User
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
+
+        self.company = self.create_company()
+        report = self.create_report()
+
+        from utils.group_report_generator import generate_group_report_pdf
+
+        reports = survey_models.Report.objects.filter(id=report.id)
+        pdf_bytes = generate_group_report_pdf(
+            reports=reports,
+            company_name=self.company.name,
+        )
+        self.assertIsNotNone(pdf_bytes)
+        self.assertGreater(len(pdf_bytes), 0)
+        self.assertTrue(pdf_bytes.startswith(b"%PDF"))
+
+    @mock.patch("survey.models.requests.get")
+    def test_admin_action_creates_group_report(self, mock_get):
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"message": "Success"}
+        mock_get.return_value = mock_response
+
+        from django.contrib.auth.models import User
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
+
+        self.company = self.create_company()
+        report = self.create_report()
+
+        response = self.client.post(
+            "/admin/survey/report/",
+            {
+                "action": "create_group_report",
+                "_selected_action": [report.id],
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        group_report = survey_models.GroupReport.objects.first()
+        self.assertIsNotNone(group_report)
+        self.assertIn(report, group_report.reports.all())
+
+    @mock.patch("survey.models.requests.get")
+    def test_management_command_processes_pending(self, mock_get):
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"message": "Success"}
+        mock_get.return_value = mock_response
+
+        from django.contrib.auth.models import User
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
+
+        self.company = self.create_company()
+        report = self.create_report()
+        report.status = "completed"
+        report.save()
+
+        group_report = self.create_group_report(
+            reports=[report],
+            company=self.company,
+        )
+
+        call_command("create_group_report")
+
+        group_report.refresh_from_db()
+        self.assertEqual(group_report.status, "completed")
+        self.assertTrue(group_report.pdf_file)
+
+    @mock.patch("survey.models.requests.get")
+    def test_route_admin_only(self, mock_get):
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"message": "Success"}
+        mock_get.return_value = mock_response
+
+        from django.contrib.auth.models import User
+        call_command("apps_loaddata")
+        call_command("initial_loaddata")
+
+        self.company = self.create_company()
+
+        response = self.client.get(f"/group-report-pdf/{self.company.id}/")
+        self.assertEqual(response.status_code, 302)
+
+        username = "test_user"
+        password = "test_pass"
+        User.objects.create_superuser(
+            username=username,
+            email="test@gmail.com",
+            password=password,
+        )
+        self.client.login(username=username, password=password)
+
+        response = self.client.get(f"/group-report-pdf/{self.company.id}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
 
 
 class TextPDFSummaryModelTestCase(TestSurveyModelBase):

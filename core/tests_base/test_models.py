@@ -375,6 +375,32 @@ class TestSurveyModelBase(APITestCase):
 
         return reports_download
 
+    def create_group_report(
+        self,
+        reports: list[survey_models.Report] = [],
+        company: survey_models.Company = None,
+        status: str = "pending",
+    ) -> survey_models.GroupReport:
+        """Create a group report object
+
+        Args:
+            reports (list[survey_models.Report]): The reports of the group report
+            company (survey_models.Company): The company of the group report
+            status (str): The status of the group report
+
+        Returns:
+            survey_models.GroupReport: The created group report object
+        """
+
+        group_report = survey_models.GroupReport.objects.create(
+            company=company, status=status
+        )
+
+        if reports:
+            group_report.reports.set(reports)
+
+        return group_report
+
     def create_report_summary_score(
         self,
         report: survey_models.Report = None,
