@@ -168,7 +168,7 @@
         "model": "survey.QuestionGroup",
         "pk": 14,
         "fields": {
-            "name": "TEMA 12 - Tecnología y medio ambiente",
+            "name": "TEMA 12 - Futuro sustentable e inclusivo",
             "details": "El impacto de la tecnología en el medio ambiente incluye el consumo de energía, los desechos electrónicos y el agotamiento de los recursos.\n\nA continuación, se indican ocho prácticas recomendadas para mitigar los efectos negativos en el medio ambiente. Priorice utilizando los números del 1 al 8, donde el 1 es el más importante. **No utilice 2 veces el mismo número.**",
             "details_bar_chart": "Adoptar prácticas sostenibles reduce el impacto ambiental de la tecnología.",
             "survey": 1,

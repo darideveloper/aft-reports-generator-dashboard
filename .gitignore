@@ -24,6 +24,7 @@ temp.*
 # AI CLI tool directories and config files
 .claude/
 .gemini/
+.opencode/
 CLAUDE.md
 AGENTS.md
 

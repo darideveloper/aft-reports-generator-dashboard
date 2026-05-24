@@ -53,11 +53,18 @@ If a summary category has no topics mapped to it, the system MUST NOT crash and 
 - **And** the report generation should complete successfully.
 
 ### Requirement: Strict Rendering Order
-The system MUST render the summary categories in the PDF in the following fixed order: CD, TN, CS, IP, TMA, EDC.
+The system MUST render the summary categories in the PDF in the following fixed order and with the following labels:
+1. **CD**: Cultura digital
+2. **TN**: Tecnología y negocios
+3. **CS**: Ciberseguridad
+4. **IP**: Impacto personal
+5. **TMA**: Futuro sustentable e inclusivo
+6. **EDC**: Ecosistema digital de colaboración
 
-#### Scenario: Consistent PDF layout
+#### Scenario: Consistent PDF layout with updated labels
 - **Given** resulting summary texts have been calculated for all categories.
 - **When** the PDF is generated.
 - **Then** the first 4 categories (CD, TN, CS, IP) must appear on page 20 in that specific sequence.
 - **And** the remaining 2 categories (TMA, EDC) must appear on page 21 in that specific sequence.
+- **And** the category TMA MUST be labeled as "Futuro sustentable e inclusivo".
 
