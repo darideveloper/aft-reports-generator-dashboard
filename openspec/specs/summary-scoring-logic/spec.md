@@ -67,4 +67,5 @@ The system MUST render the summary categories in the PDF in the following fixed 
 - **Then** the first 4 categories (CD, TN, CS, IP) must appear on page 20 in that specific sequence.
 - **And** the remaining 2 categories (TMA, EDC) must appear on page 21 in that specific sequence.
 - **And** the category TMA MUST be labeled as "Futuro sustentable e inclusivo".
+- **And** the labels MUST match the casing and pluralization defined in the list above.
 

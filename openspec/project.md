@@ -1,7 +1,7 @@
 # Project Context
 
 ## Purpose
-AFT Reports Generator Dashboard is a comprehensive Django-based web application designed to manage surveys, collect participant responses, and automatically generate detailed PDF reports for digital competency assessments. The system evaluates participants across multiple competency areas (Digital Culture, Technology & Business, Cybersecurity, Personal Impact, Technology & Environment, Digital Collaboration Ecosystem) and provides personalized feedback based on their performance.
+AFT Reports Generator Dashboard is a comprehensive Django-based web application designed to manage surveys, collect participant responses, and automatically generate detailed PDF reports for digital competency assessments. The system evaluates participants across multiple competency areas (Digital Culture, Technology & Business, Cybersecurity, Personal Impact, Sustainable & Inclusive Future, Digital Collaboration Ecosystem) and provides personalized feedback based on their performance.
 
 **Key Goals:**
 - Enable companies to assess employee digital competencies through structured surveys
@@ -120,9 +120,9 @@ AFT Reports Generator Dashboard is a comprehensive Django-based web application 
 ### Competency Areas (Paragraph Types)
 - **CD**: Cultura digital (Digital Culture)
 - **TN**: Tecnología y negocios (Technology & Business)
-- **CS**: Ciber seguridad (Cybersecurity)
+- **CS**: Ciberseguridad (Cybersecurity)
 - **IP**: Impacto personal (Personal Impact)
-- **TMA**: Futuro sustentable e inclusivo (Technology & Environment)
+- **TMA**: Futuro sustentable e inclusivo (Sustainable & Inclusive Future)
 - **EDC**: Ecosistema digital de colaboración (Digital Collaboration Ecosystem)
 
 ## Important Constraints

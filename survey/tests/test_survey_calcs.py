@@ -95,8 +95,8 @@ class SurveyCalcsUnitTestCase(TestSurveyModelBase):
     def test_edge_case_no_mapped_topics(self):
         # Category CS has no topics mapped in this test setup (if we don't set them)
         # It should fallback to report.total (which is 50.0 in setUp)
-        summary_cs = survey_models.TextPDFSummary.objects.filter(paragraph_type="CS").first()
-        summary_cs.question_groups.clear()
+        for summary in survey_models.TextPDFSummary.objects.filter(paragraph_type="CS"):
+            summary.question_groups.clear()
 
         self.calcs.save_report_summary_scores()
 

@@ -2,9 +2,7 @@
 
 ## Purpose
 Define and enforce consistent PDF styling across all WeasyPrint-based reports, including page size, font sizes, and the use of CSS variables for easy adjustments.
-
 ## Requirements
-
 ### Requirement: Standardized PDF Styling Variables
 The system SHALL define global CSS variables for PDF page size and font sizes in all WeasyPrint-based templates to facilitate easy adjustments.
 
@@ -33,3 +31,11 @@ The system SHALL ensure that all WeasyPrint-based reports are generated with a L
 #### Scenario: Page size verification
 - **WHEN** a WeasyPrint-based report is rendered
 - **THEN** the `@page` size property MUST be set to `Letter`.
+
+### Requirement: Consistent Labeling and Casing
+The system SHALL ensure that all category labels rendered in the PDF report exactly match the labels defined in the `survey.models.TextPDFSummary.TEXT_TYPE_CHOICES` in terms of spelling, casing, and pluralization.
+
+#### Scenario: PDF Label Casing Verification
+- **WHEN** the PDF is generated
+- **THEN** the labels for "Cultura digital", "Tecnología y negocios", "Ciberseguridad", "Impacto personal", "Futuro sustentable e inclusivo", and "Ecosistema digital de colaboración" MUST be rendered in lowercase (except for the first letter) exactly as defined in the model choices.
+

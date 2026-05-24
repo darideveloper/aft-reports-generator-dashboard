@@ -12,17 +12,10 @@ The system SHALL support the definition of text paragraphs that are dynamically 
 - **THEN** the system SHALL select the paragraph with the highest `min_score` that satisfies the condition for inclusion in the report.
 
 ### Requirement: Competency category summary text
-The system SHALL support the definition of summary text paragraphs for competency categories (CD, TN, CS, IP, TMA, EDC) based on aggregate scores. The labels for these categories SHALL be:
-- CD: Cultura digital
-- TN: Tecnología y negocios
-- CS: Ciberseguridad
-- IP: Impacto personal
-- TMA: Futuro sustentable e inclusivo
-- EDC: Ecosistema digital de colaboración
+The system SHALL support the definition of summary text paragraphs for competency categories (CD, TN, CS, IP, TMA, EDC) based on aggregate scores. The text content SHALL reflect the current branding and scope of each category.
 
-#### Scenario: Selecting a summary paragraph for Futuro sustentable e inclusivo
-- **WHEN** a report is generated
-- **AND** the category score for TMA is calculated
-- **AND** a `TextPDFSummary` record exists for TMA with `min_score` less than or equal to the category score
-- **THEN** the system SHALL select the paragraph with the highest `min_score` for the "Futuro sustentable e inclusivo" category.
+#### Scenario: Selecting a summary paragraph for TMA
+- **WHEN** a report is generated for the TMA category
+- **THEN** the selected `TextPDFSummary` text MUST include concepts of both "sostenibilidad" and "inclusión".
+- **AND** it MUST NOT refer to the category exclusively as "medio ambiente".
 
