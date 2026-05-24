@@ -50,11 +50,6 @@ class Company(models.Model):
             " de preguntas dentro del gráfico de barras"
         ),
     )
-    average_total = models.FloatField(
-        default=0,
-        verbose_name="Promedio",
-        help_text="Promedio de los reportes de la empresa (automáticamente calculado)",
-    )
     additional_recommendations = models.TextField(
         blank=True,
         null=True,

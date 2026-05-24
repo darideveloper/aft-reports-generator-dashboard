@@ -113,7 +113,8 @@ class Command(BaseCommand):
                 data=survey_calcs.get_all_participants_totals(),
                 resulting_paragraphs=survey_calcs.get_resulting_paragraphs(),
                 resulting_titles=survey_calcs.get_resulting_titles(),
-                company_average_total=company.average_total,
+                company_average_total=survey_calcs.get_company_average(),
+                global_average_total=survey_calcs.get_global_average(),
             )
 
             if not os.path.exists(pdf_path):

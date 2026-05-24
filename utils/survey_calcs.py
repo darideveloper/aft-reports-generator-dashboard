@@ -149,6 +149,28 @@ class SurveyCalcs:
 
         return total_score
 
+    def get_company_average(self) -> float:
+        """
+        Get the average total score for all reports in the participant's company.
+
+        Returns:
+            float: Company average total
+        """
+        avg = models.Report.objects.filter(
+            participant__company=self.company
+        ).aggregate(Avg("total"))["total__avg"]
+        return round(avg or 0.0, 2)
+
+    def get_global_average(self) -> float:
+        """
+        Get the global average total score across all reports.
+
+        Returns:
+            float: Global average total
+        """
+        avg = models.Report.objects.aggregate(Avg("total"))["total__avg"]
+        return round(avg or 0.0, 2)
+
     def get_all_participants_totals(self) -> list:
         """
         Get the total scores of participants in the survey

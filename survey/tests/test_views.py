@@ -704,65 +704,6 @@ class ResponseViewTestCase(TestSurveyViewsBase):
         self.assertEqual(report.participant, participant)
         self.assertEqual(answers.count(), len(self.data["answers"]))
 
-        # Validate company average total updated
-        self.assertEqual(participant.company.average_total, report.total)
-
-    def test_company_average_total_updated(self):
-        """Test post request with valid data for many participants"""
-
-        # Create many participants
-        for participant_index in range(3):
-
-            # Change participant email and responses
-            self.data["participant"]["email"] = f"test{participant_index}@test.com"
-            answers = [random.choice(self.options) for _ in range(10)]
-            answers_ids = [answer.id for answer in answers]
-            self.data["answers"] = answers_ids
-
-            # Create answer
-            self.client.post(self.endpoint, self.data, format="json")
-
-        # Validate company average total updated
-        reports_average_total = survey_models.Report.objects.filter(
-            participant__company=self.company
-        ).aggregate(average_total=Avg("total"))["average_total"]
-        self.company.refresh_from_db()
-        self.assertEqual(reports_average_total, self.company.average_total)
-
-    def test_company_average_many_companies(self):
-        """Test post request with valid data for many companies"""
-
-        # Delete old companies
-        survey_models.Company.objects.all().delete()
-
-        # Create many participants
-        companies = []
-        for company_index in range(2):
-            invitation_code = f"test{company_index}"
-            company = self.create_company(invitation_code=invitation_code)
-            companies.append(company)
-            for participant_index in range(3):
-
-                # Change participant email and responses
-                self.data["participant"][
-                    "email"
-                ] = f"test{participant_index}-{company_index}@test.com"
-                answers = [random.choice(self.options) for _ in range(10)]
-                answers_ids = [answer.id for answer in answers]
-                self.data["answers"] = answers_ids
-                self.data["invitation_code"] = invitation_code
-
-                # Create answer
-                self.client.post(self.endpoint, self.data, format="json")
-
-        # Validate company average total updated (for each company)
-        for company in companies:
-            reports_average_total = survey_models.Report.objects.filter(
-                participant__company=company
-            ).aggregate(average_total=Avg("total"))["average_total"]
-            company.refresh_from_db()
-            self.assertEqual(reports_average_total, company.average_total)
-
 
 class ResponseViewTotalsTestCase(TestSurveyViewsBase):
     """

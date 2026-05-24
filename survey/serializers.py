@@ -199,23 +199,6 @@ class ResponseSerializer(serializers.Serializer):
             # Save summary scores
             survey_calcs.save_report_summary_scores()
 
-            # Update company average total
-            total_sum = models.Report.objects.filter(
-                participant__company=participant.company
-            ).aggregate(total_sum=Sum("total"), total_count=Count("total"))
-
-            # Fix total None when 0 reports
-            if total_sum["total_sum"] is None:
-                total_sum["total_sum"] = 0
-
-            # Calculate total
-            average_total = total_sum["total_sum"] / total_sum["total_count"]
-            average_total = round(average_total, 2)
-
-            # Save total
-            participant.company.average_total = average_total
-            participant.company.save()
-
         return participant, selected_options, report
 
 

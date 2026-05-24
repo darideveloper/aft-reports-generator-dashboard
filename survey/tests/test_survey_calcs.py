@@ -116,3 +116,38 @@ class SurveyCalcsUnitTestCase(TestSurveyModelBase):
 
         score_record = survey_models.ReportSummaryScore.objects.get(report=self.report, paragraph_type="CD")
         self.assertEqual(score_record.score, 0)
+
+    def test_get_company_average(self):
+        self.report.total = 80.0
+        self.report.save()
+        
+        participant2 = survey_models.Participant.objects.create(
+            company=self.company,
+            name="Test User 2",
+            email="test2@example.com"
+        )
+        survey_models.Report.objects.create(
+            participant=participant2,
+            survey=self.survey,
+            total=60.0
+        )
+        
+        self.assertEqual(self.calcs.get_company_average(), 70.0)
+
+    def test_get_global_average(self):
+        self.report.total = 90.0
+        self.report.save()
+
+        company2 = survey_models.Company.objects.create(name="Other Company")
+        participant2 = survey_models.Participant.objects.create(
+            company=company2,
+            name="Other User",
+            email="other@example.com"
+        )
+        survey_models.Report.objects.create(
+            participant=participant2,
+            survey=self.survey,
+            total=70.0
+        )
+
+        self.assertEqual(self.calcs.get_global_average(), 80.0)

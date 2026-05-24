@@ -143,6 +143,7 @@ def generate_report(
     resulting_paragraphs: list,
     resulting_titles: dict,
     company_average_total: float,
+    global_average_total: float,
 ) -> str:
     """Generate PDF report from data
 
@@ -157,6 +158,7 @@ def generate_report(
         resulting_paragraphs (list): list of score and paragraph dicts
         resulting_titles (dict): dict of subtitles and paragraphs for final section
         company_average_total (float): global company average
+        global_average_total (float): global average total
 
     Returns:
         str: Generated path file
@@ -222,18 +224,10 @@ def generate_report(
     c.drawString(73, 675, f'"{name}".')
 
     data = np.array(data)
-    if len(data) > 1:
-        mean_grades = np.mean(data)
-    elif len(data) == 1:
-        mean_grades = data[0]
-    else:
-        mean_grades = 0
-
-    mean_grades = round(mean_grades, 2)
 
     bell_plot_path = generate_bell_curve_plot(
         grade=final_score,
-        mean_grades=mean_grades,
+        mean_grades=global_average_total,
         grades=data,
         company_average_total=company_average_total,
     )
@@ -411,6 +405,7 @@ if __name__ == "__main__":
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
         company_average_total=50,
+        global_average_total=50,
     )
 
     generate_report(
@@ -446,6 +441,7 @@ if __name__ == "__main__":
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
         company_average_total=50,
+        global_average_total=50,
     )
 
     generate_report(
@@ -481,6 +477,7 @@ if __name__ == "__main__":
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
         company_average_total=50,
+        global_average_total=50,
     )
 
     generate_report(
@@ -516,4 +513,5 @@ if __name__ == "__main__":
         resulting_paragraphs=mock_up_data,
         resulting_titles=mock_up_results,
         company_average_total=50,
+        global_average_total=50,
     )

@@ -1730,8 +1730,8 @@ class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
         self.assertEqual(download.status, "completed", download.logs)
         self.assertTrue(download.zip_file)
 
-        # Requests: 1 for model creation, 2 for PDFs
-        self.assertEqual(mock_get.call_count, 3)
+        # Requests: 2 for PDFs
+        self.assertEqual(mock_get.call_count, 2)
 
     @patch("requests.get")
     def test_missing_pdf_file_in_report(self, mock_get):
@@ -1764,18 +1764,11 @@ class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
     @patch("requests.get")
     def test_download_error_404(self, mock_get):
         """Test handling when PDF download fails"""
-        # We need successful creation, then 404 for download
-
-        # Response for creation
-        creation_response = MagicMock()
-        creation_response.status_code = 200
-        creation_response.json.return_value = {"success": True}
-
         # Response for download
         download_response = MagicMock()
         download_response.status_code = 404
 
-        mock_get.side_effect = [creation_response, download_response]
+        mock_get.return_value = download_response
 
         report = self.create_dummy_report_with_pdf()
         download = self.create_reports_download([report])
@@ -1793,17 +1786,12 @@ class CreateReportsDownloadFileCommandTest(TestSurveyModelBase, APITestCase):
     @patch("requests.get")
     def test_general_exception(self, mock_get, mock_zip):
         """Test handling of unexpected exceptions"""
-        # Creation success
-        creation_response = MagicMock()
-        creation_response.status_code = 200
-        creation_response.json.return_value = {"success": True}
-
         # Download success
         download_response = MagicMock()
         download_response.status_code = 200
         download_response.content = self.dummy_pdf_content
 
-        mock_get.side_effect = [creation_response, download_response]
+        mock_get.return_value = download_response
 
         report = self.create_dummy_report_with_pdf()
         download = self.create_reports_download([report])
