@@ -70,13 +70,13 @@ def generate_group_report_pdf(
             "counter": idx + 1,
             "name": report.participant.name,
             "position": report.participant.get_position_display(),
-            "score": round(report.total),
+            "score": report.total,
             "level": calcs.LEVELS_CONFIG[calcs._get_level_from_score(report.total)][
                 "name_es"
             ],
-            "dot_color": calcs.LEVELS_CONFIG[
-                calcs._get_level_from_score(report.total)
-            ]["dot_color"],
+            "dot_color": calcs.LEVELS_CONFIG[calcs._get_level_from_score(report.total)][
+                "dot_color"
+            ],
         }
         for idx, report in enumerate(reports.order_by("-total"))
     ]
@@ -84,9 +84,7 @@ def generate_group_report_pdf(
     nominal_ranking_chunks = _chunk_list(
         nominal_ranking_raw, NOMINAL_RANKING_CHUNK_SIZE
     )
-    heatmap_chunks = _chunk_list(
-        calcs.get_heatmap_data(), HEATMAP_CHUNK_SIZE
-    )
+    heatmap_chunks = _chunk_list(calcs.get_heatmap_data(), HEATMAP_CHUNK_SIZE)
     strategic_profiles = calcs.get_strategic_profiles()
 
     context = {
@@ -156,8 +154,6 @@ def generate_group_report_pdf(
 
     html_string = render_to_string("survey/pdf/group_report_template.html", context)
 
-    base_url = os.path.join(
-        settings.BASE_DIR, "survey", "templates", "survey", "pdf"
-    )
+    base_url = os.path.join(settings.BASE_DIR, "survey", "templates", "survey", "pdf")
 
     return HTML(string=html_string, base_url=base_url).write_pdf()
