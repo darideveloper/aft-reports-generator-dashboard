@@ -1,5 +1,8 @@
-## ADDED Requirements
+# group-report-generation Specification
 
+## Purpose
+Define requirements for generating aggregated PDF reports for groups of participants or entire companies, including background processing and admin integrations.
+## Requirements
 ### Requirement: Admin-only sync preview
 The system SHALL restrict the `/group-report-pdf/<company_id>/` route to authenticated admin users only. The view SHALL generate the group PDF synchronously and return it inline for preview/debugging.
 
@@ -51,17 +54,16 @@ When a new `GroupReport` is created, the system SHALL make an HTTP GET request t
 - **AND** the error details are logged in the `logs` field
 
 ### Requirement: Shared PDF generation utility
-The system SHALL provide a standalone function in `utils/group_report_generator.py` named `generate_group_report_pdf(reports: QuerySet) -> bytes` that:
-- Accepts a QuerySet of Report objects
-- Runs all group calculations via `SurveyCalcsGroupTexts`
-- Renders the HTML template `survey/pdf/group_report_template.html`
-- Generates PDF bytes via WeasyPrint
-- Returns the raw PDF bytes
+The system SHALL provide a standalone function in `utils/group_report_generator.py` named `generate_group_report_pdf` that SHALL:
+- Accept a QuerySet of Report objects.
+- Render dynamic "Priority Actions" based on the two lowest-scoring areas for the group.
+- Include dynamic "Additional Recommendations" from the Company model if available.
+- Render the HTML template and generates PDF bytes via WeasyPrint.
 
-#### Scenario: Generate PDF from reports
-- **WHEN** the function is called with a QuerySet of reports
-- **THEN** it returns valid PDF bytes
-- **AND** the PDF contains aggregated data from all provided reports
+#### Scenario: Generate PDF with dynamic priority actions
+- **WHEN** the PDF is generated for a group of reports
+- **THEN** it SHALL include exactly two "Priority Actions" blocks corresponding to the lowest-scoring areas
+- **AND** it SHALL round all displayed percentages to two decimal places.
 
 ### Requirement: Async background generation command
 The system SHALL provide a Django management command `create_group_report` that:
@@ -148,3 +150,4 @@ The system SHALL provide an admin view at `GroupReportAdmin` to serve the genera
 #### Scenario: Download non-existent PDF
 - **WHEN** an admin accesses the download URL for a GroupReport without a PDF
 - **THEN** a 404 response is returned
+

@@ -1,7 +1,7 @@
 # summary-scoring-logic Specification
 
 ## Purpose
-TBD - created by archiving change update-summary-scoring-logic. Update Purpose after archive.
+Define the scoring methodology and mapping for competency category summaries in the PDF report, ensuring consistent ordering and dynamic threshold-based text selection.
 ## Requirements
 ### Requirement: Calculate Summary Categories based on Thematic Averages
 The system MUST calculate a score for each of the 6 summary categories by averaging the scores of their related topics, and select the summary text where the score is less than or equal to the threshold (`score <= min_score`).
@@ -65,7 +65,7 @@ The system MUST render the summary categories in the PDF in the following fixed 
 - **Given** resulting summary texts have been calculated for all categories.
 - **When** the PDF is generated.
 - **Then** the first 4 categories (CD, TN, CS, IP) must appear on page 20 in that specific sequence.
-- **And** the remaining 2 categories (TMA, EDC) must appear on page 21 in that specific sequence.
-- **And** the category TMA MUST be labeled as "Futuro sustentable e inclusivo".
-- **And** the labels MUST match the casing and pluralization defined in the list above.
+- **AND** the remaining 2 categories (TMA, EDC) must appear on page 21 in that specific sequence.
+- **AND** the category TMA MUST be labeled as "Futuro sustentable e inclusivo".
+- **AND** the labels MUST match the casing and pluralization defined in the list above.
 

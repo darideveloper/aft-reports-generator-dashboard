@@ -1,21 +1,15 @@
 # form-persistence Specification
 
 ## Purpose
-TBD - created by archiving change add-backend-form-persistence. Update Purpose after archive.
+Specify requirements for maintaining participant survey state across sessions, allowing users to save their progress and resume from the last completed screen.
 ## Requirements
 ### Requirement: Save Form Progress
-The system SHALL allow saving specific form state for a given email and survey.
+The system SHALL allow saving specific form state for a given email and survey using the `FormProgress` model.
 
 #### Scenario: User saves progress
 - **WHEN** a POST request is sent to `/api/progress/` with valid `email`, `survey` (ID), `current_screen`, and `data` (JSON blob)
-- **THEN** the system SHALL create a new `FormProgress` record if one does not exist
-- **OR** update the existing record if it does exist
+- **THEN** the system SHALL create or update the `FormProgress` record for that specific survey and email.
 - **AND** return a 200/201 status with the saved data.
-
-#### Scenario: User already completed survey
-- **WHEN** a POST request is sent to `/api/progress/`
-- **BUT** the user (email) has already submitted answers for this survey
-- **THEN** the system SHALL return a 400 Bad Request error with code `ALREADY_SUBMITTED`.
 
 ### Requirement: Retrieve Form Progress
 The system SHALL allow retrieving saved progress by email and survey ID.
