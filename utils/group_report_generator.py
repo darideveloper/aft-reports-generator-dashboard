@@ -144,6 +144,7 @@ def generate_group_report_pdf(
             "high_influence": "Alta",
             "medium_low_influence": "Media/Baja",
         },
+        "weakness_question_groups": calcs.get_weakness_areas(summary=False),
         "priority_actions": calcs.get_priority_actions(),
         "additional_recommendations": [
             line.strip()

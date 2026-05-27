@@ -389,11 +389,18 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         self._dispersion_summary = None
         self._priority_summary = None
 
-    def _get_extreme_areas(self, indices: list[int]) -> list[str]:
+    def _get_extreme_areas(self, indices: list[int], use_summary=True) -> list[str]:
         """
         Helper method to get display names of areas at specific indices of the ordered list.
+        
+        Args:
+            indices: List of indices to get areas for
+            use_summary: Whether to use summary areas or question groups areas
+            
+        Returns:
+            List of area display names
         """
-        ordered_areas = self.get_average_areas_ordered(use_summary=True)
+        ordered_areas = self.get_average_areas_ordered(use_summary=use_summary)
         if len(ordered_areas) < 2:
             return []
 
@@ -443,15 +450,18 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
             self._strength_areas = self._get_extreme_areas([0, 1])
         return self._strength_areas
 
-    def get_weakness_areas(self) -> list[str]:
+    def get_weakness_areas(self, summary=True) -> list[str]:
         """
         Get the names of the bottom 2 summary areas (weaknesses).
-
+        
+        Args:
+            summary: Whether to use summary areas or question groups areas
+            
         Returns:
             list[str]: A list of area names.
         """
         if self._weakness_areas is None:
-            self._weakness_areas = self._get_extreme_areas([-1, -2])
+            self._weakness_areas = self._get_extreme_areas([-1, -2], use_summary=summary)
         return self._weakness_areas
 
     def get_standard_deviation_total_range(self) -> str:
@@ -674,7 +684,7 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                 "Incorporar criterios tecnológicos en la toma de decisiones del equipo.",
                 "Promover el uso de tecnología como habilitador del desempeño del equipo.",
             ],
-            "Tecnología y medio ambiente": [
+            "Futuro sustentable e inclusivo": [
                 "Sensibilizar sobre el impacto de la tecnología en la sostenibilidad y la inclusión.",
                 "Promover prácticas digitales responsables y equitativas en el uso de recursos.",
                 "Integrar criterios de sostenibilidad e impacto social en decisiones tecnológicas.",

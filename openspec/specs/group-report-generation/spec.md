@@ -57,6 +57,7 @@ When a new `GroupReport` is created, the system SHALL make an HTTP GET request t
 The system SHALL provide a standalone function in `utils/group_report_generator.py` named `generate_group_report_pdf` that SHALL:
 - Accept a QuerySet of Report objects.
 - Render dynamic "Priority Actions" based on the two lowest-scoring areas for the group.
+- Include dynamic "Weakness Question Groups" context for granular reporting.
 - Include dynamic "Additional Recommendations" from the Company model if available.
 - Render the HTML template and generates PDF bytes via WeasyPrint.
 
@@ -64,6 +65,10 @@ The system SHALL provide a standalone function in `utils/group_report_generator.
 - **WHEN** the PDF is generated for a group of reports
 - **THEN** it SHALL include exactly two "Priority Actions" blocks corresponding to the lowest-scoring areas
 - **AND** it SHALL round all displayed percentages to two decimal places.
+
+#### Scenario: Generate PDF with granular weaknesses
+- **WHEN** the PDF is generated for a group of reports
+- **THEN** the context SHALL include `weakness_question_groups` containing the two lowest-scoring question groups.
 
 ### Requirement: Async background generation command
 The system SHALL provide a Django management command `create_group_report` that:
