@@ -42,13 +42,13 @@ The system SHALL support the display of area-specific details next to the result
 - **THEN** that text SHALL be included in the report context and rendered adjacent to the corresponding bar chart.
 
 ### Requirement: The PDF report SHALL dynamically generate the "Señal Prioritaria" actions based on the lowest scoring knowledge areas.
-The PDF report SHALL display actionable items directly correlated with the lowest scored areas of a specific company. These areas SHALL use the updated labels, specifically "Futuro sustentable e inclusivo" instead of "Tecnología y medio ambiente".
+The PDF report SHALL display actionable items directly correlated with the lowest scored areas of a specific company. These areas SHALL use the updated labels.
 
-#### Scenario: The report is generated for a company with low score in Futuro sustentable e inclusivo
+#### Scenario: The report is generated for a company with low score in Tecnología y medio ambiente
 - **GIVEN** a company has completed surveys
-- **AND** "Futuro sustentable e inclusivo" (TMA) is one of the two lowest scoring areas
+- **AND** "Tecnología y medio ambiente" (TMA) is one of the two lowest scoring areas
 - **WHEN** the group report PDF is generated
-- **THEN** the priority actions section on page 11 MUST display the actionable recommendations corresponding to "Futuro sustentable e inclusivo".
+- **THEN** the priority actions section on page 11 MUST display the actionable recommendations corresponding to "Tecnología y medio ambiente".
 
 ### Requirement: The PDF report SHALL present lists of participant names using a single-column layout without overflow.
 Participant names MUST be displayed without spanning multiple columns, preserving readability.
