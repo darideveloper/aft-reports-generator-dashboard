@@ -151,7 +151,6 @@ class SurveyCalcsGroup:
                             )
                     self._average_areas_ordered[use_summary] = final_results
 
-        print(self._average_areas_ordered[use_summary])
         return self._average_areas_ordered[use_summary]
 
     def get_average_question_groups_ordered(self) -> dict[str, float]:
@@ -176,8 +175,8 @@ class SurveyCalcsGroup:
                 )
                 question_group_total_avg = question_group_totals.aggregate(
                     Avg("total")
-                )["total__avg"]
-                area_averages[question_group.name] = question_group_total_avg
+                )["total__avg"] or 0.0
+                area_averages[question_group.name] = round(question_group_total_avg, 2)
 
             # Order by average
             self._average_question_groups_ordered = dict(
