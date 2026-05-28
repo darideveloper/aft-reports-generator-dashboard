@@ -44,7 +44,7 @@ DOT_COLORS = {
 def _chunk_list(lst: list, chunk_size: int) -> list[list]:
     if not lst:
         return []
-    return [lst[i : i + chunk_size] for i in range(0, len(lst), chunk_size)]
+    return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
 
 
 def _get_range_es(range_val: str) -> str:

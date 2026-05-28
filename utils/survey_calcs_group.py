@@ -459,9 +459,17 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         Returns:
             list[str]: A list of area names.
         """
-        if self._weakness_areas is None:
-            self._weakness_areas = self._get_extreme_areas([-1, -2], use_summary=summary)
-        return self._weakness_areas
+        # Get weakness areas
+        weakness_areas = self._get_extreme_areas([-1, -2], use_summary=summary)
+        weakness_areas_str = [str(area) for area in weakness_areas]
+        
+        # Clean extra texts (for no rummary / question groups)
+        separator = "-"
+        if separator in weakness_areas_str[0]:
+            weakness_areas_str_clean = [area.split(separator)[1].strip() for area in weakness_areas_str]
+        else:
+            weakness_areas_str_clean = weakness_areas_str
+        return weakness_areas_str_clean
 
     def get_standard_deviation_total_range(self) -> str:
         """
