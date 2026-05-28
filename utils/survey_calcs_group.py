@@ -463,9 +463,9 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
         weakness_areas = self._get_extreme_areas([-1, -2], use_summary=summary)
         weakness_areas_str = [str(area) for area in weakness_areas]
         
-        # Clean extra texts (for no rummary / question groups)
+        # Clean extra texts (for no summary / question groups)
         separator = "-"
-        if separator in weakness_areas_str[0]:
+        if weakness_areas_str and separator in weakness_areas_str[0]:
             weakness_areas_str_clean = [area.split(separator)[1].strip() for area in weakness_areas_str]
         else:
             weakness_areas_str_clean = weakness_areas_str
