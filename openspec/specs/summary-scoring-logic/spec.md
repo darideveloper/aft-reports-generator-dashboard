@@ -58,7 +58,7 @@ The system MUST render the summary categories in the PDF in the following fixed 
 2. **TN**: Tecnología y negocios
 3. **CS**: Ciberseguridad
 4. **IP**: Impacto personal
-5. **TMA**: Tecnología y medio ambiente
+5. **TMA**: Futuro sustentable e inclusivo
 6. **EDC**: Ecosistema digital de colaboración
 
 #### Scenario: Consistent PDF layout with updated labels

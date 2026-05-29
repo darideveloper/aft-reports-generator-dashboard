@@ -528,7 +528,7 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                     "Tecnología y negocios": "B",
                     "Ciberseguridad": "C",
                     "Impacto personal": "D",
-                    "Tecnología y medio ambiente": "E",
+                    "Futuro sustentable e inclusivo": "E",
                     "Ecosistema digital de colaboración": "F",
                 }
 

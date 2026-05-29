@@ -418,7 +418,7 @@ class TextPDFSummary(models.Model):
         ("TN", "Tecnología y negocios"),
         ("CS", "Ciberseguridad"),
         ("IP", "Impacto personal"),
-        ("TMA", "Tecnología y medio ambiente"),
+        ("TMA", "Futuro sustentable e inclusivo"),
         ("EDC", "Ecosistema digital de colaboración"),
     ]
 

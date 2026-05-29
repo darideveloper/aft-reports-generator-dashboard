@@ -168,8 +168,8 @@
         "model": "survey.QuestionGroup",
         "pk": 14,
         "fields": {
-            "name": "TEMA 12 - Tecnología y medio ambiente",
-            "details": "El impacto de la tecnología en el tecnología y medio ambiente abarca desde el consumo de energía y los desechos electrónicos hasta la accesibilidad digital y la equidad social.\n\nA continuación, se indican ocho prácticas recomendadas para promover la sostenibilidad y la inclusión. Priorice utilizando los números del 1 al 8, donde el 1 es el más importante. **No utilice 2 veces el mismo número.**",
+            "name": "TEMA 12 - Futuro sustentable e inclusivo",
+            "details": "El impacto de la tecnología en el futuro sustentable e inclusivo abarca desde el consumo de energía y los desechos electrónicos hasta la accesibilidad digital y la equidad social.\n\nA continuación, se indican ocho prácticas recomendadas para promover la sostenibilidad y la inclusión. Priorice utilizando los números del 1 al 8, donde el 1 es el más importante. **No utilice 2 veces el mismo número.**",
             "details_bar_chart": "Adoptar prácticas sustentables e inclusivas fortalece la responsabilidad social y ambiental de la tecnología.",
             "survey": 1,
             "survey_index": 12,
