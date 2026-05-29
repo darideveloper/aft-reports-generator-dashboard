@@ -37,5 +37,5 @@ The system SHALL ensure that all category labels rendered in the PDF report exac
 
 #### Scenario: PDF Label Casing Verification
 - **WHEN** the PDF is generated
-- **THEN** the labels for "Cultura digital", "Tecnología y negocios", "Ciberseguridad", "Impacto personal", "Tecnología y medio ambiente", and "Ecosistema digital de colaboración" MUST be rendered in lowercase (except for the first letter) exactly as defined in the model choices.
+- **THEN** the labels for "Cultura digital", "Tecnología y negocios", "Ciberseguridad", "Impacto personal", "Futuro sustentable e inclusivo", and "Ecosistema digital de colaboración" MUST be rendered in lowercase (except for the first letter) exactly as defined in the model choices.
 

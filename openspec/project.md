@@ -122,7 +122,7 @@ AFT Reports Generator Dashboard is a comprehensive Django-based web application 
 - **TN**: Tecnología y negocios (Technology & Business)
 - **CS**: Ciberseguridad (Cybersecurity)
 - **IP**: Impacto personal (Personal Impact)
-- **TMA**: Tecnología y medio ambiente (Technology and Environment)
+- **TMA**: Futuro sustentable e inclusivo (Future Sustainability and Inclusion)
 - **EDC**: Ecosistema digital de colaboración (Digital Collaboration Ecosystem)
 
 ## Important Constraints

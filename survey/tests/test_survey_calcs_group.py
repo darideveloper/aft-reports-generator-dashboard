@@ -259,7 +259,7 @@ class SurveyCalcsGroupTestCase(TestSurveyModelBase):
             calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
             self.assertIn("Resulta prioritario fortalecer la cultura digital incorporando prácticas básicas de seguridad tecnológica", calcs.get_priority_summary())
 
-        with patch.object(SurveyCalcsGroupTexts, "get_weakness_areas", return_value=["Tecnología y negocios", "Tecnología y medio ambiente"]):
+        with patch.object(SurveyCalcsGroupTexts, "get_weakness_areas", return_value=["Tecnología y negocios", "Futuro sustentable e inclusivo"]):
             calcs = SurveyCalcsGroupTexts(survey_models.Report.objects.none())
             self.assertIn("Resulta prioritario fortalecer la comprensión de cómo la tecnología influye en el modelo de negocio", calcs.get_priority_summary())
 

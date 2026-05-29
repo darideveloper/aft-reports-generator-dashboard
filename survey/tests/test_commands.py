@@ -1469,6 +1469,7 @@ class GenerateNextReportTextPDFSummaryTestCase(GenerateNextReportBase):
             "answers": [],
         }
         self.endpoint = "/api/response/"
+        self.company = self.create_company(invitation_code=self.invitation_code)
 
         # tests data
         self.summary_types = ["CD", "TN", "CS", "IP", "TMA", "EDC"]
