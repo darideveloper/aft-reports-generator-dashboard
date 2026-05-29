@@ -1,4 +1,9 @@
-## ADDED Requirements
+# table-style-consistency Specification
+
+## Purpose
+TBD - created by archiving change table-style-consistency. Update Purpose after archive.
+
+## Requirements
 
 ### Requirement: Consistent Table Colors
 The system SHALL use background colors for table headers and columns that match the provided Google Doc reference.

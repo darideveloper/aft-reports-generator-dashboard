@@ -1,4 +1,9 @@
-## ADDED Requirements
+# dynamic-report-sections Specification
+
+## Purpose
+TBD - created by archiving change dynamic-report-sections. Update Purpose after archive.
+
+## Requirements
 
 ### Requirement: Dynamic Executive Summary
 The system SHALL inject dynamic scores, levels, and descriptive text into the Executive Summary section.
