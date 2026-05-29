@@ -691,7 +691,7 @@ class SurveyCalcsGroupTexts(SurveyCalcsGroup):
                 "Incorporar criterios tecnológicos en la toma de decisiones del equipo.",
                 "Promover el uso de tecnología como habilitador del desempeño del equipo.",
             ],
-            "Futuro sustentable e inclusivo": [
+            "Tecnología y medio ambiente": [
                 "Sensibilizar sobre el impacto de la tecnología en la sostenibilidad y la inclusión.",
                 "Promover prácticas digitales responsables y equitativas en el uso de recursos.",
                 "Integrar criterios de sostenibilidad e impacto social en decisiones tecnológicas.",
