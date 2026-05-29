@@ -28,7 +28,7 @@ class GroupReportPDFView(View):
         )
 
         response = HttpResponse(pdf_bytes, content_type="application/pdf")
-        response["Content-Disposition"] = "inline; filename='group_report.pdf'"
+        response["Content-Disposition"] = 'inline; filename="group_report.pdf"'
         return response
 
 

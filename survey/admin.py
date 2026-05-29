@@ -476,7 +476,7 @@ class GroupReportAdmin(admin.ModelAdmin):
         pdf_file = group_report.pdf_file
         try:
             response = HttpResponse(pdf_file.read(), content_type="application/pdf")
-            response["Content-Disposition"] = f"inline; filename='group_report_{pk}.pdf'"
+            response["Content-Disposition"] = f'inline; filename="group_report_{pk}.pdf"'
             return response
         except Exception:
             self.message_user(request, "Error al leer el archivo PDF.", messages.ERROR)
