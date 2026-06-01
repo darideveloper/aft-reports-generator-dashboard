@@ -460,8 +460,8 @@ class GroupReportAdmin(admin.ModelAdmin):
     def custom_links(self, obj):
         if obj.status == "completed" and obj.pdf_file:
             return format_html(
-                '<a class="btn btn-primary my-1" href="{}">Descargar PDF</a>',
-                f"download/",
+                '<a class="btn btn-primary my-1" target="_blank" href="{}">Descargar PDF</a>',
+                f"{obj.pk}/download/",
             )
         return format_html(
             '<a class="btn btn-secondary my-1 disabled" href="#" disabled>Descargar PDF</a>'
