@@ -216,11 +216,17 @@ JAZZMIN_SETTINGS = {
         "survey.Question",
         "survey.QuestionOption",
         "survey.Participant",
+        "survey.FormProgress",
         "survey.Answer",
         "survey.Report",
         "survey.ReportQuestionGroupTotal",
+        "survey.ReportSummaryScore",
+        "survey.GroupReport",
+        "survey.ReportsDownload",
         "survey.TextPDFQuestionGroup",
         "survey.TextPDFSummary",
+        "auth",
+        "authtoken",
     ],
     # Custom links to append to app groups, keyed on app name
     "custom_links": {
@@ -237,7 +243,9 @@ JAZZMIN_SETTINGS = {
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
+        "auth.group": "fas fa-users",
+        "authtoken": "fas fa-shield-alt",
+        "authtoken.Token": "fas fa-key",
         # Survey
         "survey.Company": "fas fa-building",
         "survey.Survey": "fas fa-poll",
@@ -249,10 +257,12 @@ JAZZMIN_SETTINGS = {
         "survey.Report": "fas fa-file-pdf",
         "survey.QuestionGroupModifier": "fas fa-sliders",
         "survey.ReportQuestionGroupTotal": "fas fa-chart-bar",
+        "survey.ReportSummaryScore": "fas fa-chart-pie",
         "survey.TextPDFQuestionGroup": "fas fa-paragraph",
         "survey.TextPDFSummary": "fas fa-heading",
         "survey.CompanyDesiredScore": "fas fa-star",
         "survey.ReportsDownload": "fas fa-file-zipper",
+        "survey.GroupReport": "fas fa-layer-group",
         "survey.FormProgress": "fas fa-spinner",
     },
     # Icons that are used when one is not manually specified
