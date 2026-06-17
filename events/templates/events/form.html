@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }}</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-input: #ffffff;
+            --border-input: #cbd5e1;
+            --border-focus: #3b82f6;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-error: #ef4444;
+            --bg-success: #f0fdf4;
+            --border-success: #bbf7d0;
+            --text-success: #15803d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            color: var(--text-main);
+            background-color: transparent;
+            line-height: 1.5;
+        }
+
+        .form-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        label .required {
+            color: var(--text-error);
+            margin-left: 2px;
+        }
+
+        input {
+            font-family: inherit;
+            font-size: 0.95rem;
+            padding: 10px 12px;
+            border: 1px solid var(--border-input);
+            border-radius: 6px;
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .error-message {
+            font-size: 0.75rem;
+            color: var(--text-error);
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-group.has-error input {
+            border-color: var(--text-error);
+        }
+
+        .form-group.has-error .error-message {
+            display: block;
+        }
+
+        button[type="submit"] {
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+            margin-top: 8px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button[type="submit"]:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Success & Global Error cards */
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .alert-success {
+            background-color: var(--bg-success);
+            border: 1px solid var(--border-success);
+            color: var(--text-success);
+            text-align: center;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        /* Honeypot field (hidden for users, bots fill it) */
+        .hidden-fields {
+            display: none !important;
+            visibility: hidden;
+            height: 0;
+            width: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div id="success-alert" class="alert alert-success">
+            <strong>¡Registro exitoso!</strong> Gracias por registrarte. Hemos enviado un correo de confirmación.
+        </div>
+
+        <div id="error-alert" class="alert alert-error"></div>
+
+        <form id="lead-form" novalidate>
+            <h2>{{ event.title }}</h2>
+            <p class="description">Por favor, completa tus datos para registrarte.</p>
+
+            <!-- Honeypot (Antispam) -->
+            <div class="hidden-fields">
+                <label for="website">Sitio web</label>
+                <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <!-- Nombre -->
+            {% if event.name_active %}
+            <div class="form-group" id="group-name">
+                <label for="name">Nombre{% if event.name_required %}<span class="required">*</span>{% endif %}</label>
+                <input type="text" name="name" id="name" placeholder="Ej. Juan Pérez">
+                <div class="error-message" id="error-name"></div>
+            </div>
+            {% endif %}
+
+            <!-- Puesto de Trabajo -->
+            {% if event.position_active %}
+            <div class="form-group" id="group-job_position">
+                <label for="job_position">Puesto de trabajo{% if event.position_required %}<span class="required">*</span>{% endif %}</label>
+                <input type="text" name="job_position" id="job_position" placeholder="Ej. Gerente de Ventas">
+                <div class="error-message" id="error-job_position"></div>
+            </div>
+            {% endif %}
+
+            <!-- Correo Electrónico -->
+            {% if event.email_active %}
+            <div class="form-group" id="group-email">
+                <label for="email">Correo electrónico{% if event.email_required %}<span class="required">*</span>{% endif %}</label>
+                <input type="email" name="email" id="email" placeholder="Ej. juan@example.com">
+                <div class="error-message" id="error-email"></div>
+            </div>
+            {% endif %}
+
+            <!-- Teléfono -->
+            {% if event.phone_active %}
+            <div class="form-group" id="group-phone">
+                <label for="phone">Teléfono{% if event.phone_required %}<span class="required">*</span>{% endif %}</label>
+                <input type="tel" name="phone" id="phone" placeholder="Ej. +52 55 1234 5678">
+                <div class="error-message" id="error-phone"></div>
+            </div>
+            {% endif %}
+
+            <!-- Empresa -->
+            {% if event.company_active %}
+            <div class="form-group" id="group-company">
+                <label for="company">Empresa{% if event.company_required %}<span class="required">*</span>{% endif %}</label>
+                <input type="text" name="company" id="company" placeholder="Ej. Empresa S.A.">
+                <div class="error-message" id="error-company"></div>
+            </div>
+            {% endif %}
+
+            <button type="submit" id="submit-btn">Registrarse</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('lead-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const successAlert = document.getElementById('success-alert');
+        const errorAlert = document.getElementById('error-alert');
+
+        // Dynamic Iframe Resizer messaging function
+        function sendIframeHeight() {
+            // Wait slightly for DOM to repaint before calculating height
+            setTimeout(() => {
+                const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+                window.parent.postMessage({ type: 'resize-iframe', height: height }, '*');
+            }, 50);
+        }
+
+        // Send height on initial load
+        window.addEventListener('load', sendIframeHeight);
+        window.addEventListener('resize', sendIframeHeight);
+
+        // Form submission handler
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Clear previous errors
+            errorAlert.style.display = 'none';
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('has-error');
+            });
+            document.querySelectorAll('.error-message').forEach(err => {
+                err.textContent = '';
+            });
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Procesando...';
+            sendIframeHeight();
+
+            // Build request JSON
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            const submitUrl = "{% url 'lead-submit' slug=event.slug %}";
+
+            fetch(submitUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(async response => {
+                const result = await response.json();
+                if (response.status === 201) {
+                    // Success View State
+                    form.style.display = 'none';
+                    successAlert.style.display = 'block';
+                    sendIframeHeight();
+                } else if (response.status === 400 && result.errors) {
+                    // Validation Errors View State
+                    Object.keys(result.errors).forEach(field => {
+                        const errorMsg = result.errors[field];
+                        
+                        if (field === 'non_field_errors') {
+                            errorAlert.textContent = Array.isArray(errorMsg) ? errorMsg[0] : errorMsg;
+                            errorAlert.style.display = 'block';
+                        } else {
+                            const group = document.getElementById(`group-${field}`);
+                            const errorEl = document.getElementById(`error-${field}`);
+                            if (group && errorEl) {
+                                group.classList.add('has-error');
+                                errorEl.textContent = Array.isArray(errorMsg) ? errorMsg[0] : errorMsg;
+                            }
+                        }
+                    });
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Registrarse';
+                    sendIframeHeight();
+                } else {
+                    // System errors
+                    throw new Error(result.message || 'Ocurrió un error inesperado al procesar la solicitud.');
+                }
+            })
+            .catch(error => {
+                errorAlert.textContent = error.message || 'Error de conexión. Por favor intente más tarde.';
+                errorAlert.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Registrarse';
+                sendIframeHeight();
+            });
+        });
+    </script>
+</body>
+</html>

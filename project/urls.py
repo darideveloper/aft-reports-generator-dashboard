@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 from rest_framework import routers
 
 from survey import views as survey_views
+from events import views as events_views
 
 
 # Setup drf router
@@ -39,6 +40,9 @@ urlpatterns = [
     ),
     path("api/progress/", survey_views.FormProgressView.as_view(), name="progress"),
     path("group-report-pdf/<int:company_id>/", survey_views.GroupReportPDFView.as_view(), name="group-report-pdf"),
+    # Event forms URLs
+    path("events/", include("events.urls")),
+    path("api/events/<slug:slug>/submit/", events_views.LeadSubmitView.as_view(), name="lead-submit"),
 ]
 
 if not settings.STORAGE_AWS:

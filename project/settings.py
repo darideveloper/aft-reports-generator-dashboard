@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     # Local apps
     "core",
     "survey",
+    "events",
     # Installed apps
     "corsheaders",
     "rest_framework",
@@ -225,6 +226,8 @@ JAZZMIN_SETTINGS = {
         "survey.ReportsDownload",
         "survey.TextPDFQuestionGroup",
         "survey.TextPDFSummary",
+        "events.Event",
+        "events.Lead",
         "auth",
         "authtoken",
     ],
@@ -246,6 +249,9 @@ JAZZMIN_SETTINGS = {
         "auth.group": "fas fa-users",
         "authtoken": "fas fa-shield-alt",
         "authtoken.Token": "fas fa-key",
+        # Events
+        "events.Event": "fas fa-calendar-alt",
+        "events.Lead": "fas fa-envelope-open-text",
         # Survey
         "survey.Company": "fas fa-building",
         "survey.Survey": "fas fa-poll",
@@ -397,3 +403,15 @@ DATE_FORMAT = "d/b/Y"
 TIME_FORMAT = "H:i"
 DATETIME_FORMAT = f"{DATE_FORMAT} {TIME_FORMAT}"
 USE_L10N = False
+
+# Email Settings
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 5))
+

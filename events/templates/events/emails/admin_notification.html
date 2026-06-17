@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Nuevo registro de evento</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333333; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; }
+        h2 { color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eeeeee; }
+        th { background-color: #f8fafc; font-weight: bold; width: 35%; color: #475569; }
+        td { color: #0f172a; }
+        .footer { margin-top: 30px; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Nuevo Registro de Contacto</h2>
+        <p>Se ha recibido un nuevo registro de lead para el evento <strong>{{ event.title }}</strong>.</p>
+        
+        <table>
+            {% if event.name_active and lead.name %}
+            <tr>
+                <th>Nombre</th>
+                <td>{{ lead.name }}</td>
+            </tr>
+            {% endif %}
+            
+            {% if event.position_active and lead.job_position %}
+            <tr>
+                <th>Puesto de trabajo</th>
+                <td>{{ lead.job_position }}</td>
+            </tr>
+            {% endif %}
+            
+            {% if event.email_active and lead.email %}
+            <tr>
+                <th>Correo electrónico</th>
+                <td><a href="mailto:{{ lead.email }}">{{ lead.email }}</a></td>
+            </tr>
+            {% endif %}
+            
+            {% if event.phone_active and lead.phone %}
+            <tr>
+                <th>Teléfono</th>
+                <td>{{ lead.phone }}</td>
+            </tr>
+            {% endif %}
+            
+            {% if event.company_active and lead.company %}
+            <tr>
+                <th>Empresa</th>
+                <td>{{ lead.company }}</td>
+            </tr>
+            {% endif %}
+            
+            <tr>
+                <th>Fecha de Registro</th>
+                <td>{{ lead.created_at }}</td>
+            </tr>
+        </table>
+        
+        <div class="footer">
+            <p>Este es un correo automático enviado por el sistema de Eventos de AFT Dashboard.</p>
+        </div>
+    </div>
+</body>
+</html>
