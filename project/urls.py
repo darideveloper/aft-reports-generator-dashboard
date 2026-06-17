@@ -8,6 +8,8 @@ from rest_framework import routers
 
 from survey import views as survey_views
 from events import views as events_views
+from core import views as core_views
+
 
 
 # Setup drf router
@@ -43,6 +45,8 @@ urlpatterns = [
     # Event forms URLs
     path("events/", include("events.urls")),
     path("api/events/<slug:slug>/submit/", events_views.LeadSubmitView.as_view(), name="lead-submit"),
+    # Test URLs
+    path("tests/validate-email/", core_views.ValidateEmailView.as_view(), name="validate-email"),
 ]
 
 if not settings.STORAGE_AWS:
