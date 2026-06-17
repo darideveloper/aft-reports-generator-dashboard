@@ -1,8 +1,5 @@
-# smtp-validation Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change add-smtp-validation-endpoint. Update Purpose after archive.
-## Requirements
 ### Requirement: Validate SMTP configuration and credentials
 The system SHALL provide a test endpoint at `/tests/validate-email/` to allow checking SMTP health.
 
@@ -29,4 +26,3 @@ The system SHALL provide a test endpoint at `/tests/validate-email/` to allow ch
 #### Scenario: Invalid JSON payload
 - **WHEN** a client performs a `POST` request to `/tests/validate-email/` with a malformed or non-JSON body
 - **THEN** the system SHALL return an HTTP `400 Bad Request` response with a JSON payload indicating that the request body must be valid JSON.
-

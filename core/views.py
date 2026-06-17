@@ -4,6 +4,7 @@ from django.core.mail import get_connection, EmailMessage
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ParseError
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +13,17 @@ class ValidateEmailView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def get(self, request):
-        token = request.query_params.get("token")
+    def post(self, request):
+        # 0. Parse JSON Request Data
+        try:
+            data = request.data
+        except ParseError as e:
+            return Response(
+                {"status": "error", "message": "Invalid JSON payload: " + str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        token = data.get("token")
         expected_token = getattr(settings, "SMTP_TEST_TOKEN", None)
         
         # 1. Enforce Token Security
@@ -29,8 +39,18 @@ class ValidateEmailView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
             
-        destination_email = request.query_params.get("email")
-        real_send = request.query_params.get("real", "false").lower() in ("true", "1", "yes")
+        destination_email = data.get("email")
+        
+        # Safely parse real_send from body (handling bool, str, or int)
+        real_param = data.get("real", False)
+        if isinstance(real_param, bool):
+            real_send = real_param
+        elif isinstance(real_param, str):
+            real_send = real_param.lower() in ("true", "1", "yes")
+        elif isinstance(real_param, int):
+            real_send = real_param != 0
+        else:
+            real_send = False
         
         # 2. Validation
         if real_send and not destination_email:
@@ -70,3 +90,4 @@ class ValidateEmailView(APIView):
                 "status": "error",
                 "message": f"SMTP Validation failed: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
