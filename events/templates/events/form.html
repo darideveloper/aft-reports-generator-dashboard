@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,17 +7,17 @@
     <title>{{ event.title }}</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --primary: {{ branding.colors.primary|default:"#0a3c58" }};
+            --primary-hover: {{ branding.colors.primary_hover|default:"#072a3e" }};
             --bg-input: #ffffff;
             --border-input: #cbd5e1;
-            --border-focus: #3b82f6;
+            --border-focus: {{ branding.colors.primary|default:"#0a3c58" }};
             --text-main: #0f172a;
             --text-muted: #64748b;
             --text-error: #ef4444;
-            --bg-success: #f0fdf4;
-            --border-success: #bbf7d0;
-            --text-success: #15803d;
+            --bg-success: {{ branding.colors.secondary|default:"#bcd3cd" }}26;
+            --border-success: {{ branding.colors.secondary|default:"#bcd3cd" }};
+            --text-success: {{ branding.colors.primary|default:"#0a3c58" }};
         }
 
         body {
@@ -88,7 +89,7 @@
 
         input:focus {
             border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 3px rgba(10, 60, 88, 0.15);
         }
 
         .error-message {
@@ -165,6 +166,12 @@
 </head>
 <body>
     <div class="form-container">
+        {% if logo_url %}
+        <div class="logo-container" style="text-align: center; margin-bottom: 24px;">
+            <img src="{{ logo_url }}" alt="Logo" style="max-height: 50px; max-width: 100%; object-fit: contain;">
+        </div>
+        {% endif %}
+
         <div id="success-alert" class="alert alert-success">
             <strong>¡Registro exitoso!</strong> Gracias por registrarte. Hemos enviado un correo de confirmación.
         </div>

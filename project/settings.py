@@ -116,6 +116,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.branding",
             ],
         },
     },
@@ -417,5 +418,18 @@ EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 5))
 
 # SMTP Validation Endpoint Token
 SMTP_TEST_TOKEN = os.getenv("SMTP_TEST_TOKEN")
+
+
+# Centralized Branding Configuration (DRY)
+BRANDING = {
+    "colors": {
+        "primary": "#0a3c58",
+        "primary_hover": "#072a3e",
+        "secondary": "#bcd3cd",
+        "accent": "#f3d39c",
+    },
+    "logo_path": "https://aft-reports-generator.s3.amazonaws.com/static/core/imgs/logo-leadforward.jpg",
+}
+
 
 

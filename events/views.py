@@ -7,6 +7,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.templatetags.static import static
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,12 +24,32 @@ def send_event_emails(lead):
     event = lead.event
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@example.com")
 
+    # Resolve branding
+    branding = getattr(settings, "BRANDING", {})
+    logo_path = branding.get("logo_path", "core/imgs/logo.webp")
+
+    if logo_path.startswith(("http://", "https://")):
+        logo_url = logo_path
+    else:
+        logo_relative_url = static(logo_path)
+        if logo_relative_url.startswith(("http://", "https://")):
+            logo_url = logo_relative_url
+        else:
+            host = "localhost:8000"
+            if hasattr(settings, "ALLOWED_HOSTS") and settings.ALLOWED_HOSTS:
+                hosts = [h for h in settings.ALLOWED_HOSTS if h and h != "*"]
+                if hosts:
+                    host = hosts[0]
+            protocol = "http" if getattr(settings, "DEBUG", False) else "https"
+            logo_url = f"{protocol}://{host}{logo_relative_url}"
+
     # 1. Admin Email Notification
     if event.notify_email:
         admin_subject = f"Nuevo registro: {event.title}"
         try:
             admin_html = render_to_string(
-                "events/emails/admin_notification.html", {"lead": lead, "event": event}
+                "events/emails/admin_notification.html",
+                {"lead": lead, "event": event, "branding": branding, "logo_url": logo_url}
             )
             admin_text = strip_tags(admin_html)
 
@@ -48,7 +69,8 @@ def send_event_emails(lead):
         client_subject = f"Confirmación de registro: {event.title}"
         try:
             client_html = render_to_string(
-                "events/emails/client_confirmation.html", {"lead": lead, "event": event}
+                "events/emails/client_confirmation.html",
+                {"lead": lead, "event": event, "branding": branding, "logo_url": logo_url}
             )
             client_text = strip_tags(client_html)
 

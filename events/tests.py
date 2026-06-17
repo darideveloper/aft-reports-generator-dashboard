@@ -129,3 +129,42 @@ class LeadSubmitAPITestCase(APITestCase):
 
         # Verify data is still stored safely
         self.assertTrue(Lead.objects.filter(event=self.event, name="Maria Lopez").exists())
+
+    def test_event_form_branding_rendering(self):
+        url = reverse("events:event-form", kwargs={"slug": self.event.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify context contains branding settings
+        self.assertIn("branding", response.context)
+        self.assertEqual(response.context["branding"]["colors"]["primary"], "#0a3c58")
+
+        # Verify template HTML rendering contains brand assets and colors
+        content = response.content.decode("utf-8")
+        self.assertIn("#0a3c58", content)
+        self.assertIn("#072a3e", content)
+        self.assertIn("https://aft-reports-generator.s3.amazonaws.com/static/core/imgs/logo-leadforward.jpg", content)
+
+    def test_confirmation_email_branding_and_signature(self):
+        data = {
+            "name": "Alex Smith",
+            "email": "alex@example.com",
+            "website": "",
+        }
+        response = self.client.post(self.submit_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Verify client email formatting and signature
+        self.assertEqual(len(mail.outbox), 2)
+        client_mail = mail.outbox[1]
+        self.assertEqual(client_mail.subject, f"Confirmación de registro: {self.event.title}")
+
+        # Text version checks
+        self.assertIn("El equipo LeadForward Global Solutions MJ", client_mail.body)
+
+        # HTML version checks
+        html_content = client_mail.alternatives[0][0]
+        self.assertIn("#0a3c58", html_content)
+        self.assertIn("El equipo LeadForward Global Solutions MJ", html_content)
+        self.assertIn("https://aft-reports-generator.s3.amazonaws.com/static/core/imgs/logo-leadforward.jpg", html_content)
+
