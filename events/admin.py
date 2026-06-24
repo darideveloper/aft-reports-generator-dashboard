@@ -1,19 +1,34 @@
 from django.contrib import admin
 import csv
 from django.http import HttpResponse
+from django.utils.html import format_html
 from .models import Event, Lead
 
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("title", "slug", "is_active", "notify_email", "created_at")
+    list_display = (
+        "title",
+        "slug",
+        "is_active",
+        "notify_email",
+        "invitation_link_display",
+        "created_at",
+    )
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ("title", "slug")
     list_filter = ("is_active", "created_at")
 
     fieldsets = (
         (None, {
-            "fields": ("title", "slug", "is_active", "notify_email")
+            "fields": (
+                "title",
+                "slug",
+                "is_active",
+                "notify_email",
+                "invitation_link",
+                "invitation_label",
+            )
         }),
         ("Campos del Formulario (Activo)", {
             "fields": (
@@ -34,6 +49,15 @@ class EventAdmin(admin.ModelAdmin):
             )
         }),
     )
+
+    @admin.display(description="Enlace de invitación", ordering="invitation_link")
+    def invitation_link_display(self, obj):
+        if not obj.invitation_link:
+            return "—"
+        return format_html(
+            '<a href="{0}" target="_blank" rel="noopener noreferrer">{0}</a>',
+            obj.invitation_link,
+        )
 
 
 @admin.register(Lead)

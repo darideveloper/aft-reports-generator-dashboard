@@ -25,13 +25,26 @@
         
         <div class="message-body">
             <p>Hola {% if lead.name %}{{ lead.name }}{% else %}participante{% endif %},</p>
-            
+
             <p>Queremos confirmarte que hemos recibido exitosamente tus datos para el evento: <strong>{{ event.title }}</strong>.</p>
-            
+
             <p>Agradecemos tu interés en participar. Estaremos compartiendo más detalles y novedades del evento próximamente a través de esta dirección de correo electrónico.</p>
-            
+
             <p>Si tienes alguna duda, por favor ponte en contacto con nosotros respondiendo a este mensaje.</p>
         </div>
+
+        {% if event.invitation_link %}
+        <div class="button-wrapper">
+            <a href="{{ event.invitation_link }}"
+               target="_blank" rel="noopener noreferrer"
+               class="button"
+               style="color: #ffffff; text-decoration: none;">{{ event.invitation_label_display }}</a>
+        </div>
+        <p style="word-break: break-all; font-size: 12px; color: #94a3b8;
+                  text-align: center; margin-top: 12px;">
+            {{ event.invitation_link }}
+        </p>
+        {% endif %}
         
         <div class="footer">
             <p>Saludos cordiales,<br>El equipo LeadForward Global Solutions MJ</p>

@@ -176,6 +176,16 @@
             <strong>¡Registro exitoso!</strong> Gracias por registrarte. Hemos enviado un correo de confirmación.
         </div>
 
+        {% if event.invitation_link %}
+        <div id="invitation-cta" class="alert alert-success" style="display: none; text-align: center;">
+            <a id="invitation-cta-link" href="#"
+               target="_blank" rel="noopener noreferrer"
+               style="background-color: {{ branding.colors.primary|default:'#0a3c58' }};
+                      color: #ffffff; padding: 12px 24px; border-radius: 6px;
+                      text-decoration: none; font-weight: bold; display: inline-block;">Acceder al evento</a>
+        </div>
+        {% endif %}
+
         <div id="error-alert" class="alert alert-error"></div>
 
         <form id="lead-form" novalidate>
@@ -296,6 +306,13 @@
                     // Success View State
                     form.style.display = 'none';
                     successAlert.style.display = 'block';
+                    {% if event.invitation_link %}
+                    const ctaEl = document.getElementById('invitation-cta');
+                    const ctaLink = document.getElementById('invitation-cta-link');
+                    ctaLink.href = "{{ event.invitation_link|escapejs }}";
+                    ctaLink.textContent = "{{ event.invitation_label_display|escapejs }}";
+                    ctaEl.style.display = 'block';
+                    {% endif %}
                     sendIframeHeight();
                 } else if (response.status === 400 && result.errors) {
                     // Validation Errors View State
