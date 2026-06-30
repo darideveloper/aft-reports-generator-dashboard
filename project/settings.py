@@ -25,6 +25,7 @@ STORAGE_AWS = os.environ.get("STORAGE_AWS") == "True"
 HOST = os.getenv("HOST")
 TEST_HEADLESS = os.getenv("TEST_HEADLESS", "False") == "True"
 PAGE_SIZE = int(os.getenv("PAGE_SIZE", 10))
+NOMINAL_RANKING_CHUNK_SIZE = int(os.getenv("NOMINAL_RANKING_CHUNK_SIZE", 18))
 BAR_CHART_ENDPOINT = os.getenv("BAR_CHART_ENDPOINT")
 N8N_BASE_WEBHOOKS = os.getenv("N8N_BASE_WEBHOOKS")
 PDF_REPORT_TITLE = os.getenv("PDF_REPORT_TITLE", "Alfabetización Tecnológica")
