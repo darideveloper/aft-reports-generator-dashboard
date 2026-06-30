@@ -341,6 +341,16 @@ td {
   border: 1px solid #000;
 }
 
+.nominal-ranking-table {
+  table-layout: fixed;
+  font-size: 10pt;
+}
+
+.nominal-ranking-table th,
+.nominal-ranking-table td {
+  padding: 8px 6px;
+}
+
 .distribution-table td,
 .area-results-table td {
   padding: 8px 15px;

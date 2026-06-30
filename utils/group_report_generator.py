@@ -9,7 +9,7 @@ from weasyprint import HTML
 from survey import models
 from utils.survey_calcs_group import SurveyCalcsGroupTexts
 
-NOMINAL_RANKING_CHUNK_SIZE = 16
+NOMINAL_RANKING_CHUNK_SIZE = 15
 HEATMAP_CHUNK_SIZE = 15
 STRATEGIC_CHUNK_SIZE = 40
 
