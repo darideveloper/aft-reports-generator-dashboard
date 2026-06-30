@@ -1,8 +1,4 @@
-import os
-import tempfile
-
-from django.conf import settings
-from django.core.files.base import File
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 
 from survey import models
@@ -63,20 +59,11 @@ class Command(BaseCommand):
                 additional_recommendations=additional_recommendations,
             )
 
-            with tempfile.NamedTemporaryFile(
-                dir=os.path.join(settings.BASE_DIR, "media", "temp"),
-                suffix=".pdf",
-                delete=False,
-            ) as tmp:
-                tmp.write(pdf_bytes)
-                tmp_path = tmp.name
-
-            with open(tmp_path, "rb") as f:
-                next_group_report.pdf_file.save(
-                    os.path.basename(tmp_path), File(f), save=True
-                )
-
-            os.remove(tmp_path)
+            next_group_report.pdf_file.save(
+                f"group_report_{next_group_report.id}.pdf",
+                ContentFile(pdf_bytes),
+                save=True,
+            )
 
             next_group_report.status = "completed"
             message = f"GroupReport {next_group_report.id} completed"
