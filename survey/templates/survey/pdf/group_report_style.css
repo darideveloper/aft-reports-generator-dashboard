@@ -346,7 +346,11 @@ td {
   font-size: 10pt;
 }
 
-.nominal-ranking-table th,
+.nominal-ranking-table th {
+  font-size: 8pt;
+  padding: 8px 3px;
+}
+
 .nominal-ranking-table td {
   padding: 8px 6px;
 }
