@@ -17,15 +17,22 @@ The nominal ranking table in the group report SHALL use `table-layout: fixed` wi
 - **THEN** the six column width percentages SHALL sum to exactly 100%
 
 ### Requirement: Consistent row height regardless of content length
-The nominal ranking table SHALL render all data rows at a consistent height, regardless of whether cell content wraps to a single line or multiple lines, by using a reduced font size and reduced cell padding scoped to this table.
+The nominal ranking table SHALL render all data rows at a consistent height, regardless of whether cell content wraps to a single line or multiple lines, by using a reduced font size and reduced cell padding scoped to this table. Header cells SHALL use a smaller font size and reduced horizontal padding to prevent text overflow in narrow columns.
+
+#### Scenario: Column headers use abbreviated text for narrow columns
+- **WHEN** the nominal ranking table is rendered in the PDF
+- **THEN** the column header text SHALL be "Rank." (not "Ranking")
+- **AND** the column header text SHALL be "Semáf." (not "Semáforo")
 
 #### Scenario: Font size is reduced for the table
 - **WHEN** the nominal ranking table is rendered in the PDF
-- **THEN** the table text SHALL use `font-size: 10pt`
+- **THEN** table data cells SHALL use `font-size: 10pt`
+- **AND** table header cells SHALL use `font-size: 8pt`
 
 #### Scenario: Cell padding is reduced for the table
 - **WHEN** the nominal ranking table is rendered in the PDF
-- **THEN** table header and data cells SHALL use `padding: 8px 6px`
+- **THEN** table data cells SHALL use `padding: 8px 6px`
+- **AND** table header cells SHALL use `padding: 8px 3px`
 
 ### Requirement: Chunks fit on one Letter page
 The system SHALL ensure that a chunk of `NOMINAL_RANKING_CHUNK_SIZE` participant rows in the nominal ranking table — including the header row and the section title (on the first chunk) — fits within a single Letter page (279.4mm × 215.9mm) with 25mm top and bottom margins. The chunk size SHALL be configurable via the `NOMINAL_RANKING_CHUNK_SIZE` environment variable with a default of 18.
