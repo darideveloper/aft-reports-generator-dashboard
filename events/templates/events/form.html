@@ -162,6 +162,36 @@
             width: 0;
             overflow: hidden;
         }
+
+        /* Terms consent checkbox */
+        .terms-group {
+            margin-bottom: 16px;
+        }
+
+        .terms-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .terms-label input[type="checkbox"] {
+            margin-top: 2px;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        .terms-label a {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .terms-group.has-error .terms-label a {
+            color: var(--text-error);
+        }
     </style>
 </head>
 <body>
@@ -242,6 +272,15 @@
                 <div class="error-message" id="error-company"></div>
             </div>
             {% endif %}
+
+            <!-- Términos y Condiciones -->
+            <div class="form-group terms-group" id="group-terms">
+                <label class="terms-label" for="terms">
+                    <input type="checkbox" name="terms" id="terms" required>
+                    <span>He leído y acepto los <a href="https://www.leadforward.mx/legal" target="_blank" rel="noopener noreferrer">Términos y Condiciones y el Aviso de Privacidad</a>.</span>
+                </label>
+                <div class="error-message" id="error-terms"></div>
+            </div>
 
             <button type="submit" id="submit-btn">Registrarse</button>
         </form>

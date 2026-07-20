@@ -62,6 +62,7 @@ class LeadSubmitAPITestCase(APITestCase):
             "job_position": "Desarrollador",
             "phone": "555-1234",  # Inactive field, will be ignored
             "website": "",  # Empty honeypot
+            "terms": True,
         }
 
         response = self.client.post(self.submit_url, data, format="json")
@@ -86,6 +87,7 @@ class LeadSubmitAPITestCase(APITestCase):
             "name": "",  # Required name is empty
             "email": "juan@example.com",
             "website": "",
+            "terms": True,
         }
 
         response = self.client.post(self.submit_url, data, format="json")
@@ -105,6 +107,7 @@ class LeadSubmitAPITestCase(APITestCase):
             "name": "Spam Bot",
             "email": "bot@spam.com",
             "website": "http://spam-link.com",  # Honeypot filled!
+            "terms": True,
         }
 
         response = self.client.post(self.submit_url, data, format="json")
@@ -116,6 +119,8 @@ class LeadSubmitAPITestCase(APITestCase):
         lead = Lead.objects.get(event=self.event)
         self.assertEqual(lead.name, "Spam Bot")
         self.assertTrue(lead.is_spam)
+        # Verify terms is NOT persisted
+        self.assertFalse(hasattr(lead, "terms"))
 
         # Verify NO emails were sent
         self.assertEqual(len(mail.outbox), 0)
@@ -129,6 +134,7 @@ class LeadSubmitAPITestCase(APITestCase):
             "name": "Maria Lopez",
             "email": "maria@example.com",
             "website": "",
+            "terms": True,
         }
 
         response = self.client.post(self.submit_url, data, format="json")
@@ -138,7 +144,45 @@ class LeadSubmitAPITestCase(APITestCase):
         # Verify data is still stored safely
         self.assertTrue(Lead.objects.filter(event=self.event, name="Maria Lopez").exists())
 
-    def test_event_form_branding_rendering(self):
+    def test_terms_missing_returns_400(self):
+        data = {
+            "name": "Juan Perez",
+            "email": "juan@example.com",
+            "website": "",
+        }
+
+        response = self.client.post(self.submit_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("terms", response.data["errors"])
+        self.assertIn("Debe aceptar los Términos", str(response.data["errors"]["terms"]))
+        self.assertFalse(Lead.objects.filter(event=self.event).exists())
+
+    def test_terms_false_returns_400(self):
+        data = {
+            "name": "Juan Perez",
+            "email": "juan@example.com",
+            "website": "",
+            "terms": False,
+        }
+
+        response = self.client.post(self.submit_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("terms", response.data["errors"])
+        self.assertFalse(Lead.objects.filter(event=self.event).exists())
+
+    def test_terms_not_stored_on_lead_row(self):
+        data = {
+            "name": "Maria Terms",
+            "email": "terms@example.com",
+            "website": "",
+            "terms": True,
+        }
+
+        response = self.client.post(self.submit_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        lead = Lead.objects.get(email="terms@example.com")
+        self.assertFalse(hasattr(lead, "terms"))
         url = reverse("events:event-form", kwargs={"slug": self.event.slug})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -158,6 +202,7 @@ class LeadSubmitAPITestCase(APITestCase):
             "name": "Alex Smith",
             "email": "alex@example.com",
             "website": "",
+            "terms": True,
         }
         response = self.client.post(self.submit_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -197,7 +242,7 @@ class InvitationLinkEmailTestCase(APITestCase):
         self.submit_url = reverse("lead-submit", kwargs={"slug": self.event.slug})
 
     def _post_lead(self, data=None):
-        payload = {"name": "Visitante", "email": "v@example.com", "website": ""}
+        payload = {"name": "Visitante", "email": "v@example.com", "website": "", "terms": True}
         if data:
             payload.update(data)
         return self.client.post(self.submit_url, payload, format="json")
@@ -539,7 +584,7 @@ class LongInvitationLinkRenderTestCase(APITestCase):
 
     def test_long_url_intact_in_client_email(self):
         response = self.client.post(self.submit_url, {
-            "name": "L", "email": "l@e.com", "website": "",
+            "name": "L", "email": "l@e.com", "website": "", "terms": True,
         }, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         client_html = mail.outbox[1].alternatives[0][0]
