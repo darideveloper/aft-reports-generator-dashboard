@@ -1,7 +1,10 @@
 from django.contrib import admin
 import csv
+from io import BytesIO
 from django.http import HttpResponse
 from django.utils.html import format_html
+from openpyxl import Workbook
+from openpyxl.styles import Font
 from .models import Event, Lead
 
 
@@ -87,11 +90,34 @@ class LeadAdmin(admin.ModelAdmin):
         "created_at",
     )
 
-    actions = ["export_as_csv"]
+    actions = ["export_as_csv", "export_as_excel"]
+
+    _HEADER_COLUMNS = [
+        "Nombre",
+        "Email",
+        "Teléfono",
+        "Puesto de trabajo",
+        "Empresa",
+        "Evento",
+        "Spam",
+        "Fecha de Registro",
+    ]
 
     def has_add_permission(self, request):
         # Prevent manual creation of leads via admin
         return False
+
+    def _lead_row(self, obj):
+        return [
+            obj.name or "",
+            obj.email or "",
+            obj.phone or "",
+            obj.job_position or "",
+            obj.company or "",
+            obj.event.title,
+            "Sí" if obj.is_spam else "No",
+            obj.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        ]
 
     @admin.action(description="Exportar registros seleccionados a CSV")
     def export_as_csv(self, request, queryset):
@@ -99,27 +125,34 @@ class LeadAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = 'attachment; filename="leads_registro.csv"'
 
         writer = csv.writer(response)
-        writer.writerow([
-            "Nombre",
-            "Email",
-            "Teléfono",
-            "Puesto de trabajo",
-            "Empresa",
-            "Evento",
-            "Spam",
-            "Fecha de Registro",
-        ])
+        writer.writerow(self._HEADER_COLUMNS)
 
         for obj in queryset:
-            writer.writerow([
-                obj.name or "",
-                obj.email or "",
-                obj.phone or "",
-                obj.job_position or "",
-                obj.company or "",
-                obj.event.title,
-                "Sí" if obj.is_spam else "No",
-                obj.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            ])
+            writer.writerow(self._lead_row(obj))
 
+        return response
+
+    @admin.action(description="Exportar registros seleccionados a Excel")
+    def export_as_excel(self, request, queryset):
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = Lead._meta.verbose_name_plural
+
+        bold_font = Font(bold=True)
+        sheet.append(self._HEADER_COLUMNS)
+        for cell in sheet[1]:
+            cell.font = bold_font
+
+        for obj in queryset:
+            sheet.append(self._lead_row(obj))
+
+        buffer = BytesIO()
+        workbook.save(buffer)
+        buffer.seek(0)
+
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = 'attachment; filename="leads_registro.xlsx"'
         return response
