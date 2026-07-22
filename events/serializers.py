@@ -5,10 +5,12 @@ from .models import Lead
 class LeadSubmitSerializer(serializers.ModelSerializer):
     # Honeypot field (hidden field to catch spam bots)
     website = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    # Terms and privacy consent (validated then popped — not stored)
+    terms = serializers.BooleanField(required=False, write_only=True)
 
     class Meta:
         model = Lead
-        fields = ("name", "job_position", "email", "phone", "company", "website")
+        fields = ("name", "job_position", "email", "phone", "company", "website", "terms")
 
     def validate(self, attrs):
         event = self.context.get("event")
@@ -40,7 +42,14 @@ class LeadSubmitSerializer(serializers.ModelSerializer):
         if errors:
             raise serializers.ValidationError(errors)
 
-        # Pop website so it is not passed to the model's create/save methods
+        # Terms acceptance — must be truthy (handles missing, false, null)
+        if not attrs.get("terms"):
+            raise serializers.ValidationError(
+                {"terms": "Debe aceptar los Términos y Condiciones y el Aviso de Privacidad."}
+            )
+
+        # Pop transient fields so they are not passed to the model's create/save
         attrs.pop("website", None)
+        attrs.pop("terms", None)
 
         return attrs

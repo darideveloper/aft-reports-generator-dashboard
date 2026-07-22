@@ -27,32 +27,99 @@ The system SHALL broadcast the scroll height of the form page via JavaScript `po
 - **WHEN** the event form page completes rendering or its window is resized
 - **THEN** client-side JavaScript sends a `postMessage` containing the document scroll height with the message type `resize-iframe` to the parent window.
 
-### Requirement: JSON Lead Submission API with Honeypot Protection
-The system SHALL expose a public, CSRF-exempt JSON POST endpoint `/api/events/<slug>/submit/` to register lead submissions. If a hidden honeypot field is filled, the submission MUST be silently flagged or rejected to prevent spam.
+### Requirement: JSON Lead Submission API with Honeypot Protection and Terms Consent
+The system SHALL expose a public, CSRF-exempt JSON POST endpoint `/api/events/<slug>/submit/` to register lead submissions. If a hidden honeypot field is filled, the submission MUST be silently flagged or rejected to prevent spam. The submission MUST also include a boolean `terms` field that the user must set to `true` as acceptance of the event's terms and privacy policy. Submissions where `terms` is missing, `false`, or not a boolean MUST be rejected with a field-level validation error.
 
-#### Scenario: Lead submitted successfully via AJAX
+- The `terms` field MUST NOT be persisted to the `Lead` model. It MUST be validated and then discarded before the model `save()` call, following the same transient-field pattern as the `website` honeypot field.
+- The validation error message for a missing or unchecked `terms` MUST read: `"Debe aceptar los Términos y Condiciones y el Aviso de Privacidad."`
+- The admin notification email MAY include a row indicating `Aceptó términos` with the value `"Sí"` to provide the event organizer with evidence of consent.
+
+#### Scenario: Lead submitted successfully with terms accepted
 - **WHEN** a client sends a JSON POST request containing values for Name and Phone, leaving the honeypot field `website` empty
-- **THEN** the system registers a new `Lead` database record, returns a JSON success response `{"status": "ok"}`, and does not reload the page.
+- **AND** the request includes `"terms": true`
+- **THEN** the system registers a new `Lead` database record, returns a JSON success response `{"status": "ok"}`, and does not reload the page
+- **AND** the resulting `Lead` row does not contain a `terms` column or any record of the terms acceptance value
+
+#### Scenario: Submission rejected when terms is missing
+- **WHEN** a client sends a JSON POST request containing valid values for all active required fields, but omits the `terms` key entirely
+- **THEN** the system returns HTTP 400 with a field-level error `{"terms": ["Debe aceptar los Términos y Condiciones y el Aviso de Privacidad."]}`
+- **AND** no `Lead` record is created
+
+#### Scenario: Submission rejected when terms is false
+- **WHEN** a client sends a JSON POST request containing valid values for all active required fields, but `"terms": false`
+- **THEN** the system returns HTTP 400 with a field-level error on `terms`
+- **AND** no `Lead` record is created
 
 #### Scenario: Spam submission blocked by honeypot
 - **WHEN** a bot submits a JSON POST request where the honeypot field `website` contains a value (e.g. "http://spam.org")
-- **THEN** the system rejects the submission or flags the Lead as spam, prevents dispatching SMTP emails, and returns a simulated response to the client.
+- **AND** the request includes `"terms": true` (bots can fill checkboxes)
+- **THEN** the system flags the Lead as spam, prevents dispatching SMTP emails, and returns a simulated response to the client
+- **AND** the `terms` value is still not persisted
+
+### Requirement: Form Checkbox for Terms and Privacy Consent
+The public event form at `/events/<slug>/` SHALL render a mandatory checkbox above the submit button with the label text **"He leído y acepto los Términos y Condiciones y el Aviso de Privacidad."** The entire spanned text (both document names) SHALL hyperlink to `https://www.leadforward.mx/legal` with `target="_blank"` and `rel="noopener noreferrer"`, styled as bold text.
+
+- The checkbox SHALL use the HTML5 `required` attribute so browsers block submission client-side before the AJAX call.
+- The error display pattern SHALL match the existing field-level error pattern (`form-group.has-error` + `.error-message`).
+- The checkbox SHALL appear unconditionally — it is not controlled by any per-event field toggle on the `Event` model.
+
+#### Scenario: Checkbox renders with bold linked label
+- **WHEN** a client accesses the event form at `/events/<slug>/`
+- **THEN** the HTML contains a checkbox input with `id="terms"` and `name="terms"`
+- **AND** the adjacent label text contains the hyperlink `<a href="https://www.leadforward.mx/legal" target="_blank" rel="noopener noreferrer">`
+- **AND** the label text reads verbatim: `He leído y acepto los Términos y Condiciones y el Aviso de Privacidad.`
+- **AND** the label text is rendered in bold (`font-weight` of `700` or a `<strong>` equivalent)
+- **AND** the checkbox group appears after the last conditional field and immediately above the submit button
+
+#### Scenario: Checkbox error displayed inline
+- **WHEN** a client submits the form without checking the checkbox
+- **AND** the server returns 400 with a `terms` error
+- **THEN** the checkbox group receives the `has-error` CSS class
+- **AND** the corresponding `.error-message` element displays the validation text
 
 ### Requirement: SMTP Auto-notifications with Error Resilience
 Upon successful lead registration, the system SHALL send a notification email to the event's contact email and a branded thank-you confirmation email to the client using a globally configured SMTP server. 
 - The client confirmation email MUST use the corporate color palette and display the company logo as configured in the system branding settings.
 - The client confirmation email footer signature MUST read "El equipo LeadForward Global Solutions MJ".
+- The client confirmation email body MUST follow the concise format defined in the "Client Confirmation Email Body Format" requirement.
 - The email transmission operations MUST enforce a timeout constraint of 5 seconds.
 - The form submission MUST succeed even if SMTP sending fails.
 
 #### Scenario: Successful submission triggers emails
 - **WHEN** a valid lead is registered via the submission API
-- **THEN** the system triggers one email to the event organizer containing lead details and one email to the client's email address confirming their registration, styled with the corporate branding colors, the corporate logo resolved from settings, and containing the footer signature "El equipo LeadForward Global Solutions MJ".
+- **THEN** the system triggers one email to the event organizer containing lead details and one email to the client's email address confirming their registration, styled with the corporate branding colors, the corporate logo resolved from settings, containing the footer signature "El equipo LeadForward Global Solutions MJ", and using the concise client confirmation body format.
 
 #### Scenario: Database save succeeds despite SMTP failure
 - **WHEN** a valid lead is submitted but the SMTP mail server connection fails or times out
 - **THEN** the system successfully saves the `Lead` to the database, logs the SMTP error, and returns a JSON success response to the client.
 
+### Requirement: Client Confirmation Email Body Format
+The system SHALL render the client confirmation email using a concise, fixed body format when `event.email_active` is true and the lead has a non-empty email address. The email MUST greet the lead by name, confirm the event title in bold, express appreciation, and provide a contact line. The format MUST match the exact structure below, with placeholders substituted at send time.
+
+#### Scenario: Client confirmation email uses the new concise format
+- **WHEN** a valid lead with name "Ana García" and email "ana@example.com" is submitted to an event titled "WEBINAR | PULSO Digital"
+- **THEN** the client confirmation email HTML body contains the following sequence of rendered text blocks:
+  - A heading reading "¡Gracias por registrarte!"
+  - A greeting line reading "Hola Ana García"
+  - A confirmation line reading "Queremos confirmarte que hemos recibido exitosamente tus datos para el evento: WEBINAR | PULSO Digital" with the event title rendered in bold
+  - A line reading "Agradecemos tu interés en participar."
+  - A line reading "Si tienes alguna duda, por favor ponte en contacto con nosotros respondiendo a este mensaje."
+
+#### Scenario: Client confirmation email omits the legacy future-updates sentence
+- **WHEN** a valid lead is submitted to any event
+- **THEN** the client confirmation email body MUST NOT contain the text "Estaremos compartiendo más detalles y novedades del evento próximamente a través de esta dirección de correo electrónico."
+
+#### Scenario: Client confirmation email falls back when lead name is missing
+- **WHEN** a valid lead without a name is submitted to an event titled "Conferencia Anual"
+- **THEN** the greeting line reads "Hola participante" or equivalent fallback text
+- **AND** the confirmation line still renders the event title "Conferencia Anual" in bold
+
+#### Scenario: Existing branding, logo, invitation CTA, and footer are preserved
+- **WHEN** a valid lead is submitted to an event configured with branding colors, a logo, and an invitation link
+- **THEN** the email continues to apply the corporate primary color to the top border and heading
+- **AND** the logo is rendered at the top when configured
+- **AND** the invitation-link CTA button and raw-URL fallback appear in the same position and style as before
+- **AND** the footer continues to display "Saludos cordiales, El equipo LeadForward Global Solutions MJ"
 
 ### Requirement: Optional Event Invitation Link
 The system MUST allow administrators to configure an optional invitation URL on each `Event` plus an optional button label, and the system MUST surface the resulting call-to-action (CTA) in two specific places and only in those two places: the client confirmation email and the post-submit success state of the public form.

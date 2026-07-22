@@ -49,7 +49,7 @@ def send_event_emails(lead):
         try:
             admin_html = render_to_string(
                 "events/emails/admin_notification.html",
-                {"lead": lead, "event": event, "branding": branding, "logo_url": logo_url}
+                {"lead": lead, "event": event, "branding": branding, "logo_url": logo_url, "terms_accepted": True}
             )
             admin_text = strip_tags(admin_html)
 
