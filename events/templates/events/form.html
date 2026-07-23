@@ -206,7 +206,7 @@
             <strong>¡Registro exitoso!</strong> Gracias por registrarte. Hemos enviado un correo de confirmación.
         </div>
 
-        {% if event.invitation_link %}
+        {% if event.invitation_link and event.event_datetime %}
         <div id="invitation-cta" class="alert alert-success" style="display: none; text-align: center;">
             <a id="invitation-cta-link" href="#"
                target="_blank" rel="noopener noreferrer"
@@ -345,10 +345,10 @@
                     // Success View State
                     form.style.display = 'none';
                     successAlert.style.display = 'block';
-                    {% if event.invitation_link %}
+                    {% if event.invitation_link and event.event_datetime %}
                     const ctaEl = document.getElementById('invitation-cta');
                     const ctaLink = document.getElementById('invitation-cta-link');
-                    ctaLink.href = "{{ event.invitation_link|escapejs }}";
+                    ctaLink.href = "{% url 'events:event-access' slug=event.slug %}";
                     ctaLink.textContent = "{{ event.invitation_label_display|escapejs }}";
                     ctaEl.style.display = 'block';
                     {% endif %}

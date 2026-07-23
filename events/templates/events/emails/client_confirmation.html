@@ -33,17 +33,13 @@
             <p>Si tienes alguna duda, por favor ponte en contacto con nosotros respondiendo a este mensaje.</p>
         </div>
 
-        {% if event.invitation_link %}
+        {% if access_url %}
         <div class="button-wrapper">
-            <a href="{{ event.invitation_link }}"
+            <a href="{{ access_url }}"
                target="_blank" rel="noopener noreferrer"
                class="button"
                style="color: #ffffff; text-decoration: none;">{{ event.invitation_label_display }}</a>
         </div>
-        <p style="word-break: break-all; font-size: 12px; color: #94a3b8;
-                  text-align: center; margin-top: 12px;">
-            {{ event.invitation_link }}
-        </p>
         {% endif %}
         
         <div class="footer">

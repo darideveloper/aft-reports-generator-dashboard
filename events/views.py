@@ -1,4 +1,8 @@
 import logging
+from datetime import timedelta
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -6,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.utils import timezone
 from django.conf import settings
 from django.templatetags.static import static
 
@@ -20,28 +25,33 @@ from .serializers import LeadSubmitSerializer
 logger = logging.getLogger(__name__)
 
 
+def _resolve_absolute_url(relative_url):
+    if relative_url.startswith(("http://", "https://")):
+        return relative_url
+    host = "localhost:8000"
+    if hasattr(settings, "ALLOWED_HOSTS") and settings.ALLOWED_HOSTS:
+        hosts = [h for h in settings.ALLOWED_HOSTS if h and h != "*"]
+        if hosts:
+            host = hosts[0]
+    protocol = "http" if getattr(settings, "DEBUG", False) else "https"
+    return f"{protocol}://{host}{relative_url}"
+
+
 def send_event_emails(lead):
     event = lead.event
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@example.com")
 
-    # Resolve branding
     branding = getattr(settings, "BRANDING", {})
     logo_path = branding.get("logo_path", "core/imgs/logo.webp")
-
     if logo_path.startswith(("http://", "https://")):
         logo_url = logo_path
     else:
-        logo_relative_url = static(logo_path)
-        if logo_relative_url.startswith(("http://", "https://")):
-            logo_url = logo_relative_url
-        else:
-            host = "localhost:8000"
-            if hasattr(settings, "ALLOWED_HOSTS") and settings.ALLOWED_HOSTS:
-                hosts = [h for h in settings.ALLOWED_HOSTS if h and h != "*"]
-                if hosts:
-                    host = hosts[0]
-            protocol = "http" if getattr(settings, "DEBUG", False) else "https"
-            logo_url = f"{protocol}://{host}{logo_relative_url}"
+        logo_url = _resolve_absolute_url(static(logo_path))
+
+    access_url = None
+    if event.invitation_link and event.event_datetime:
+        access_relative_url = reverse("events:event-access", kwargs={"slug": event.slug})
+        access_url = _resolve_absolute_url(access_relative_url)
 
     # 1. Admin Email Notification
     if event.notify_email:
@@ -70,7 +80,7 @@ def send_event_emails(lead):
         try:
             client_html = render_to_string(
                 "events/emails/client_confirmation.html",
-                {"lead": lead, "event": event, "branding": branding, "logo_url": logo_url}
+                {"lead": lead, "event": event, "branding": branding, "logo_url": logo_url, "access_url": access_url}
             )
             client_text = strip_tags(client_html)
 
@@ -96,6 +106,45 @@ class EventFormView(TemplateView):
         event = get_object_or_404(Event, slug=slug, is_active=True)
         context["event"] = event
         return context
+
+
+class EventAccessView(TemplateView):
+    template_name = "events/access.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        event = context["event"]
+        now = timezone.now()
+
+        now_plus_1h = now + timedelta(hours=1)
+        time_until_event = event.event_datetime - now
+        total_seconds = int(time_until_event.total_seconds())
+
+        context.update({
+            "total_seconds": total_seconds,
+            "time_until_event": time_until_event,
+        })
+        return context
+
+    def get(self, request, *args, **kwargs):
+        slug = self.kwargs.get("slug")
+        event = get_object_or_404(Event, slug=slug, is_active=True)
+
+        if not event.event_datetime or not event.invitation_link:
+            from django.http import Http404
+            raise Http404("Evento sin enlace de invitación o fecha configurada.")
+
+        now = timezone.now()
+
+        if event.duration_minutes > 0 and event.event_end_datetime and now >= event.event_end_datetime:
+            self.template_name = "events/ended.html"
+            return self.render_to_response({"event": event})
+
+        now_plus_1h = now + timedelta(hours=1)
+        if now_plus_1h >= event.event_datetime:
+            return HttpResponseRedirect(event.invitation_link)
+
+        return super().get(request, event=event, *args, **kwargs)
 
 
 class LeadSubmitView(APIView):

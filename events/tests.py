@@ -13,6 +13,10 @@ from openpyxl import load_workbook
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from datetime import timedelta
+
+from django.utils import timezone as tz
+
 from .models import Event, Lead, _validate_http_https_url
 from .admin import LeadAdmin
 
@@ -223,7 +227,7 @@ class LeadSubmitAPITestCase(APITestCase):
 
 
 class InvitationLinkEmailTestCase(APITestCase):
-    """Tests for the optional invitation link CTA in the client confirmation email."""
+    """Tests for the invitation link CTA in the client confirmation email (now gated through access page)."""
 
     def setUp(self):
         self.event = Event.objects.create(
@@ -238,8 +242,11 @@ class InvitationLinkEmailTestCase(APITestCase):
             email_required=True,
             phone_active=False,
             phone_required=False,
+            event_datetime=tz.now() + timedelta(days=1),
+            duration_minutes=60,
         )
         self.submit_url = reverse("lead-submit", kwargs={"slug": self.event.slug})
+        self.access_path = reverse("events:event-access", kwargs={"slug": self.event.slug})
 
     def _post_lead(self, data=None):
         payload = {"name": "Visitante", "email": "v@example.com", "website": "", "terms": True}
@@ -255,21 +262,17 @@ class InvitationLinkEmailTestCase(APITestCase):
         response = self._post_lead()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # outbox: [admin, client]
         self.assertEqual(len(mail.outbox), 2)
         client_html = mail.outbox[1].alternatives[0][0]
         admin_html = mail.outbox[0].alternatives[0][0]
 
-        # Custom label as link text
         self.assertIn("Ver grabación", client_html)
-        self.assertIn("https://zoom.us/j/123?pwd=abc", client_html)
-        # Raw URL fallback present
-        self.assertIn("word-break: break-all", client_html)
-        # No "Acceder al evento" default leaked
+        self.assertIn(self.access_path, client_html)
+        self.assertNotIn("https://zoom.us/j/123?pwd=abc", client_html)
+        self.assertNotIn("word-break: break-all", client_html)
         self.assertNotIn("Acceder al evento", client_html)
-        # Admin email does NOT include the URL or label
-        self.assertNotIn("https://zoom.us/j/123", admin_html)
         self.assertNotIn("Ver grabación", admin_html)
+        self.assertNotIn(self.access_path, admin_html)
 
     def test_default_label_used_when_label_blank(self):
         self.event.invitation_link = "https://zoom.us/j/123"
@@ -281,7 +284,8 @@ class InvitationLinkEmailTestCase(APITestCase):
 
         client_html = mail.outbox[1].alternatives[0][0]
         self.assertIn("Acceder al evento", client_html)
-        self.assertIn("https://zoom.us/j/123", client_html)
+        self.assertIn(self.access_path, client_html)
+        self.assertNotIn("https://zoom.us/j/123", client_html)
 
     def test_no_invitation_link_omits_cta_in_client_email(self):
         self.event.invitation_link = ""
@@ -292,12 +296,11 @@ class InvitationLinkEmailTestCase(APITestCase):
 
         client_html = mail.outbox[1].alternatives[0][0]
         self.assertNotIn("Acceder al evento", client_html)
-        self.assertNotIn('href="https://zoom.us', client_html)
-        self.assertNotIn("word-break: break-all", client_html)
+        self.assertNotIn(self.access_path, client_html)
 
 
 class InvitationLinkFormTestCase(TestCase):
-    """Tests for the optional invitation link CTA in the public form post-submit success state."""
+    """Tests for the invitation link CTA in the public form post-submit success state (now links to access page)."""
 
     def setUp(self):
         self.event = Event.objects.create(
@@ -306,10 +309,13 @@ class InvitationLinkFormTestCase(TestCase):
             notify_email="organizer@example.com",
             name_active=True,
             name_required=True,
+            event_datetime=tz.now() + timedelta(days=1),
+            duration_minutes=60,
         )
         self.form_url = reverse("events:event-form", kwargs={"slug": self.event.slug})
+        self.access_path = reverse("events:event-access", kwargs={"slug": self.event.slug})
 
-    def test_form_renders_invitation_cta_when_link_set(self):
+    def test_form_renders_invitation_cta_when_link_and_datetime_set(self):
         self.event.invitation_link = "https://zoom.us/j/123"
         self.event.invitation_label = "Unirse ahora"
         self.event.save()
@@ -320,10 +326,9 @@ class InvitationLinkFormTestCase(TestCase):
         content = response.content.decode("utf-8")
         self.assertIn('id="invitation-cta"', content)
         self.assertIn('id="invitation-cta-link"', content)
-        # JS branch with escapejs interpolation present
-        self.assertIn('ctaLink.href = "https://zoom.us/j/123"', content)
+        self.assertIn(self.access_path, content)
         self.assertIn("Unirse ahora", content)
-        # Pre-submit CTA must NOT be visible (display: none)
+        self.assertNotIn('ctaLink.href = "https://zoom.us/j/123"', content)
         self.assertIn('id="invitation-cta" class="alert alert-success" style="display: none;', content)
 
     def test_form_omits_invitation_cta_when_no_link(self):
@@ -337,6 +342,16 @@ class InvitationLinkFormTestCase(TestCase):
         self.assertNotIn('id="invitation-cta"', content)
         self.assertNotIn("Acceder al evento", content)
 
+    def test_form_omits_invitation_cta_when_no_datetime(self):
+        self.event.event_datetime = None
+        self.event.save()
+
+        response = self.client.get(self.form_url)
+        self.assertEqual(response.status_code, 200)
+
+        content = response.content.decode("utf-8")
+        self.assertNotIn('id="invitation-cta"', content)
+
     def test_form_uses_default_label_when_label_blank(self):
         self.event.invitation_link = "https://zoom.us/j/123"
         self.event.invitation_label = ""
@@ -346,7 +361,6 @@ class InvitationLinkFormTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         content = response.content.decode("utf-8")
-        # Default label interpolated into the JS branch
         self.assertIn("ctaLink.textContent = \"Acceder al evento\"", content)
 
 
@@ -419,7 +433,7 @@ class InvitationLinkAdminTestCase(TestCase):
         )
         self.client.login(username="admin", password="admin")
 
-    def test_admin_edit_form_exposes_both_fields(self):
+    def test_admin_edit_form_exposes_all_fields(self):
         event = Event.objects.create(
             title="Admin Test", slug="admin-test",
             notify_email="o@e.com",
@@ -431,8 +445,13 @@ class InvitationLinkAdminTestCase(TestCase):
         content = response.content.decode("utf-8")
         self.assertIn('name="invitation_link"', content)
         self.assertIn('name="invitation_label"', content)
+        self.assertIn('name="event_datetime_0"', content)
+        self.assertIn('name="event_datetime_1"', content)
+        self.assertIn('name="duration_minutes"', content)
         self.assertIn("Enlace de invitación", content)
         self.assertIn("Texto del botón de invitación", content)
+        self.assertIn("Fecha y hora del evento", content)
+        self.assertIn("Duración (minutos)", content)
 
     def test_admin_list_view_renders_clickable_link(self):
         Event.objects.create(
@@ -475,6 +494,9 @@ class InvitationLinkAdminTestCase(TestCase):
             "notify_email": "o@e.com",
             "invitation_link": "https://zoom.us/j/999",
             "invitation_label": "Únete ya",
+            "event_datetime_0": "",
+            "event_datetime_1": "",
+            "duration_minutes": "0",
             # The remaining fieldsets are in the admin form; send their
             # current values so the form does not blank them out.
             "name_active": "on", "name_required": "on",
@@ -535,12 +557,12 @@ class InvitationLabelEscapejsSafetyTestCase(TestCase):
         self.event = Event.objects.create(
             title="Escape Test", slug="escape-test",
             notify_email="a@b.com", name_active=True, name_required=True,
+            event_datetime=tz.now() + timedelta(days=1),
+            duration_minutes=60,
         )
         self.form_url = reverse("events:event-form", kwargs={"slug": self.event.slug})
 
     def test_invitation_label_escapejs_safe(self):
-        """Label containing </script> must be escapejs-encoded so it does
-        not break out of the inline <script> block in form.html."""
         evil = "</script><script>alert(1)</script>"
         self.event.invitation_link = "https://example.com"
         self.event.invitation_label = evil
@@ -550,22 +572,14 @@ class InvitationLabelEscapejsSafetyTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
 
-        # Django's |escapejs turns '<' into the unicode escape '\u003C'.
-        # The raw '<' from the label must NOT appear inside the JS branch.
-        # Concretely: the rendered JS string for the label must contain
-        # the escaped form, not the raw </script><script>alert(1).
         self.assertIn(r"\u003C", content)
-        # The raw injection string must not be inlined verbatim into the
-        # JS branch (it would terminate the <script> block).
         self.assertNotIn("alert(1)<", content)
 
 
 class LongInvitationLinkRenderTestCase(APITestCase):
-    """S2 fix: long URL (up to 500 chars) must render intact in both
-    the client email and the iframe CTA, not just survive in the DB."""
+    """S2 fix: long URL (up to 500 chars) must not leak into email or form surfaces."""
 
     def setUp(self):
-        # Build a URL just under 500 chars to exercise the boundary.
         path = "p" * 400
         self.long_url = f"https://example.com/{path}?utm_source=mail&utm_campaign=q3"
         self.assertLessEqual(len(self.long_url), 500)
@@ -579,36 +593,28 @@ class LongInvitationLinkRenderTestCase(APITestCase):
             phone_active=False, phone_required=False,
             email_active=True, email_required=True,
             invitation_link=self.long_url,
+            event_datetime=tz.now() + timedelta(days=1),
+            duration_minutes=60,
         )
         self.submit_url = reverse("lead-submit", kwargs={"slug": self.event.slug})
 
-    def test_long_url_intact_in_client_email(self):
+    def test_long_url_not_exposed_in_client_email(self):
         response = self.client.post(self.submit_url, {
             "name": "L", "email": "l@e.com", "website": "", "terms": True,
         }, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         client_html = mail.outbox[1].alternatives[0][0]
-        # The URL is HTML-escaped in the email (Django auto-escape).
-        # Assert the escaped form is present AND the URL is not truncated.
-        # Length must be preserved: every character of the URL survives escaping.
-        expected_html = self.long_url.replace("&", "&amp;")
-        self.assertIn(expected_html, client_html)
-        # Also assert no truncation: the full path length is preserved.
-        path_part = self.long_url.split("?")[0]
-        self.assertIn(path_part, client_html)
+        self.assertNotIn("example.com/p", client_html)
+        self.assertNotIn("utm_source", client_html)
 
-    def test_long_url_intact_in_iframe_template(self):
-        url = reverse("events:event-form", kwargs={"slug": self.event.slug})
-        response = self.client.get(url)
+    def test_access_url_rendered_in_iframe_template(self):
+        form_url = reverse("events:event-form", kwargs={"slug": self.event.slug})
+        access_path = reverse("events:event-access", kwargs={"slug": self.event.slug})
+        response = self.client.get(form_url)
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
-        # The JS branch uses |escapejs which turns '=' into '\u003D'
-        # and '&' into '\u0026'. The path stays unescaped.
-        path_part = self.long_url.split("?")[0]
-        self.assertIn(f'ctaLink.href = "{path_part}', content)
-        # The escaped query-string characters are present too
-        self.assertIn(r"\u003Dmail", content)
-        self.assertIn(r"\u0026utm_campaign\u003Dq3", content)
+        self.assertIn(access_path, content)
+        self.assertNotIn(self.long_url.split("?")[0], content)
 
 
 class LeadExportActionsTestCase(TestCase):
@@ -858,4 +864,89 @@ class LeadExportActionsTestCase(TestCase):
             "Expected no-items-selected admin warning, got body snippet: "
                 + body[:500],
         )
+
+
+class EventAccessGateTestCase(TestCase):
+    """Tests for the EventAccessView intermediate access page."""
+
+    def setUp(self):
+        self.access_url = reverse("events:event-access", kwargs={"slug": "test-access"})
+
+    def _event(self, **overrides):
+        params = dict(
+            title="Evento de Acceso",
+            slug="test-access",
+            notify_email="o@e.com",
+            invitation_link="https://zoom.us/j/123",
+            event_datetime=tz.now() + timedelta(hours=3),
+            duration_minutes=60,
+        )
+        params.update(overrides)
+        return Event.objects.create(**params)
+
+    def test_redirects_within_one_hour(self):
+        self._event(event_datetime=tz.now() + timedelta(minutes=30))
+        response = self.client.get(self.access_url)
+        self.assertRedirects(response, "https://zoom.us/j/123", fetch_redirect_response=False)
+
+    def test_renders_countdown_when_more_than_one_hour(self):
+        self._event(event_datetime=tz.now() + timedelta(hours=3))
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/access.html")
+        self.assertContains(response, "Evento de Acceso")
+        self.assertContains(response, "invitation-btn")
+        self.assertContains(response, "countdown")
+
+    def test_renders_ended_when_event_passed_with_duration(self):
+        self._event(
+            event_datetime=tz.now() - timedelta(hours=2),
+            duration_minutes=60,
+        )
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/ended.html")
+        self.assertContains(response, "ya ha finalizado")
+
+    def test_skips_ended_check_when_duration_is_zero(self):
+        self._event(
+            event_datetime=tz.now() - timedelta(hours=2),
+            duration_minutes=0,
+        )
+        response = self.client.get(self.access_url)
+        self.assertRedirects(response, "https://zoom.us/j/123", fetch_redirect_response=False)
+
+    def test_404_when_invitation_link_missing(self):
+        self._event(invitation_link="")
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_404_when_event_datetime_missing(self):
+        self._event(event_datetime=None)
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 404)
+
+
+class EventModelValidationTestCase(TestCase):
+    """Tests for Event model clean() validation."""
+
+    def test_rejects_duration_zero_when_datetime_set(self):
+        e = Event(
+            title="x", slug="x-dur", notify_email="a@b.com",
+            event_datetime=tz.now() + timedelta(days=1),
+            duration_minutes=0,
+        )
+        with self.assertRaises(ValidationError):
+            e.clean()
+
+    def test_allows_duration_zero_when_datetime_null(self):
+        e = Event(
+            title="x", slug="x-null", notify_email="a@b.com",
+            event_datetime=None,
+            duration_minutes=0,
+        )
+        try:
+            e.clean()
+        except ValidationError:
+            self.fail("clean() raised ValidationError when event_datetime is None")
 

@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import models
+from django.utils import timezone
 
 
 _http_https_validator = URLValidator(schemes=["http", "https"])
@@ -47,6 +50,20 @@ class Event(models.Model):
             "invitación está definido."
         ),
     )
+    event_datetime = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha y hora del evento",
+        help_text="Fecha y hora de inicio del evento.",
+    )
+    duration_minutes = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name="Duración (minutos)",
+        help_text=(
+            "Duración estimada del evento en minutos. "
+            "Debe ser mayor a 0 si se especifica una fecha y hora."
+        ),
+    )
 
     # Dynamic Field Toggles (Active)
     name_active = models.BooleanField(default=True, verbose_name="Nombre activo")
@@ -75,11 +92,21 @@ class Event(models.Model):
 
     @property
     def invitation_label_display(self) -> str:
-        """Return the trimmed invitation label, or the project default
-        when the label is empty or whitespace-only."""
         if self.invitation_label and self.invitation_label.strip():
             return self.invitation_label.strip()
         return "Acceder al evento"
+
+    @property
+    def event_end_datetime(self):
+        if self.event_datetime is None:
+            return None
+        return self.event_datetime + timedelta(minutes=self.duration_minutes or 0)
+
+    def clean(self):
+        if self.event_datetime is not None and self.duration_minutes == 0:
+            raise ValidationError(
+                {"duration_minutes": "Debe especificar una duración mayor a 0 cuando establece una fecha y hora."}
+            )
 
 
 class Lead(models.Model):

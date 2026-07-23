@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }}</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 20px; color: #0f172a; background: #f4f6f9; line-height: 1.5; }
+        .container { max-width: 480px; margin: 40px auto; background: #ffffff; padding: 32px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-align: center; }
+        h2 { font-size: 1.5rem; margin: 0 0 8px; color: #0f172a; }
+        .event-datetime { font-size: 0.9rem; color: #64748b; margin-bottom: 24px; }
+        .countdown { font-size: 2.5rem; font-weight: 700; color: #0a3c58; margin: 24px 0; font-variant-numeric: tabular-nums; }
+        .countdown-label { font-size: 0.85rem; color: #64748b; margin-bottom: 24px; }
+        .invitation-btn { background-color: #0a3c58; color: #ffffff; padding: 14px 28px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; display: none; }
+        .invitation-btn.visible { display: inline-block; }
+        .invitation-btn:hover { background-color: #072a3e; }
+        .fallback-text { font-size: 0.9rem; color: #64748b; margin-top: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>{{ event.title }}</h2>
+        <p class="event-datetime">{{ event.event_datetime|date:"l, j \\d\\e F \\d\\e Y \\a \\l\\a\\s H:i" }}</p>
+
+        <p class="countdown-label">Tiempo restante para acceder al evento</p>
+        <div id="countdown" class="countdown">--:--:--</div>
+
+        <a id="invitation-btn" href="{{ event.invitation_link }}"
+           target="_blank" rel="noopener noreferrer"
+           class="invitation-btn">{{ event.invitation_label_display }}</a>
+
+        <p class="fallback-text" id="fallback-text">
+            El enlace estará disponible aproximadamente
+            {% if time_until_event.days > 0 %}
+                {{ time_until_event.days }} día{{ time_until_event.days|pluralize:",s" }}
+            {% else %}
+                {{ time_until_event.seconds| floatformat:0 }} minutos
+            {% endif %}
+            antes del inicio del evento.
+        </p>
+    </div>
+
+    <script>
+        var totalSeconds = {{ total_seconds }};
+        var countdownEl = document.getElementById('countdown');
+        var btnEl = document.getElementById('invitation-btn');
+        var fallbackEl = document.getElementById('fallback-text');
+
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+        function tick() {
+            if (totalSeconds <= 0) {
+                countdownEl.textContent = '00:00:00';
+                btnEl.classList.add('visible');
+                if (fallbackEl) fallbackEl.style.display = 'none';
+                return;
+            }
+
+            totalSeconds--;
+
+            var h = Math.floor(totalSeconds / 3600);
+            var m = Math.floor((totalSeconds % 3600) / 60);
+            var s = totalSeconds % 60;
+            countdownEl.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+
+            if (totalSeconds <= 3600) {
+                btnEl.classList.add('visible');
+                if (fallbackEl) fallbackEl.style.display = 'none';
+            }
+        }
+
+        tick();
+        setInterval(tick, 1000);
+    </script>
+</body>
+</html>
