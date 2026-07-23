@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 from io import BytesIO
 from unittest.mock import patch
 import csv
+import datetime
+import re
+from zoneinfo import ZoneInfo
 
 from openpyxl import load_workbook
 
@@ -19,6 +22,12 @@ from django.utils import timezone as tz
 
 from .models import Event, Lead, _validate_http_https_url
 from .admin import LeadAdmin
+from .views import (
+    _build_google_calendar_url,
+    _build_microsoft_calendar_url,
+    _build_ics_content,
+    _escape_ics_text,
+)
 
 
 class EventModelTestCase(TestCase):
@@ -949,4 +958,181 @@ class EventModelValidationTestCase(TestCase):
             e.clean()
         except ValidationError:
             self.fail("clean() raised ValidationError when event_datetime is None")
+
+
+class CalendarUrlHelpersTestCase(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Conferencia de Pruebas",
+            slug="test-calendar",
+            notify_email="organizer@example.com",
+            invitation_link="https://zoom.us/j/123",
+            event_datetime=tz.now() + timedelta(days=7),
+            duration_minutes=120,
+        )
+
+    def test_google_url_contains_required_params(self):
+        url = _build_google_calendar_url(self.event)
+        self.assertIn("action=TEMPLATE", url)
+        self.assertIn("text=", url)
+        self.assertIn("ctz=America%2FMexico_City", url)
+        self.assertIn("trp=false", url)
+        self.assertIn("location=https%3A%2F%2Fzoom.us%2Fj%2F123", url)
+
+    def test_google_url_omits_location_when_no_link(self):
+        self.event.invitation_link = None
+        self.event.save()
+        url = _build_google_calendar_url(self.event)
+        self.assertNotIn("location=", url)
+
+    def test_microsoft_url_contains_required_params(self):
+        url = _build_microsoft_calendar_url(self.event)
+        self.assertIn("subject=", url)
+        self.assertIn("startdt=", url)
+        self.assertIn("enddt=", url)
+        self.assertIn("path=%2Fcalendar%2Faction%2Fcompose", url)
+        self.assertIn("rru=addevent", url)
+        self.assertIn("location=https%3A%2F%2Fzoom.us%2Fj%2F123", url)
+
+    def test_microsoft_url_omits_location_when_no_link(self):
+        self.event.invitation_link = None
+        self.event.save()
+        url = _build_microsoft_calendar_url(self.event)
+        self.assertNotIn("location=", url)
+
+    def test_ics_content_contains_required_fields(self):
+        content = _build_ics_content(self.event)
+        self.assertIn("BEGIN:VCALENDAR", content)
+        self.assertIn("DTSTART:", content)
+        self.assertIn("DTEND:", content)
+        self.assertIn("SUMMARY:Conferencia de Pruebas", content)
+        self.assertIn("UID:test-calendar@aft-dashboard", content)
+        self.assertIn("LOCATION:https://zoom.us/j/123", content)
+        self.assertIn("END:VCALENDAR", content)
+        self.assertTrue(content.endswith("\r\n"))
+
+    def test_ics_content_omits_location_when_no_link(self):
+        self.event.invitation_link = None
+        self.event.save()
+        content = _build_ics_content(self.event)
+        self.assertNotIn("LOCATION:", content)
+
+    def test_ics_content_dtend_equals_dtstart_when_duration_zero(self):
+        self.event.duration_minutes = 0
+        self.event.save()
+        content = _build_ics_content(self.event)
+        lines = content.split("\r\n")
+        dtstart = [l for l in lines if l.startswith("DTSTART:")][0]
+        dtend = [l for l in lines if l.startswith("DTEND:")][0]
+        self.assertEqual(dtstart.split(":")[1], dtend.split(":")[1])
+
+    def test_ics_escapes_special_characters(self):
+        self.event.title = "Evento; Especial, Edicion\\2024"
+        self.event.save()
+        content = _build_ics_content(self.event)
+        self.assertIn("SUMMARY:Evento\\; Especial\\, Edicion\\\\2024", content)
+
+    def test_ics_escapes_location_special_characters(self):
+        self.event.invitation_link = "https://zoom.us/j/123;extra,param\\back"
+        self.event.save()
+        content = _build_ics_content(self.event)
+        self.assertIn("LOCATION:https://zoom.us/j/123\\;extra\\,param\\\\back", content)
+
+    def test_calendar_urls_contain_correct_utc_dates(self):
+        mexico_tz = ZoneInfo("America/Mexico_City")
+        dt = datetime.datetime(2024, 3, 15, 16, 0, 0, tzinfo=mexico_tz)
+        self.event.event_datetime = dt
+        self.event.duration_minutes = 60
+        self.event.save()
+
+        google_url = _build_google_calendar_url(self.event)
+        self.assertIn("dates=20240315T220000Z%2F20240315T230000Z", google_url)
+
+        microsoft_url = _build_microsoft_calendar_url(self.event)
+        self.assertIn("startdt=2024-03-15T22%3A00%3A00%2B00%3A00", microsoft_url)
+        self.assertIn("enddt=2024-03-15T23%3A00%3A00%2B00%3A00", microsoft_url)
+
+        ics_content = _build_ics_content(self.event)
+        self.assertIn("DTSTART:20240315T220000Z", ics_content)
+        self.assertIn("DTEND:20240315T230000Z", ics_content)
+
+
+class EventCalendarIcsViewTestCase(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Evento ICS",
+            slug="test-ics",
+            notify_email="organizer@example.com",
+            invitation_link="https://zoom.us/j/123",
+            event_datetime=tz.now() + timedelta(days=7),
+            duration_minutes=60,
+        )
+        self.ics_url = reverse("events:event-ics", kwargs={"slug": self.event.slug})
+
+    def test_ics_view_returns_correct_headers(self):
+        response = self.client.get(self.ics_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/calendar")
+        self.assertIn('attachment; filename="test-ics.ics"', response["Content-Disposition"])
+
+    def test_ics_view_body_contains_icalendar(self):
+        response = self.client.get(self.ics_url)
+        self.assertContains(response, "BEGIN:VCALENDAR")
+        self.assertContains(response, "SUMMARY:Evento ICS")
+        self.assertContains(response, "END:VCALENDAR")
+
+    def test_ics_view_404_when_event_inactive(self):
+        self.event.is_active = False
+        self.event.save()
+        response = self.client.get(self.ics_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_ics_view_404_when_datetime_missing(self):
+        self.event.event_datetime = None
+        self.event.save()
+        response = self.client.get(self.ics_url)
+        self.assertEqual(response.status_code, 404)
+
+
+class CalendarButtonsTemplateTestCase(TestCase):
+    def setUp(self):
+        self.event = Event.objects.create(
+            title="Evento Calendario",
+            slug="cal-event",
+            notify_email="organizer@example.com",
+            invitation_link="https://zoom.us/j/123",
+            event_datetime=tz.now() + timedelta(hours=3),
+            duration_minutes=120,
+        )
+        self.access_url = reverse("events:event-access", kwargs={"slug": self.event.slug})
+
+    def test_access_page_renders_calendar_buttons(self):
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        self.assertIn("calendar-section", content)
+        self.assertIn("Google Calendar", content)
+        self.assertIn("Outlook", content)
+        self.assertIn("Apple Calendar", content)
+
+        google_btn = re.search(r'<a[^>]*google\.com/calendar[^>]*>.*?Google Calendar.*?</a>', content, re.DOTALL)
+        self.assertIsNotNone(google_btn)
+        self.assertIn('target="_blank"', google_btn.group())
+        self.assertNotIn("download", google_btn.group())
+
+        outlook_btn = re.search(r'<a[^>]*outlook\.office\.com[^>]*>.*?Outlook.*?</a>', content, re.DOTALL)
+        self.assertIsNotNone(outlook_btn)
+        self.assertIn('target="_blank"', outlook_btn.group())
+        self.assertNotIn("download", outlook_btn.group())
+
+        apple_btn = re.search(r'<a[^>]*download[^>]*>.*?Apple Calendar.*?</a>', content, re.DOTALL)
+        self.assertIsNotNone(apple_btn)
+        self.assertIn("download", apple_btn.group())
+        self.assertNotIn('target="_blank"', apple_btn.group())
+
+    def test_access_page_404_when_datetime_missing(self):
+        self.event.event_datetime = None
+        self.event.save()
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 404)
 

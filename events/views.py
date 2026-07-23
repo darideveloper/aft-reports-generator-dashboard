@@ -1,9 +1,11 @@
 import logging
+import datetime
 from datetime import timedelta
+from urllib.parse import urlencode
 
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.shortcuts import get_object_or_404
@@ -96,6 +98,94 @@ def send_event_emails(lead):
             logger.error(f"Error al enviar confirmación de cliente por correo: {str(e)}")
 
 
+def _escape_ics_text(value):
+    if not value:
+        return ""
+    return value.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
+
+
+def _build_google_calendar_url(event):
+    if not event.event_datetime:
+        raise ValueError("Event must have event_datetime set")
+    utc_start = event.event_datetime.astimezone(datetime.timezone.utc)
+    end_dt = event.event_end_datetime
+    if end_dt is None or event.duration_minutes in (0, None):
+        utc_end = utc_start
+    else:
+        utc_end = end_dt.astimezone(datetime.timezone.utc)
+
+    fmt = "%Y%m%dT%H%M%SZ"
+    dates = f"{utc_start.strftime(fmt)}/{utc_end.strftime(fmt)}"
+
+    params = {
+        "action": "TEMPLATE",
+        "text": event.title,
+        "dates": dates,
+        "ctz": settings.TIME_ZONE,
+        "trp": "false",
+    }
+    if event.invitation_link:
+        params["location"] = event.invitation_link
+
+    return "https://www.google.com/calendar/render?" + urlencode(params)
+
+
+def _build_microsoft_calendar_url(event):
+    if not event.event_datetime:
+        raise ValueError("Event must have event_datetime set")
+    utc_start = event.event_datetime.astimezone(datetime.timezone.utc)
+    end_dt = event.event_end_datetime
+    if end_dt is None or event.duration_minutes in (0, None):
+        utc_end = utc_start
+    else:
+        utc_end = end_dt.astimezone(datetime.timezone.utc)
+
+    params = {
+        "subject": event.title,
+        "startdt": utc_start.isoformat(),
+        "enddt": utc_end.isoformat(),
+        "path": "/calendar/action/compose",
+        "rru": "addevent",
+    }
+    if event.invitation_link:
+        params["location"] = event.invitation_link
+
+    return "https://outlook.office.com/calendar/0/deeplink/compose?" + urlencode(params)
+
+
+def _build_ics_content(event):
+    if not event.event_datetime:
+        raise ValueError("Event must have event_datetime set")
+    utc_start = event.event_datetime.astimezone(datetime.timezone.utc)
+    end_dt = event.event_end_datetime
+    if end_dt is None or event.duration_minutes in (0, None):
+        utc_end = utc_start
+    else:
+        utc_end = end_dt.astimezone(datetime.timezone.utc)
+
+    fmt = "%Y%m%dT%H%M%SZ"
+    dtstamp = timezone.now().astimezone(datetime.timezone.utc).strftime(fmt)
+
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//AFT Dashboard//Eventos//ES",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        f"DTSTART:{utc_start.strftime(fmt)}",
+        f"DTEND:{utc_end.strftime(fmt)}",
+        f"SUMMARY:{_escape_ics_text(event.title)}",
+        f"UID:{event.slug}@aft-dashboard",
+        f"DTSTAMP:{dtstamp}",
+    ]
+    if event.invitation_link:
+        lines.append(f"LOCATION:{_escape_ics_text(event.invitation_link)}")
+    lines.append("END:VEVENT")
+    lines.append("END:VCALENDAR")
+    return "\r\n".join(lines) + "\r\n"
+
+
 @method_decorator(xframe_options_exempt, name="dispatch")
 class EventFormView(TemplateView):
     template_name = "events/form.html"
@@ -116,7 +206,6 @@ class EventAccessView(TemplateView):
         event = context["event"]
         now = timezone.now()
 
-        now_plus_1h = now + timedelta(hours=1)
         time_until_event = event.event_datetime - now
         total_seconds = int(time_until_event.total_seconds())
 
@@ -124,6 +213,12 @@ class EventAccessView(TemplateView):
             "total_seconds": total_seconds,
             "time_until_event": time_until_event,
         })
+
+        if event.event_datetime:
+            context["google_calendar_url"] = _build_google_calendar_url(event)
+            context["microsoft_calendar_url"] = _build_microsoft_calendar_url(event)
+            context["ics_url"] = reverse("events:event-ics", kwargs={"slug": event.slug})
+
         return context
 
     def get(self, request, *args, **kwargs):
@@ -131,7 +226,6 @@ class EventAccessView(TemplateView):
         event = get_object_or_404(Event, slug=slug, is_active=True)
 
         if not event.event_datetime or not event.invitation_link:
-            from django.http import Http404
             raise Http404("Evento sin enlace de invitación o fecha configurada.")
 
         now = timezone.now()
@@ -145,6 +239,17 @@ class EventAccessView(TemplateView):
             return HttpResponseRedirect(event.invitation_link)
 
         return super().get(request, event=event, *args, **kwargs)
+
+
+class EventCalendarIcsView(View):
+    def get(self, request, slug):
+        event = get_object_or_404(Event, slug=slug, is_active=True)
+        if not event.event_datetime:
+            raise Http404
+        content = _build_ics_content(event)
+        response = HttpResponse(content, content_type="text/calendar")
+        response["Content-Disposition"] = f'attachment; filename="{event.slug}.ics"'
+        return response
 
 
 class LeadSubmitView(APIView):

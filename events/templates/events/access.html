@@ -15,6 +15,13 @@
         .invitation-btn.visible { display: inline-block; }
         .invitation-btn:hover { background-color: #072a3e; }
         .fallback-text { font-size: 0.9rem; color: #64748b; margin-top: 16px; }
+
+        .calendar-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid #e2e8f0; }
+        .calendar-label { font-size: 0.85rem; color: #64748b; margin-bottom: 14px; }
+        .calendar-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .calendar-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 500; text-decoration: none; border: 1px solid #e2e8f0; background: #ffffff; color: #334155; transition: box-shadow 0.15s, border-color 0.15s; }
+        .calendar-btn:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        .calendar-btn svg { flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -28,6 +35,26 @@
         <a id="invitation-btn" href="{{ event.invitation_link }}"
            target="_blank" rel="noopener noreferrer"
            class="invitation-btn">{{ event.invitation_label_display }}</a>
+
+        {% if event.event_datetime %}
+        <div class="calendar-section">
+            <p class="calendar-label">Agregar a tu calendario:</p>
+            <div class="calendar-buttons">
+                <a href="{{ google_calendar_url }}" target="_blank" rel="noopener noreferrer" class="calendar-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#4285F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Google Calendar</span>
+                </a>
+                <a href="{{ microsoft_calendar_url }}" target="_blank" rel="noopener noreferrer" class="calendar-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0078D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                    <span>Outlook</span>
+                </a>
+                <a href="{{ ics_url }}" download class="calendar-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Apple Calendar</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
 
         <p class="fallback-text" id="fallback-text">
             El enlace estará disponible aproximadamente
