@@ -24,7 +24,7 @@
         <h2>¡Gracias por registrarte!</h2>
         
         <div class="message-body">
-            <p>Hola {% if lead.name %}{{ lead.name }}{% else %}participante{% endif %}</p>
+            <p>Hola {% if lead.name %}{{ lead.name|title }}{% else %}participante{% endif %}</p>
 
             <p>Queremos confirmarte que hemos recibido exitosamente tus datos para el evento: <strong>{{ event.title }}</strong></p>
 
