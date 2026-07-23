@@ -56,15 +56,6 @@
         </div>
         {% endif %}
 
-        <p class="fallback-text" id="fallback-text">
-            El enlace estará disponible aproximadamente
-            {% if time_until_event.days > 0 %}
-                {{ time_until_event.days }} día{{ time_until_event.days|pluralize:",s" }}
-            {% else %}
-                {{ time_until_event.seconds| floatformat:0 }} minutos
-            {% endif %}
-            antes del inicio del evento.
-        </p>
     </div>
 
     <script>
