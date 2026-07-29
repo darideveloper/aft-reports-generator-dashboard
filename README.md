@@ -36,7 +36,7 @@ python manage.py runserver
 
 ## Contact
 
-Developed by [Smooth Software Solutions (3S)](https://darideveloper.com)
+Developed by [Dari Developer](https://darideveloper.com)
 
 - 🌐 [darideveloper.com](https://darideveloper.com)
 - 💬 [WhatsApp](https://api.whatsapp.com/send?phone=5214493402622)
@@ -82,7 +82,7 @@ python manage.py runserver
 
 ## Contacto
 
-Desarrollado por [Smooth Software Solutions (3S)](https://darideveloper.com)
+Desarrollado por [Dari Developer](https://darideveloper.com)
 
 - 🌐 [darideveloper.com](https://darideveloper.com)
 - 💬 [WhatsApp](https://api.whatsapp.com/send?phone=5214493402622)
