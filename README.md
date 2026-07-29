@@ -1,5 +1,51 @@
 # AFT — Reports Generator Dashboard
 
+Admin backend of the **AFT (Alfabetización Tecnológica / Tech Literacy)** ecosystem, built for **LeadForward Global Solutions**. A technology skills assessment platform that manages surveys, participants, and generates individual and group PDF reports.
+
+## Tech Stack
+
+- **Django 4.2 + DRF** — Framework & REST API
+- **PostgreSQL** — Database
+- **ReportLab + WeasyPrint** — Individual & group PDF reports
+- **Matplotlib, NumPy, SciPy, Pandas** — Data analysis & charts
+- **Amazon S3 (django-storages + boto3)** — Cloud storage
+- **Django Jazzmin** — Modern admin panel
+- **n8n** — Webhooks for async report generation
+- **Docker + Gunicorn** — Deployment
+
+## Features
+
+- Multi-group surveys with weighted percentages and JSON modifiers
+- Participant management with 20 standardized positions and influence mapping
+- Individual PDF reports with bell curve charts and dynamic text
+- Group PDF reports with heatmaps, rankings and strategic profiles
+- Event system: embeddable forms, access gate, calendar, lead capture
+- 8 REST endpoints, 17 admin models, 11 management commands
+
+## Setup
+
+```bash
+cp .env.example .env
+# Configure environment variables
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+---
+
+## Contact
+
+Developed by [Smooth Software Solutions (3S)](https://darideveloper.com)
+
+- 🌐 [darideveloper.com](https://darideveloper.com)
+- 💬 [WhatsApp](https://api.whatsapp.com/send?phone=5214493402622)
+- 📂 [View project in portfolio](https://darideveloper.com/portafolio/aft)
+
+---
+
+# AFT — Reports Generator Dashboard
+
 Backend administrativo del ecosistema **AFT (Alfabetización Tecnológica)**, desarrollado para **LeadForward Global Solutions**. Plataforma de evaluación de competencias tecnológicas que gestiona encuestas, participantes y genera reportes individuales y grupales en PDF.
 
 ## Tech Stack
