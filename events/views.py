@@ -55,6 +55,17 @@ def send_event_emails(lead):
         access_relative_url = reverse("events:event-access", kwargs={"slug": event.slug})
         access_url = _resolve_absolute_url(access_relative_url)
 
+    google_url = None
+    microsoft_url = None
+    ics_absolute_url = None
+    ics_content = None
+    if event.event_datetime:
+        google_url = _build_google_calendar_url(event)
+        microsoft_url = _build_microsoft_calendar_url(event)
+        ics_relative_url = reverse("events:event-ics", kwargs={"slug": event.slug})
+        ics_absolute_url = _resolve_absolute_url(ics_relative_url)
+        ics_content = _build_ics_content(event)
+
     # 1. Admin Email Notification
     if event.notify_email:
         admin_subject = f"Nuevo registro: {event.title}"
@@ -82,9 +93,21 @@ def send_event_emails(lead):
         try:
             client_html = render_to_string(
                 "events/emails/client_confirmation.html",
-                {"lead": lead, "event": event, "branding": branding, "logo_url": logo_url, "access_url": access_url}
+                {
+                    "lead": lead, "event": event, "branding": branding,
+                    "logo_url": logo_url, "access_url": access_url,
+                    "google_url": google_url, "microsoft_url": microsoft_url,
+                    "ics_absolute_url": ics_absolute_url,
+                }
             )
             client_text = strip_tags(client_html)
+            if google_url:
+                client_text += (
+                    "\n\nAgregar a tu calendario:"
+                    f"\nGoogle Calendar: {google_url}"
+                    f"\nOutlook: {microsoft_url}"
+                    f"\nApple Calendar (.ics): {ics_absolute_url}"
+                )
 
             client_msg = EmailMultiAlternatives(
                 subject=client_subject,
@@ -93,6 +116,8 @@ def send_event_emails(lead):
                 to=[lead.email],
             )
             client_msg.attach_alternative(client_html, "text/html")
+            if ics_content:
+                client_msg.attach(f"{event.slug}.ics", ics_content, "text/calendar")
             client_msg.send()
         except Exception as e:
             logger.error(f"Error al enviar confirmación de cliente por correo: {str(e)}")

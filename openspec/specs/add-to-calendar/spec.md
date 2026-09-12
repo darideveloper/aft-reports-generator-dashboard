@@ -1,4 +1,9 @@
-## ADDED Requirements
+# add-to-calendar Specification
+
+## Purpose
+Defines how the events app generates Add-to-Calendar actions (Google Calendar links, Outlook links, downloadable `.ics` files) and renders calendar buttons on the access page and in the client confirmation email.
+
+## Requirements
 
 ### Requirement: Google Calendar link generation
 The system SHALL generate a pre-filled Google Calendar event creation URL from an Event's title, datetime, duration, and `invitation_link`. The URL SHALL use UTC dates with the `ctz` parameter set to `settings.TIME_ZONE`.
@@ -66,3 +71,14 @@ All calendar URLs and `.ics` files SHALL use UTC dates. The `ctz` parameter on t
 #### Scenario: UTC dates in generated URLs
 - **WHEN** an Event has `event_datetime` in `America/Mexico_City` timezone
 - **THEN** the Google and Outlook URLs and `.ics` SHALL contain the corresponding UTC date (e.g., `16:00 CST` → `22:00Z`)
+
+### Requirement: Calendar builders reused for email with absolute ICS URL
+The system SHALL reuse `_build_google_calendar_url`, `_build_microsoft_calendar_url`, and `_build_ics_content` for email rendering without duplicating date logic. The email SHALL use an absolute ICS download URL built with `reverse("events:event-ics")` + `_resolve_absolute_url`. Existing access-page buttons and ICS endpoint behavior SHALL remain unchanged.
+
+#### Scenario: Email context reuses builder output
+- **WHEN** `send_event_emails()` runs for an event with `event_datetime` set
+- **THEN** the template context `google_url` equals `_build_google_calendar_url(event)`, `microsoft_url` equals `_build_microsoft_calendar_url(event)`, and `ics_absolute_url` is an absolute URL (`http://` when `DEBUG=True`, otherwise `https://`) containing `/ics/`
+
+#### Scenario: Access page and ICS endpoint unchanged
+- **WHEN** the access page or `<slug>/ics/` endpoint is requested after this change
+- **THEN** responses match pre-change behavior (relative `ics_url` on access page still valid, endpoint headers and body unchanged)

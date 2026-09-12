@@ -614,7 +614,10 @@ class LongInvitationLinkRenderTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         client_html = mail.outbox[1].alternatives[0][0]
         self.assertNotIn("example.com/p", client_html)
-        self.assertNotIn("utm_source", client_html)
+        # Raw query string must never leak; the URL-encoded form inside the
+        # calendar buttons' location param (utm_source%3D...) is expected.
+        self.assertNotIn("?utm_source", client_html)
+        self.assertNotIn("utm_source=mail", client_html)
 
     def test_access_url_rendered_in_iframe_template(self):
         form_url = reverse("events:event-form", kwargs={"slug": self.event.slug})
@@ -1135,4 +1138,110 @@ class CalendarButtonsTemplateTestCase(TestCase):
         self.event.save()
         response = self.client.get(self.access_url)
         self.assertEqual(response.status_code, 404)
+
+
+class EmailCalendarInviteTestCase(APITestCase):
+    """Tests for the hybrid calendar section + ICS attachment in the client email."""
+
+    def _event(self, **overrides):
+        params = dict(
+            title="Evento Email Calendario",
+            slug="email-cal-event",
+            notify_email="organizer@example.com",
+            invitation_link="https://zoom.us/j/123",
+            event_datetime=tz.now() + timedelta(days=2),
+            duration_minutes=60,
+            name_active=True,
+            name_required=True,
+            position_active=False,
+            position_required=False,
+            email_active=True,
+            email_required=True,
+            phone_active=False,
+            phone_required=False,
+        )
+        params.update(overrides)
+        return Event.objects.create(**params)
+
+    def _post_lead(self, event):
+        url = reverse("lead-submit", kwargs={"slug": event.slug})
+        return self.client.post(url, {
+            "name": "Ana García",
+            "email": "ana@example.com",
+            "website": "",
+            "terms": True,
+        }, format="json")
+
+    def test_email_contains_calendar_section_and_no_raw_link(self):
+        event = self._event()
+        response = self._post_lead(event)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        client_html = mail.outbox[1].alternatives[0][0]
+        self.assertIn("Agregar a tu calendario:", client_html)
+        self.assertIn("google.com/calendar", client_html)
+        self.assertIn("outlook.office.com", client_html)
+        self.assertIn("/ics/", client_html)
+        self.assertIn('role="presentation"', client_html)
+        self.assertNotIn("https://zoom.us/j/123", client_html)
+
+    def test_email_omits_calendar_section_without_datetime(self):
+        event = self._event(event_datetime=None)
+        response = self._post_lead(event)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        client_html = mail.outbox[1].alternatives[0][0]
+        self.assertNotIn("Agregar a tu calendario:", client_html)
+        self.assertNotIn("google.com/calendar", client_html)
+        self.assertNotIn("outlook.office.com", client_html)
+        self.assertNotIn("/ics/", client_html)
+        self.assertEqual(mail.outbox[1].attachments, [])
+
+    def test_email_calendar_without_invitation_link(self):
+        event = self._event(invitation_link="")
+        response = self._post_lead(event)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        client_html = mail.outbox[1].alternatives[0][0]
+        self.assertIn("Agregar a tu calendario:", client_html)
+        # Access CTA requires invitation_link, calendar does not
+        self.assertNotIn("Acceder al evento", client_html)
+        self.assertEqual(len(mail.outbox[1].attachments), 1)
+
+    def test_email_ics_attachment_content(self):
+        event = self._event()
+        response = self._post_lead(event)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        attachments = mail.outbox[1].attachments
+        self.assertEqual(len(attachments), 1)
+        filename, content, mimetype = attachments[0]
+        self.assertEqual(filename, f"{event.slug}.ics")
+        self.assertEqual(mimetype, "text/calendar")
+        self.assertIn("BEGIN:VCALENDAR", content)
+        self.assertIn("DTSTART:", content)
+        self.assertIn("DTEND:", content)
+        self.assertIn(f"UID:{event.slug}@aft-dashboard", content)
+
+    def test_email_text_body_contains_calendar_urls(self):
+        event = self._event()
+        response = self._post_lead(event)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        text_body = mail.outbox[1].body
+        self.assertIn("google.com/calendar", text_body)
+        self.assertIn("outlook.office.com", text_body)
+        self.assertIn("/ics/", text_body)
+
+    def test_spam_submission_sends_no_email(self):
+        event = self._event()
+        url = reverse("lead-submit", kwargs={"slug": event.slug})
+        response = self.client.post(url, {
+            "name": "Spam Bot",
+            "email": "bot@spam.com",
+            "website": "http://spam-link.com",
+            "terms": True,
+        }, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(mail.outbox), 0)
 
