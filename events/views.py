@@ -237,6 +237,7 @@ class EventAccessView(TemplateView):
         context.update({
             "total_seconds": total_seconds,
             "time_until_event": time_until_event,
+            "early_seconds": (event.access_early_minutes or 0) * 60,
         })
 
         if event.event_datetime:
@@ -259,8 +260,8 @@ class EventAccessView(TemplateView):
             self.template_name = "events/ended.html"
             return self.render_to_response({"event": event})
 
-        now_plus_1h = now + timedelta(hours=1)
-        if now_plus_1h >= event.event_datetime:
+        early_open = now + timedelta(minutes=event.access_early_minutes or 0)
+        if early_open >= event.event_datetime:
             return HttpResponseRedirect(event.invitation_link)
 
         return super().get(request, event=event, *args, **kwargs)

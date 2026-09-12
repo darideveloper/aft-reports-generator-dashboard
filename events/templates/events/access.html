@@ -60,6 +60,7 @@
 
     <script>
         var totalSeconds = {{ total_seconds }};
+        var earlySeconds = {{ early_seconds }};
         var countdownEl = document.getElementById('countdown');
         var btnEl = document.getElementById('invitation-btn');
         var fallbackEl = document.getElementById('fallback-text');
@@ -81,7 +82,7 @@
             var s = totalSeconds % 60;
             countdownEl.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
 
-            if (totalSeconds <= 3600) {
+            if (totalSeconds <= earlySeconds) {
                 btnEl.classList.add('visible');
                 if (fallbackEl) fallbackEl.style.display = 'none';
             }

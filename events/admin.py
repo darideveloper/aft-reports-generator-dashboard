@@ -33,6 +33,7 @@ class EventAdmin(admin.ModelAdmin):
                 "invitation_label",
                 "event_datetime",
                 "duration_minutes",
+                "access_early_minutes",
             )
         }),
         ("Campos del Formulario (Activo)", {

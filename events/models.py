@@ -64,6 +64,14 @@ class Event(models.Model):
             "Debe ser mayor a 0 si se especifica una fecha y hora."
         ),
     )
+    access_early_minutes = models.PositiveIntegerField(
+        default=30,
+        verbose_name="Anticipación de acceso (minutos)",
+        help_text=(
+            "Minutos antes del inicio en que se muestra el enlace de invitación. "
+            "0 = solo desde el inicio."
+        ),
+    )
 
     # Dynamic Field Toggles (Active)
     name_active = models.BooleanField(default=True, verbose_name="Nombre activo")

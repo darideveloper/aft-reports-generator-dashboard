@@ -457,10 +457,12 @@ class InvitationLinkAdminTestCase(TestCase):
         self.assertIn('name="event_datetime_0"', content)
         self.assertIn('name="event_datetime_1"', content)
         self.assertIn('name="duration_minutes"', content)
+        self.assertIn('name="access_early_minutes"', content)
         self.assertIn("Enlace de invitación", content)
         self.assertIn("Texto del botón de invitación", content)
         self.assertIn("Fecha y hora del evento", content)
         self.assertIn("Duración (minutos)", content)
+        self.assertIn("Anticipación de acceso (minutos)", content)
 
     def test_admin_list_view_renders_clickable_link(self):
         Event.objects.create(
@@ -506,6 +508,7 @@ class InvitationLinkAdminTestCase(TestCase):
             "event_datetime_0": "",
             "event_datetime_1": "",
             "duration_minutes": "0",
+            "access_early_minutes": "30",
             # The remaining fieldsets are in the admin form; send their
             # current values so the form does not blank them out.
             "name_active": "on", "name_required": "on",
@@ -910,6 +913,54 @@ class EventAccessGateTestCase(TestCase):
         self.assertContains(response, "invitation-btn")
         self.assertContains(response, "countdown")
 
+    def test_redirects_within_default_30_min_window(self):
+        self._event(event_datetime=tz.now() + timedelta(minutes=20))
+        response = self.client.get(self.access_url)
+        self.assertRedirects(response, "https://zoom.us/j/123", fetch_redirect_response=False)
+
+    def test_renders_countdown_outside_default_30_min_window(self):
+        self._event(event_datetime=tz.now() + timedelta(minutes=60))
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/access.html")
+        self.assertEqual(response.context["early_seconds"], 30 * 60)
+
+    def test_custom_window_redirects_inside_window(self):
+        self._event(
+            event_datetime=tz.now() + timedelta(minutes=60),
+            access_early_minutes=90,
+        )
+        response = self.client.get(self.access_url)
+        self.assertRedirects(response, "https://zoom.us/j/123", fetch_redirect_response=False)
+
+    def test_custom_window_exposes_early_seconds(self):
+        self._event(
+            event_datetime=tz.now() + timedelta(minutes=120),
+            access_early_minutes=90,
+        )
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["early_seconds"], 90 * 60)
+        self.assertContains(response, "var earlySeconds = 5400")
+
+    def test_zero_window_blocks_early_redirect(self):
+        self._event(
+            event_datetime=tz.now() + timedelta(minutes=5),
+            access_early_minutes=0,
+        )
+        response = self.client.get(self.access_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/access.html")
+
+    def test_zero_window_redirects_once_started(self):
+        self._event(
+            event_datetime=tz.now() - timedelta(minutes=5),
+            duration_minutes=60,
+            access_early_minutes=0,
+        )
+        response = self.client.get(self.access_url)
+        self.assertRedirects(response, "https://zoom.us/j/123", fetch_redirect_response=False)
+
     def test_renders_ended_when_event_passed_with_duration(self):
         self._event(
             event_datetime=tz.now() - timedelta(hours=2),
@@ -961,6 +1012,30 @@ class EventModelValidationTestCase(TestCase):
             e.clean()
         except ValidationError:
             self.fail("clean() raised ValidationError when event_datetime is None")
+
+    def test_access_early_minutes_defaults_to_30(self):
+        e = Event.objects.create(
+            title="y", slug="y-default", notify_email="a@b.com",
+        )
+        self.assertEqual(e.access_early_minutes, 30)
+
+    def test_access_early_minutes_rejects_negatives(self):
+        # IntegerField range validators are backend-dependent (SQLite adds
+        # none), so assert via the form field — the path the admin uses.
+        form_field = Event._meta.get_field("access_early_minutes").formfield()
+        with self.assertRaises(ValidationError):
+            form_field.clean(-5)
+        self.assertEqual(form_field.clean(0), 0)
+
+    def test_access_early_minutes_admin_round_trip(self):
+        e = Event.objects.create(
+            title="w", slug="w-custom", notify_email="a@b.com",
+            event_datetime=tz.now() + timedelta(days=1),
+            duration_minutes=60,
+            access_early_minutes=90,
+        )
+        e.refresh_from_db()
+        self.assertEqual(e.access_early_minutes, 90)
 
 
 class CalendarUrlHelpersTestCase(TestCase):
