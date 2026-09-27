@@ -237,6 +237,15 @@
             </div>
             {% endif %}
 
+            <!-- Empresa -->
+            {% if event.company_active %}
+            <div class="form-group" id="group-company">
+                <label for="company">Empresa{% if event.company_required %}<span class="required">*</span>{% endif %}</label>
+                <input type="text" name="company" id="company" placeholder="Ej. Empresa S.A.">
+                <div class="error-message" id="error-company"></div>
+            </div>
+            {% endif %}
+
             <!-- Puesto de Trabajo -->
             {% if event.position_active %}
             <div class="form-group" id="group-job_position">
@@ -261,15 +270,6 @@
                 <label for="phone">Teléfono{% if event.phone_required %}<span class="required">*</span>{% endif %}</label>
                 <input type="tel" name="phone" id="phone" placeholder="Ej. +52 55 1234 5678">
                 <div class="error-message" id="error-phone"></div>
-            </div>
-            {% endif %}
-
-            <!-- Empresa -->
-            {% if event.company_active %}
-            <div class="form-group" id="group-company">
-                <label for="company">Empresa{% if event.company_required %}<span class="required">*</span>{% endif %}</label>
-                <input type="text" name="company" id="company" placeholder="Ej. Empresa S.A.">
-                <div class="error-message" id="error-company"></div>
             </div>
             {% endif %}
 
