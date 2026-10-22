@@ -4,6 +4,7 @@ whitenoise==6.2.0
 gunicorn>=24.1.1
 django-cors-headers==4.1.0
 python-dotenv==1.1.1
+certifi==2026.10.19  # drops compromised emSign roots (GHSA-6q48-6c7w-9gw2)
 
 # posgresql
 psycopg==3.2.3

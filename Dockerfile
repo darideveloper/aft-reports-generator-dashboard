@@ -74,12 +74,15 @@ WORKDIR /app
 COPY . /app/
 
 # Install system dependencies
+# python3.12 is in the install list to pull the current Ubuntu security revision:
+# the playwright base image ships 3.12.3-1ubuntu0.7, far behind noble-updates.
 RUN apt-get update && apt-get install -y \
     libpq-dev gcc \
     curl \
     wget \
     gnupg \
     ca-certificates \
+    python3.12 libpython3.12-stdlib \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
