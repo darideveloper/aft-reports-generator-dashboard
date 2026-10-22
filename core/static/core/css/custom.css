@@ -20,6 +20,18 @@ h1 img {
   width: 300px;
 }
 
+/* jazzmin 3.0.5 dropped the <h1> wrapper around the login/logout logo,
+   so size and centre it here instead. */
+.login-logo {
+  text-align: center;
+}
+
+.login-logo .logo-light,
+.login-logo .logo-dark {
+  width: 300px;
+  max-width: 100%;
+}
+
 #jazzy-logo img {
   box-shadow: none !important;
 }
