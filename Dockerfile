@@ -74,11 +74,13 @@ WORKDIR /app
 COPY . /app/
 
 # Install system dependencies
-# python3.12 is in the install list to pull the current Ubuntu security revision:
-# the playwright base image ships 3.12.3-1ubuntu0.7, far behind noble-updates.
-# Upgrading it restores PEP 668's EXTERNALLY-MANAGED marker, which this image
+# The playwright base lags behind noble-security, so upgrade the whole system
+# (tar, gzip, coreutils, perl...) and then pull the current python3.12 revision.
+# The upgrade restores PEP 668's EXTERNALLY-MANAGED marker, which this image
 # ships without, so it is removed again to keep pip usable from /usr/local.
-RUN apt-get update && apt-get install -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && apt-get upgrade -y -o Dpkg::Options::=--force-confold \
+    && apt-get install -y \
     libpq-dev gcc \
     curl \
     wget \
