@@ -1,8 +1,8 @@
 # base
-Django==4.2.7
+Django==5.2.18
 whitenoise==6.2.0
 gunicorn>=24.1.1
-django-cors-headers==4.1.0
+django-cors-headers==4.9.0
 python-dotenv==1.1.1
 certifi==2026.10.19  # drops compromised emSign roots (GHSA-6q48-6c7w-9gw2)
 
@@ -12,16 +12,16 @@ psycopg2-binary==2.9.10
 
 # images and s3
 pillow==11.0.0
-django-storages==1.13.2
+django-storages==1.14.6
 boto3==1.26.137
 
 # drf & jwt
-djangorestframework==3.15.2
-django-filter==24.3
+djangorestframework==3.18.3
+django-filter==26.2
 # djangorestframework-simplejwt==5.4.0
 
 # UI
-django-jazzmin==3.0.1
+django-jazzmin==3.0.5
 
 # testing
 selenium==4.20.0
