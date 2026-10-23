@@ -10,6 +10,7 @@ from survey import models
 from rest_framework.authtoken.models import Token
 
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 from survey.models import Question, QuestionOption
 
 
@@ -312,7 +313,7 @@ class Command(BaseCommand):
             list: A list of results containing status and server replies.
         """
 
-        url = "http://127.0.0.1:8000/api/response/"
+        url = f"{settings.HOST}/api/response/"
 
         headers = {
             "Authorization": f"Token {token}",
