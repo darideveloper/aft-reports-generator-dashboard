@@ -1,7 +1,7 @@
 import os
 import io
 import json
-from PyPDF2 import PdfWriter, PdfReader
+from pypdf import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import legal
 from reportlab.pdfbase import pdfmetrics

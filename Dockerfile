@@ -1,11 +1,8 @@
-#
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
-#
-# PLEASE DO NOT EDIT IT DIRECTLY.
-#
-
-# Use Python 3.12 slim image
-FROM mcr.microsoft.com/playwright/python:v1.54.0-noble
+# Base: official Playwright image (Ubuntu noble), kept because the per-minute
+# `generate_next_report` Coolify task renders charts with Chromium at runtime.
+# The Python interpreter comes from this distro, so CPython security backports
+# for this project depend on Ubuntu publishing them.
+FROM mcr.microsoft.com/playwright/python:v1.64.1-noble
 
 # ENV variables
 

@@ -19,7 +19,7 @@ from utils.media import get_media_url
 from utils.survey_calcs import SurveyCalcs
 
 import requests
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from playwright.sync_api import sync_playwright
 
 from unittest.mock import MagicMock, patch
