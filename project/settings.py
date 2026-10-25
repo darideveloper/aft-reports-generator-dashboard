@@ -446,3 +446,16 @@ BRANDING = {
 
 
 
+# Test runs go through the Django test client over plain HTTP: the production
+# HTTPS redirect would turn every request into a 301, and secure-only cookies
+# cannot be set. Must live at the END of the file — the security block above
+# assigns these unconditionally.
+# ALLOWED_HOSTS is production-only in the container, so the test client
+# (HTTP_HOST="localhost" / "testserver") gets a 400 without these.
+if IS_TESTING:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    for _test_host in ("localhost", "127.0.0.1", "testserver"):
+        if _test_host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_test_host)
